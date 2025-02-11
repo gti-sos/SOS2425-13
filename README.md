@@ -1,7 +1,7 @@
 ## SOS2425 - Grupo 13
 ### Team
 - [Blanca García Alonso](https://github.com/blancagrclns)
-- [Nombre Apellido](https://github.com/usuario2)
+- [Alvaro Morillo Navajas](https://github.com/alvmornav)
 - [Nombre Apellido](https://github.com/usuario3)
 
 ### Project Description
