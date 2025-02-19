@@ -2,7 +2,7 @@
 ### Team
 - [Blanca García Alonso](https://github.com/blancagrclns)
 - [Alvaro Morillo Navajas](https://github.com/alvmornav)
-- [Nombre Apellido](https://github.com/usuario3)
+- [Darío López Villegas](https://github.com/darlopvil)
 
 ### Project Description
 Wildfires affect water quality by increasing erosion and sedimentation, impacting water supply. National parks protect key watersheds but are vulnerable to fires that alter their ecosystem and water availability.

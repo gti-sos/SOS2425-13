@@ -10,8 +10,11 @@ let myArray = [1954, 1954, 1918, 1916, 1955, 1957, 1973, 1981, 1991, 1995];
 let sumaFechas = myArray.reduce( (acumulador, numero) => { return acumulador + numero; }, 0);
 let mediaFechas = sumaFechas / myArray.length;
 
-//Imprimiendo resultados
-log("Imprimiendo el array: " +myArray);
+
+//Usar JSON para imprimir el array
+log("Imprimiendo el array: " +JSON.stringify(myArray, null,2));
+
+//Imprimiendo la media
 log("Imprimiendo media de las fechas: " +mediaFechas);
 
 
