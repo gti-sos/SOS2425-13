@@ -6,6 +6,18 @@ const PORT = process.env.PORT || 16078;
 app.use(express.static("public"));
 
 
+app.get("/", (req, res) => {
+    res.send(`
+        <h1>Bienvenido a la API del Grupo 13</h1>
+        <p>Visita las siguientes rutas:</p>
+        <ul>
+            <li><a href="/cool">/cool</a> - Genera una cara ASCII</li>
+            <li><a href="/about">/about</a> - Información del grupo</li>
+            <li><a href="/samples/BGA">/samples/BGA</a> - API con datos</li>
+        </ul>
+    `);
+});
+
 app.get("/about", (req, res) => {
     res.sendFile(__dirname + "/public/about.html");
 });
