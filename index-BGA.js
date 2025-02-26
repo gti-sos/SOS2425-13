@@ -64,24 +64,9 @@ function calcularMediaProyectos(comunidad) {
     return media.toFixed(2);
 }
 
-// Función para calcular la media del amount por comunidad y año
-function calcularMediaAmount(year) {
-    let datosFiltrados = datos.filter(d => d.year === year);
-    let totalAmount = datosFiltrados.reduce((acc, d) => acc + d.amount, 0);
-    let media = totalAmount / datosFiltrados.length;
-    return media.toFixed(2);
-}
 
 
 log("\n MEDIA DE PROYECTOS POR COMUNIDAD \n");
 ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"].forEach(comunidad => {
     log(`Media de project_count en ${comunidad}: ${calcularMediaProyectos(comunidad)}`);
-});
-
-
-
-// Calcular e imprimir la media por año
-log("\n MEDIA DE CANTIDAD DE AGUA POR AÑO \n");
-[2015, 2016, 2017].forEach(year => {
-    log(`Media del amount en ${year}: ${calcularMediaAmount(year)}`);
 });
