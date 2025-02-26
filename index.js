@@ -40,9 +40,7 @@ app.get("/samples/BGA", (req, res) => {
 });
 
 
-
-
-//samples/BGA
+//PARTE BLANCA GARCÍA ALONSO
 
 const datosB = [
     { year: 2015, comunidad: "andalucia", amount: 12604168, project_count: 45 },
