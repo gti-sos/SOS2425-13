@@ -54,25 +54,7 @@ const datos = [
     { year: 2017, comunidad: "País Vasco", amount: 3194418, project_count: 18 }
 ];
 
-// Función para calcular la media del amount por comunidad (sin distinguir por año)
-function calcularMediaPorComunidad() {
-    let comunidadMap = {};
 
-    datos.forEach(d => {
-        if (!comunidadMap[d.comunidad]) {
-            comunidadMap[d.comunidad] = { total: 0, count: 0 };
-        }
-        comunidadMap[d.comunidad].total += d.amount;
-        comunidadMap[d.comunidad].count += 1;
-    });
-
-    let mediaPorComunidad = Object.keys(comunidadMap).map(comunidad => ({
-        comunidad: comunidad,
-        media_amount: (comunidadMap[comunidad].total / comunidadMap[comunidad].count).toFixed(2)
-    }));
-
-    return mediaPorComunidad;
-}
 
 
 // Función para calcular la media del amount por comunidad y año
@@ -82,16 +64,6 @@ function calcularMediaAmount(year) {
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
 }
-
-// Imprimir los datos
-//log("Imprimiendo los datos: " + JSON.stringify(datos, null, 2));
-
-// Calcular e imprimir la media por comunidad
-let medias = calcularMediaPorComunidad();
-log("\n MEDIA DE CANTIDAD DE AGUA POR COMUNIDAD AUTÓNOMA \n");
-medias.forEach(m =>  {
-    log(`Media del amount en ${m.comunidad}: ${m.media_amount}`);
-});
 
 
 // Calcular e imprimir la media por año
