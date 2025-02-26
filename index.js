@@ -1,12 +1,32 @@
 const express = require("express");
-const app = express();
 const cool = require("cool-ascii-faces");
-
+const app = express();
 const PORT = process.env.PORT || 16078;
+
+app.use(express.static("public"));
+
+
+app.get("/about", (req, res) => {
+    res.sendFile(__dirname + "/public/about.html");
+});
 
 app.get("/cool", (req, res) => {
     res.send(`<h1>${cool()}</h1>`);
 });
+
+app.get("/samples/BGA", (req, res) => {
+    let resultado = "<h2> MEDIA DE PROYECTOS POR COMUNIDAD</h2>";
+    const comunidades= ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"];
+   
+    
+
+    comunidades.forEach(comunidad => {
+        resultado  += `<p> <h4>Media de project_count en ${comunidad}:</h4> ${calcularMediaProyectos(comunidad)} </p>`;
+    });
+
+    res.send(resultado);
+});
+
 
 
 
@@ -69,19 +89,6 @@ function calcularMediaProyectos(comunidad) {
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
 }
-
-app.get("/samples/BGA", (req, res) => {
-    let resultado = "<h2> MEDIA DE PROYECTOS POR COMUNIDAD</h2>";
-    const comunidades= ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"];
-   
-    
-
-    comunidades.forEach(comunidad => {
-        resultado  += `<p> <h4>Media de project_count en ${comunidad}:</h4> ${calcularMediaProyectos(comunidad)} </p>`;
-    });
-
-    res.send(resultado);
-});
 
 // Iniciar el servidor
 app.listen(PORT, () => {
