@@ -4,7 +4,7 @@ function log(m) {
 }
 
 // Declaración del array con los datos
-const datos = [
+const datosB = [
     { year: 2015, comunidad: "andalucia", amount: 12604168, project_count: 45 },
     { year: 2015, comunidad: "aragon", amount: 5494284, project_count: 18 },
     { year: 2015, comunidad: "asturias", amount: 2319946, project_count: 8 },
@@ -54,11 +54,13 @@ const datos = [
     { year: 2017, comunidad: "pais vasco", amount: 3194418, project_count: 18 }
 ];
 
+module.exports = datosB;
+
 
 
 // Función para calcular la media del amount por comunidad y año
 function calcularMediaProyectos(comunidad) {
-    let datosFiltrados = datos.filter(d => d.comunidad === comunidad);
+    let datosFiltrados = datosB.filter(d => d.comunidad === comunidad);
     let totalAmount = datosFiltrados.reduce((acc, d) => acc + d.project_count, 0);
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
