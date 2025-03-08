@@ -30,9 +30,9 @@ const datosB = require("./index-BGA.js");
 
 app.get("/samples/BGA", (req, res) => {
     let resultado = "<h2> MEDIA DE PROYECTOS POR COMUNIDAD</h2>";
-    const comunidades= ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"];
+    const comunidades = ["andalucia", "aragon", "asturias", "baleares", "canarias", "cantabria", "castilla y leon", "castilla-La mancha", "catalunia", "valencia", "extremadura", "galicia", "madrid", "murcia", "pais vasco"];
     comunidades.forEach(comunidad => {
-        resultado  += `<p> <h4>Media de project_count en ${comunidad}:</h4> ${calcularMediaProyectos(comunidad)} </p>`;
+        resultado += `<p> <h4>Media de project_count en ${comunidad}:</h4> ${calcularMediaProyectos(comunidad)} </p>`;
     });
 
     res.send(resultado);
@@ -48,17 +48,37 @@ function calcularMediaProyectos(comunidad) {
 }
 
 
-//PARTE DARÍO LÓPEZ VILLEGAS
-const datosD = require("./index-DLV.js");
+//PARTE DARÍO
+
+
+const datosDario = require("./index-DLV.js");
+    
+//Algoritmo usado y replicado:
+function mediaParquesPorComunidad (){
+    let mapDeComunidades = {};
+    datosDario.datosD.forEach(d => {
+       
+        if (!mapDeComunidades[d.autonomous_community]) {
+            mapDeComunidades[d.autonomous_community] = { total: 0, count: 0 };
+        }
+       
+         mapDeComunidades[d.autonomous_community].total += d.current_area;
+         mapDeComunidades[d.autonomous_community].count += 1;
+    });
+    let mediaPorComunidad = Object.keys(mapDeComunidades).map(comunidad => ({
+        comunidad: comunidad,
+        media_current_area: (mapDeComunidades[comunidad].total / mapDeComunidades[comunidad].count).toFixed(2)
+    }));
+    return mediaPorComunidad;
+}
+
 
 app.get("/samples/DLV", (req, res) => {
-
-    let resultado = "\n MEDIA DE TODAS LAS ÁREAS DE PARQUES NATURALES \n";
-
-    let cantidadTotal = datosD.reduce((acc, d) => acc + d.current_area, 0);
-    let media = cantidadTotal / datosD.length;
-    resultado += (`Media de current_area en ${datosD.autonomous_community}: ${media.toFixed(2)}`);
-    
+        let medias = mediaParquesPorComunidad();
+    let resultado = ("\n MEDIA DE TODAS LAS ÁREAS DE LOS PARQUES NATURALES POR COMUNIDAD AUTÓNOMA \n");
+    medias.forEach(m =>  {
+    resultado += (`Media de todas las áreas de todos los parques naturales en ${m.comunidad}: ${m.media_current_area}`);
+});
     res.send(resultado);
 });
 
