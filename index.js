@@ -52,21 +52,18 @@ function calcularMediaProyectos(comunidad) {
 const datosD = require("./index-DLV.js");
 
 app.get("/samples/DLV", (req, res) => {
-    let resultado = "<h2> MEDIA DE TODAS LAS ÁREAS DE PARQUES NATURALES POR COMUNIDAD AUTÓNOMA </h2>";
-    const comunidades = ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"];
-    comunidades.forEach(comunidad => {
-        resultado += `<p> <h4>Media de current_area en ${comunidad}:</h4> ${calcularMediaPorComunidad(comunidad)} </p>`;
-    });
 
+    let resultado = "\n MEDIA DE TODAS LAS ÁREAS DE PARQUES NATURALES \n";
+
+    let cantidadTotal = datosD.reduce((acc, d) => acc + d.current_area, 0);
+    let media = cantidadTotal / datosD.length;
+    resultado += (`Media de current_area en ${datosD.autonomous_community}: ${media.toFixed(2)}`);
+    
     res.send(resultado);
 });
 
-function calcularMediaPorComunidad(comunidad) {
-    let datosFiltradosPorComunidadAutonoma = datosD.filter(x => x.autonomous_community === comunidad);
-    let cantidadTotal = datosFiltradosPorComunidadAutonoma.reduce((acc, d) => acc + d.current_area, 0);
-    let media = cantidadTotal / datosFiltradosPorComunidadAutonoma.length;
-    return media.toFixed(2);
-}
+
+
 
 
 // Iniciar el servidor

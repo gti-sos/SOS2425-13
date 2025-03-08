@@ -19,19 +19,20 @@ const datosD = [
 ];
 
 
-//Calcular la media por comunidad autónoma (autonomous_community)
-function calcularMediaPorComunidad(comunidad) {
-    let datosFiltradosPorComunidadAutonoma = datosD.filter(x => x.comunidad === comunidad);
-    let cantidadTotal = datosFiltradosPorComunidadAutonoma.reduce((acc, d) => acc + d.current_area, 0);
-    let media = cantidadTotal / datosFiltradosPorComunidadAutonoma.length;
-    return media.toFixed(2);
+//Calcular la media de las zonas de parques naturales
+function calcularMediaDeExtensionesDeParquesNaturales() {
+
+    log("\n MEDIA DE TODAS LAS ÁREAS DE PARQUES NATURALES \n");
+
+   
+    let cantidadTotal = datosD.reduce((acc, d) => acc + d.current_area, 0);
+    let media = cantidadTotal / datosD.length;
+    log(`Media de current_area en ${datosD.autonomous_community}: ${media.toFixed(2)}`);
+    
 }
 
+log(calcularMediaDeExtensionesDeParquesNaturales());
 
-log("\n MEDIA DE TODAS LAS ÁREAS DE PARQUES NATURALES POR COMUNIDAD AUTÓNOMA \n");
-["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"].forEach(comunidad => {
-    log(`Media de current_area en ${comunidad}: ${calcularMediaPorComunidad(comunidad)}`);
-});
 
 
 
