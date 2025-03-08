@@ -51,12 +51,12 @@ function calcularMediaProyectos(comunidad) {
 //PARTE DARÍO
 
 
-const datosDario = require("./index-DLV.js");
+const datosD = require("./index-DLV.js");
     
 //Algoritmo usado y replicado:
 function mediaParquesPorComunidad (){
     let mapDeComunidades = {};
-    datosDario.datosD.forEach(d => {
+    datosD.forEach(d => {
        
         if (!mapDeComunidades[d.autonomous_community]) {
             mapDeComunidades[d.autonomous_community] = { total: 0, count: 0 };

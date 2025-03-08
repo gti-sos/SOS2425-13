@@ -17,6 +17,7 @@ const datosD = [
     { national_park: "Archipiélago de Cabrera", declaration_date: 1991, autonomous_community: "Baleares", initial_area: 10021, current_area: 10021 },
   
 ];
+module.exports = datosD;
 
 
 //Funcion para calcular la extensión promedio de todos los parques naturales por comunidad autónoma
