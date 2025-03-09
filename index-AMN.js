@@ -56,7 +56,7 @@ function calcularMediaPorComunidad() {
 
 // Función para calcular la media de numero de incendios por comunidad y año
 function calcularMediaNumberOfAccidents(year) {
-    let datosFiltrados = datos.filter(d => d.year === year);
+    let datosFiltrados = datosAlvaro.filter(d => d.year === year);
     let totalNumberOfAccidents = datosFiltrados.reduce((acc, d) => acc + d.number_of_accidents, 0);
     let media = totalNumberOfAccidents / datosFiltrados.length;
     return media.toFixed(2);
