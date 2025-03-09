@@ -83,6 +83,32 @@ app.get("/samples/DLV", (req, res) => {
 });
 
 
+// PARTE ALVARO MORILLO
+
+const datosAlvaro = require("./index-AMN.js");
+
+function calcularMediaNumeroDeIncendios(comunidad) {
+    const datosFiltrados = datosAlvaro.filter(d => d.comunidad === comunidad);
+    if (datosFiltrados.length === 0) return "No hay datos disponibles";
+    const totalAccidentes = datosFiltrados.map(d => d.number_of_accidents).reduce((acc, num) => acc + num, 0);
+    return (totalAccidentes / datosFiltrados.length).toFixed(2);
+}
+
+
+app.get("/samples/AMN", (req, res) => {
+    const comunidades = [
+        "Andalucía", "Aragón", "Asturias", "Canarias", "Cantabria", "Castilla y León", "Castilla-La Mancha", "Cataluña", "Comunidad Valenciana", "Ceuta", "Comunidad de Madrid"
+    ];
+
+    const resultado = `
+        <h2>MEDIA DE ACCIDENTES FORESTALES POR COMUNIDAD</h2>
+        ${comunidades.map(comunidad => `
+            <p><strong>Media de número de accidentes forestales en ${comunidad}:</strong> ${calcularMediaNumeroDeIncendios(comunidad)}</p>
+        `).join("")}
+    `;
+
+    res.send(resultado);
+});
 
 
 

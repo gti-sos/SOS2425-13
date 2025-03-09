@@ -4,7 +4,7 @@ function log(m) {
 }
 
 // Declaración del array con los datos
-const datos = [
+const datosAlvaro = [
     { year: 2006, comunidad: "Andalucía", number_of_accidents: 8034, percentage_of_large_fires: 0.19 },
     { year: 2006, comunidad: "Aragón", number_of_accidents: 3877, percentage_of_large_fires: 0.39 },
     { year: 2006, comunidad: "Asturias", number_of_accidents: 17003, percentage_of_large_fires: 0.05 },
@@ -15,6 +15,7 @@ const datos = [
     { year: 2006, comunidad: "Castilla y León", number_of_accidents: 18343, percentage_of_large_firest: 0.27 },
     { year: 2006, comunidad: "Cataluña", number_of_accidents: 5756, percentage_of_large_fires: 0.17 },
     { year: 2006, comunidad: "Ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
+    { year: 2006, comunidad: "Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
 
     { year: 2016, comunidad: "Andalucía", number_of_accidents: 8347, percentage_of_large_fires: 0.17 },
     { year: 2016, comunidad: "Aragón", number_of_accidents: 3567, percentage_of_large_firest: 0.37 },
@@ -26,10 +27,13 @@ const datos = [
     { year: 2016, comunidad: "Castilla y León", number_of_accidents: 19100, percentage_of_large_fires: 0.23 },
     { year: 2016, comunidad: "Cataluña", number_of_accidents: 5345, percentage_of_large_fires: 0.17 },
     { year: 2016, comunidad: "Ceuta", number_of_accidents: 4, percentage_of_large_fires: 0 },
+    { year: 2016, comunidad: "Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
 
 ];
 
-// Función para calcular la media del amount por comunidad (sin distinguir por año)
+module.exports = datosAlvaro;
+
+// Función para calcular la media de numero de incendios por comunidad (sin distinguir por año)
 function calcularMediaPorComunidad() {
     let comunidadMap = {};
 
@@ -50,7 +54,7 @@ function calcularMediaPorComunidad() {
 }
 
 
-// Función para calcular la media del amount por comunidad y año
+// Función para calcular la media de numero de incendios por comunidad y año
 function calcularMediaNumberOfAccidents(year) {
     let datosFiltrados = datos.filter(d => d.year === year);
     let totalNumberOfAccidents = datosFiltrados.reduce((acc, d) => acc + d.number_of_accidents, 0);
@@ -58,8 +62,6 @@ function calcularMediaNumberOfAccidents(year) {
     return media.toFixed(2);
 }
 
-// Imprimir los datos
-//log("Imprimiendo los datos: " + JSON.stringify(datos, null, 2));
 
 // Calcular e imprimir la media por comunidad
 let medias = calcularMediaPorComunidad();
