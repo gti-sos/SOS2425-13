@@ -15,7 +15,7 @@ const datosAlvaro = [
     { year: 2006, comunidad: "Castilla y León", number_of_accidents: 18343, percentage_of_large_firest: 0.27 },
     { year: 2006, comunidad: "Cataluña", number_of_accidents: 5756, percentage_of_large_fires: 0.17 },
     { year: 2006, comunidad: "Ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
-    { year: 2006, comunidad: "Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
+    { year: 2006, comunidad: "Comunidad de Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
 
     { year: 2016, comunidad: "Andalucía", number_of_accidents: 8347, percentage_of_large_fires: 0.17 },
     { year: 2016, comunidad: "Aragón", number_of_accidents: 3567, percentage_of_large_firest: 0.37 },
@@ -27,7 +27,7 @@ const datosAlvaro = [
     { year: 2016, comunidad: "Castilla y León", number_of_accidents: 19100, percentage_of_large_fires: 0.23 },
     { year: 2016, comunidad: "Cataluña", number_of_accidents: 5345, percentage_of_large_fires: 0.17 },
     { year: 2016, comunidad: "Ceuta", number_of_accidents: 4, percentage_of_large_fires: 0 },
-    { year: 2016, comunidad: "Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
+    { year: 2016, comunidad: "Comunidad de Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
 
 ];
 
