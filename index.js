@@ -75,9 +75,9 @@ function mediaParquesPorComunidad (){
 
 app.get("/samples/DLV", (req, res) => {
         let medias = mediaParquesPorComunidad();
-    let resultado = ("\n MEDIA DE TODAS LAS ÁREAS DE LOS PARQUES NATURALES POR COMUNIDAD AUTÓNOMA \n");
+    let resultado = ("<h2>MEDIA DE TODAS LAS ÁREAS DE LOS PARQUES NATURALES POR COMUNIDAD AUTÓNOMA </h2>");
     medias.forEach(m =>  {
-    resultado += (`Media de todas las áreas de todos los parques naturales en ${m.comunidad}: ${m.media_current_area}`);
+    resultado += (`<p> <h4>Media de todas las áreas de todos los parques naturales en ${m.comunidad}:</h2> ${m.media_current_area}</p>`);
 });
     res.send(resultado);
 });
