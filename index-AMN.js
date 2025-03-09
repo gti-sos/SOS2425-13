@@ -37,7 +37,7 @@ module.exports = datosAlvaro;
 function calcularMediaPorComunidad() {
     let comunidadMap = {};
 
-    datos.forEach(d => {
+    datosAlvaro.forEach(d => {
         if (!comunidadMap[d.comunidad]) {
             comunidadMap[d.comunidad] = { total: 0, count: 0 };
         }
