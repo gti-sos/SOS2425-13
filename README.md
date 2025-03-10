@@ -23,6 +23,3 @@ This comprehensive approach will contribute to the development of more efficient
 <p><a href="https://sos2425-13.onrender.com/samples/DLV" target="_blank">Darío López Villegas</a></p>
 <p><a href="https://sos2425-13.onrender.com/samples/AMN" target="_blank">Alvaro Morillo Navajas</a></p>
 
-
-### URL
-https://sos2425-13.onrender.com
