@@ -15,6 +15,14 @@ This comprehensive approach will contribute to the development of more efficient
 ### Repository
 - [https://github.com/gti-sos/SOS2425-13](https://github.com/gti-sos/SOS2425-13)
 
+<h2>URL</h2>
+    <p><a href="https://sos2425-13.onrender.com" target="_blank">https://sos2425-13.onrender.com</a></p>
+    
+    <h2>APIs</h2>
+    <p><a href="https://sos2425-13.onrender.com/samples/BGA" target="_blank">Blanca García Alonso</a></p>
+    <p><a href="https://sos2425-13.onrender.com/samples/DLV" target="_blank">Darío López Villegas</a></p>
+    <p><a href="https://sos2425-13.onrender.com/samples/AMN" target="_blank">Alvaro Morillo Navajas</a></p>
+
 
 ### URL
 https://sos2425-13.onrender.com
