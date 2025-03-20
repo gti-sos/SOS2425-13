@@ -2,8 +2,10 @@ const express = require("express");
 const cool = require("cool-ascii-faces");
 const app = express();
 const PORT = process.env.PORT || 16078;
+const BASE_API = "/api/v1";
 
 app.use(express.static("public"));
+app.use(express.json()); //Para que pueda interpretar el body de las peticiones POST
 
 
 app.get("/", (req, res) => {
@@ -53,7 +55,7 @@ function calcularMediaProyectos(comunidad) {
 
 const datosD = require("./index-DLV.js");
     
-//Algoritmo usado y replicado:
+//L04 - Media de todas las áreas de los parques naturales por comunidad autónoma
 function mediaParquesPorComunidad (){
     let mapDeComunidades = {};
     datosD.forEach(d => {
@@ -80,6 +82,31 @@ app.get("/samples/DLV", (req, res) => {
     resultado += (`<p> <h4>Media de todas las áreas de todos los parques naturales en ${m.comunidad}:</h2> ${m.media_current_area}</p>`);
 });
     res.send(resultado);
+});
+
+//L05
+let nuevosParques = [
+    { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
+    { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
+    { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
+    { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
+    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
+];
+
+app.get(BASE_API + "/national-parks", (request, response) => {
+    console.log("Has accedido a la API de darlopvil - national-parks");
+    response.send(JSON.stringify(datosD,null,2));
+    
+});
+
+app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
+    console.log("Devolviendo 10 datos iniciales");
+    response.send(JSON.stringify(nuevosParques,null,2));
 });
 
 
