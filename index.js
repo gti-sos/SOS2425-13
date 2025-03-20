@@ -50,7 +50,7 @@ function calcularMediaProyectos(comunidad) {
 }
 
 
-//PARTE DARÍO
+                            /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
 
 
 const datosD = require("./index-DLV.js");
@@ -97,17 +97,21 @@ let nuevosParques = [
     { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
     { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
 ];
-
-app.get(BASE_API + "/national-parks", (request, response) => {
-    console.log("Has accedido a la API de darlopvil - national-parks");
-    response.send(JSON.stringify(datosD,null,2));
-    
-});
-
+// GET al recurso /national-parks/loadInitialData
 app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
     console.log("Devolviendo 10 datos iniciales");
     response.send(JSON.stringify(nuevosParques,null,2));
 });
+
+// GET al recurso /national-parks
+app.get(BASE_API + "/national-parks", (request, response) => {
+    console.log("Has accedido a la API de darlopvil - national-parks");
+    response.send(JSON.stringify(datosD,null,2));
+    response.sendStatus(200);
+    
+});
+
+
 
 
 // PARTE ALVARO MORILLO
