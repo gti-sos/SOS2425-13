@@ -3,6 +3,7 @@ const cool = require("cool-ascii-faces");
 const app = express();
 const PORT = process.env.PORT || 16078;
 const BASE_API = "/api/v1";
+app.use(express.json)
 
 app.use(express.static("public"));
 app.use(express.json()); //Para que pueda interpretar el body de las peticiones POST
@@ -26,10 +27,12 @@ app.get("/cool", (req, res) => {
 
 
 
-//PARTE BLANCA GARCÍA ALONSO
+
+                            /*  -----------------------------------     PARTE BLANCA     ----------------------------------------  */
+
 const datosB = require("./index-BGA.js");
 
-
+//L04
 app.get("/samples/BGA", (req, res) => {
     let resultado = "<h2> MEDIA DE PROYECTOS POR COMUNIDAD</h2>";
     const comunidades = ["andalucia", "aragon", "asturias", "baleares", "canarias", "cantabria", "castilla y leon", "castilla-La mancha", "catalunia", "valencia", "extremadura", "galicia", "madrid", "murcia", "pais vasco"];
@@ -48,6 +51,34 @@ function calcularMediaProyectos(comunidad) {
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
 }
+
+//L05
+
+let nuevasAyudas=[
+    {year:"2010",autonomous_community:"andalucia",amount:"5447744",benefited_population:"13599",project_count:"60"}];
+
+app.get(BASE_API + "/water-supply-improvements/loadInitialData", (request, response) => {
+    console.log("Devolviendo 10 datos iniciales");
+    response.send(JSON.stringify(nuevasAyudas,null,2));
+});
+
+app.get(BASE_API + "/water-supply-improvements", (request, response) => {
+    console.log("Has accedido a la API de blagaralo - water-supply-improvements");
+    response.send(JSON.stringify(datosB,null,2));
+    response.sendStatus(200);
+    
+});
+
+app.post(BASE_API+ "/water-supply-improvements",(reques,response)=>{
+    console.log("POST to + /water-supply-improvements");
+    console.log(`<${request.body}>`);
+    let newImprovements = JSON.parse(reques,body);
+    nuevasAyudas.push(newImprovements);
+    response.sendStatus(201);
+})
+
+
+
 
 
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
@@ -114,7 +145,9 @@ app.get(BASE_API + "/national-parks", (request, response) => {
 
 
 
-// PARTE ALVARO MORILLO
+
+                            /*  -----------------------------------     PARTE ALVARO     ----------------------------------------  */
+
 
 const datosAlvaro = require("./index-AMN.js");
 
