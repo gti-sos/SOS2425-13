@@ -124,36 +124,133 @@ app.get("/samples/DLV", (req, res) => {
 });
 
 //L05
-let nuevosParques = [
-    { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
-    { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
-    { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
-    { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
-    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
-];
-// GET al recurso /national-parks/loadInitialData
-app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
-    console.log("Devolviendo 10 datos iniciales");
-    response.send(JSON.stringify(nuevosParques,null,2));
-});
+
 
 // GET al recurso /national-parks
+/*
+Debe tener desplegado en Render una API REST funcional ofreciendo su fuente de datos. 
+La API debe estar desplegada (e integrada con los compañeros de grupo) en la dirección: https://sos2425-XX.onrender.com/api/v1/FFFFF  
+(Siendo XX el numero de grupo relleno con ceros y FFFFF el nombre del recurso).
+
+*/
 app.get(BASE_API + "/national-parks", (request, response) => {
-    console.log("Has accedido a la API de darlopvil - national-parks");
+    console.log("New GET to /national-parks");
+
     response.send(JSON.stringify(datosD,null,2));
     response.sendStatus(200);
     
 });
 
+// GET al recurso /national-parks/loadInitialData
+/*
+El recurso debe contener una ruta /api/v1/FFFFF/loadInitialData que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
+
+*/
+app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
+    console.log("New GET to /national-parks/loadInitialData");
+
+    if(datosD.length ===0){
+        let nuevosParques = [
+            { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
+            { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
+            { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
+            { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
+            { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
+        ];
+        console.log("Datos iniciales cargados correctamente");
+        response.send({message: "Datos iniciales cargados correctamente", data: nuevosParques});
+        response.sendStatus(200);   
+    }else{
+        console.log("Ya existen datos en el array. No se sobreescriben");
+        response.send({message: "Ya existen datos en el array", data: nuevosParques});
+        response.sendStatus(200);
+    }
+
+   
+});
 
 
+/*
+14. -
+La API debe cumplir con las buenas prácticas definidas en los laboratorios:
+    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
+    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
+    -No se debe devolver HTML en ningún caso
+
+*/
+
+// -Deben implementarse todos los métodos de la tabla azul (vistos en el L05) + Códigos de estado
+// a- POST a /api/v1/national-parks
+app.post(BASE_API + "/national-parks", (request, response) => {
+    console.log("New POST to /national-parks");
+    let newPark = request.body;
+
+    //Si el body de la petición no tiene al menos alguno de los campos obligatorios, devolvemos un error 400 (mala sintaxis)
+    if(!newPark.national_park || !newPark.declaration_date || !newPark.autonomous_community || !newPark.initial_area || !newPark.current_area){
+        return response.status(400).send({error: "Faltan campos obligatorios"});
+
+    }
+
+    //Verifico que no exista ya un parque con el mismo nombre
+    let parkExists = datosD.find(p => p.national_park === newPark.national_park);
+    if(parkExists){
+        return response.status(409).send({error: "Ya existe un parque con ese nombre"});
+    }
+
+    //Si todo está correcto, añado el nuevo parque al array de datos
+    datosD.push(newPark);
+    response.status(201).send({message: "Parque añadido correctamente", data: newPark});
+});
+// a- POST a /api/v1/national-parks/Teide
+app.post(BASE_API + "/national-parks/:name", (request, response) => {
+    console.log("New POST to /national-parks/:name");
+
+    return response.status(405).send({error: "Método no permitido"});
+});
 
 
+//b- GET a /api/v1/national-parks/Teide
+app.get(BASE_API + "/national-parks/:name", (request, response) => {
+    console.log("New GET to /national-parks/:name");
+    let parkName = request.params.name; //request params es un objeto que contiene los valores de los parámetros de la URL
+    let park = datosD.find(p => p.national_park === parkName);
+    if(park.length === 0){
+        return response.status(404).send({error: "Parque no encontrado"});
+    }else{
+       
+        return response.status(200).send(park);
+    }
+});
+
+//c- PUT a /api/v1/national-parks
+app.put(BASE_API + "/national-parks", (request, response) => {
+    console.log("New PUT to /national-parks");
+    return response.status(405).send({error: "Método no permitido"});
+});
+
+//c- PUT a /api/v1/national-parks/Teide
+app.put(BASE_API + "/national-parks/:name", (request, response) => {
+    console.log("New PUT to /national-parks/:name");
+    let parkName = request.params.name;
+
+    
+    let park = datosD.find(p => p.national_park === parkName);
+    //Si no existe el parque, devuelvo un error 404
+    if(park.length === 0){
+        return response.status(404).send({error: "Parque no encontrado. No puedo actualizarlo"});
+    }
+    let park_body = request.body;
+    //Si el body del request no existe o está vacío, devuelvo un error 400
+    if(!park_body|| Object.keys(park_body).length === 0){
+        return response.status(400).send({error: "Petición mal formada: No hay datos en el array de la solicitud"});
+    }
+
+});
                             /*  -----------------------------------     PARTE ALVARO     ----------------------------------------  */
 
 
@@ -184,7 +281,10 @@ app.get("/samples/AMN", (req, res) => {
 
 
 
+
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
 });
+
+
