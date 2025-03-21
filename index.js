@@ -3,7 +3,7 @@ const cool = require("cool-ascii-faces");
 const app = express();
 const PORT = process.env.PORT || 16078;
 const BASE_API = "/api/v1";
-app.use(express.json)
+
 
 app.use(express.static("public"));
 app.use(express.json()); //Para que pueda interpretar el body de las peticiones POST
