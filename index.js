@@ -70,7 +70,7 @@ app.get(BASE_API + "/water-supply-improvements", (request, response) => {
 });
 
 app.post(BASE_API+ "/water-supply-improvements/loadInitialData",(reques,response)=>{
-    console.log("POST to + /water-supply-improvements");
+    console.log("POST to + /water-supply-improvements/loadInitialData");
     console.log(`<${request.body}>`);
     let newImprovements = JSON.parse(reques,body);
     nuevasAyudas.push(newImprovements);
