@@ -53,7 +53,7 @@ function calcularMediaProyectos(comunidad) {
 }
 
 //L05
-
+/*
 let nuevasAyudas=[
     {year:"2010",autonomous_community:"andalucia",amount:"5447744",benefited_population:"13599",project_count:"60"}];
 
@@ -78,7 +78,7 @@ app.post(BASE_API+ "/water-supply-improvements",(reques,response)=>{
 })
 
 
-
+/*
 
 
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
