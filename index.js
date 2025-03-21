@@ -62,25 +62,25 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (request, respo
     response.send(JSON.stringify(nuevasAyudas,null,2));
 });
 
-app.get(BASE_API + "/water-supply-improvements", (request, response) => {
+app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("Has accedido a la API de blagaralo - water-supply-improvements");
     response.send(JSON.stringify(datosB,null,2));
     response.sendStatus(200);
     
 });
 
-app.post(BASE_API+ "/water-supply-improvements/loadInitialData",(reques,response)=>{
+app.post(BASE_API+ "/water-supply-improvements/loadInitialData",(req,res)=>{
     console.log("POST to + /water-supply-improvements/loadInitialData");
-    console.log(`<${request.body}>`);
-    let newImprovements = JSON.parse(reques,body);
+    console.log(`<${req.body}>`);
+    let newImprovements = req.body;
     nuevasAyudas.push(newImprovements);
     response.sendStatus(201);
 })
 
-app.post(BASE_API+ "/water-supply-improvements",(reques,response)=>{
+app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     console.log("POST to + /water-supply-improvements");
-    console.log(`<${request.body}>`);
-    let newImprovements = JSON.parse(reques,body);
+    console.log(`<${req.body}>`);
+    let newImprovements = req.body;
     nuevasAyudas.push(newImprovements);
     response.sendStatus(201);
 })
