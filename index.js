@@ -71,7 +71,7 @@ app.get(BASE_API + "/water-supply-improvements", (request, response) => {
 
 app.post(BASE_API+ "/water-supply-improvements",(reques,response)=>{
     console.log("POST to + /water-supply-improvements");
-    console.log(`<${request.body}>`);
+    //console.log(`<${request.body}>`);
     let newImprovements = JSON.parse(reques,body);
     nuevasAyudas.push(newImprovements);
     response.sendStatus(201);
