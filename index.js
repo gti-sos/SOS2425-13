@@ -53,7 +53,7 @@ function calcularMediaProyectos(comunidad) {
 }
 
 //L05
-/*
+
 let nuevasAyudas=[
     {year:"2010",autonomous_community:"andalucia",amount:"5447744",benefited_population:"13599",project_count:"60"}];
 
@@ -71,14 +71,14 @@ app.get(BASE_API + "/water-supply-improvements", (request, response) => {
 
 app.post(BASE_API+ "/water-supply-improvements",(reques,response)=>{
     console.log("POST to + /water-supply-improvements");
-    //console.log(`<${request.body}>`);
+    console.log(`<${request.body}>`);
     let newImprovements = JSON.parse(reques,body);
     nuevasAyudas.push(newImprovements);
     response.sendStatus(201);
 })
 
 
-/*
+
 
 
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
