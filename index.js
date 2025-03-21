@@ -74,7 +74,7 @@ app.post(BASE_API+ "/water-supply-improvements/loadInitialData",(req,res)=>{
     console.log(`<${req.body}>`);
     let newImprovements = req.body;
     nuevasAyudas.push(newImprovements);
-    response.sendStatus(201);
+    res.sendStatus(201);
 })
 
 app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
@@ -82,7 +82,7 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     console.log(`<${req.body}>`);
     let newImprovements = req.body;
     nuevasAyudas.push(newImprovements);
-    response.sendStatus(201);
+    res.sendStatus(201);
 })
 
 
