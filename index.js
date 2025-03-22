@@ -129,7 +129,7 @@ app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
     }
     
     // Eliminar from y to de los query params para procesarlos separadamente
-    const { from, to, ...otherParams } = request.query;
+    const { from, to, ...otherParams } = req.query;
 
     // Procesar el resto de parámetros de consulta
     if(Object.keys(otherParams).length > 0) {
@@ -147,7 +147,7 @@ app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
     }
     
     // Enviar datos filtrados (array vacío si no hay coincidencias)
-    return response.status(200).send(filterDataB);
+    return res.status(200).send(filterDataB);
 });
 
 
