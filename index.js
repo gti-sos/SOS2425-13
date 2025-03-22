@@ -120,8 +120,8 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     
 //POST 2.- Si está repetido el campo -> error
 
-let improvementsExist= datosB.find(i => i.year == newImprovements.year 
-    && i.autonomous_community== newImprovements.autonomous_community);
+let improvementsExist= datosB.find(i => i.year === newImprovements.year 
+    && i.autonomous_community === newImprovements.autonomous_community);
     if(improvementsExist){
         return res.status(409).send({error:"Ya existe una ayuda para esa comunidad en ese año"})
     }
