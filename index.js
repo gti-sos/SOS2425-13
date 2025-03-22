@@ -100,7 +100,60 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     -No se debe devolver HTML en ningún caso
 */
 
-//POST 1.- Si falta algún campo -> error 
+//GET 1
+
+app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
+    console.log("New GET to /water-supply-improvements");
+
+    if(datosB.length===0){
+        return res.status(404).send({
+            error: "No hay datos cargados",
+            message: "Hacer GET a loadInitalData para cargar datos de prueba"
+        });
+    }
+
+    //Creación de copia para no machacar datos
+    let filterDataB =[...datosB];
+
+    //Parametros especiales
+    const fromYearB = req.query.from ? parseInt(req.query.from) : null;
+    const toYearB = req.query.to ? parseInt(req.query.to) : null;
+
+    // Aplicar filtros de rango si están presentes
+    if (fromYearB !== null && !isNaN(fromYearB)) {
+        filterDataB = filterDataB.filter(improvements => improvements.declaration_date >= fromYearB);
+    }
+    
+    if (toYearB !== null && !isNaN(toYearB)) {
+        filterDataB = filterDataB.filter(improvements => improvements.declaration_date <= toYearB);
+    }
+    
+    // Eliminar from y to de los query params para procesarlos separadamente
+    const { from, to, ...otherParams } = request.query;
+
+    // Procesar el resto de parámetros de consulta
+    if(Object.keys(otherParams).length > 0) {
+        for (const [key, value] of Object.entries(otherParams)) {
+            if (filterDataB.length > 0 && key in filterDataB[0]) {
+                // Si el campo es numérico, comparar con valores numéricos
+                if (typeof filterDataB[0][key] === 'number') {
+                    filterDataB = filterDataB.filter(improvements => improvements[key] === parseInt(value));
+                } else {
+                    // Para campos de texto, hacer búsqueda exacta
+                    filterDataB = filterDataB.filter(improvements => improvements[key] === value);
+                }
+            }
+        }
+    }
+    
+    // Enviar datos filtrados (array vacío si no hay coincidencias)
+    return response.status(200).send(filterDataB);
+});
+
+
+
+
+//POST 2.- Si falta algún campo -> error 
 
 app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     let newImprovements = req.body;
@@ -130,7 +183,7 @@ let improvementsExist= datosB.find(i => i.year === newImprovements.year
     res.sendStatus(201);
 });
 
-//POST 3.- Error para recurso especifico
+//POST 2.- Error para recurso especifico
 app.post(BASE_API+ "/water-supply-improvements:year",(req,res)=>{
     console.log("New POST to /water-supply-improvements:year");
 
