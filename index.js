@@ -36,8 +36,8 @@ const datosB = require("./index-BGA.js");
 app.get("/samples/BGA", (req, res) => {
     let resultado = "<h2> MEDIA DE PROYECTOS POR COMUNIDAD</h2>";
     const comunidades = ["andalucia", "aragon", "asturias", "baleares", "canarias", "cantabria", "castilla y leon", "castilla-La mancha", "catalunia", "valencia", "extremadura", "galicia", "madrid", "murcia", "pais vasco"];
-    comunidades.forEach(comunidad => {
-        resultado += `<p> <h4>Media de project_count en ${comunidad}:</h4> ${calcularMediaProyectos(comunidad)} </p>`;
+    comunidades.forEach(autonomous_community => {
+        resultado += `<p> <h4>Media de project_count en ${autonomous_community}:</h4> ${calcularMediaProyectos(autonomous_community)} </p>`;
     });
 
     res.send(resultado);
@@ -45,8 +45,8 @@ app.get("/samples/BGA", (req, res) => {
 
 
 
-function calcularMediaProyectos(comunidad) {
-    let datosFiltrados = datosB.filter(d => d.comunidad === comunidad);
+function calcularMediaProyectos(autonomous_community) {
+    let datosFiltrados = datosB.filter(d => d.autonomous_community === autonomous_community);
     let totalAmount = datosFiltrados.reduce((acc, d) => acc + d.project_count, 0);
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
@@ -166,16 +166,16 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
     }
 
     // 2. Verificar si es una fecha (año)
-    const yearParam = parseInt(param);
-    if (!isNaN(yearParam)) {
-        const improvementsByYear = datosB.filter(i => i.year === yearParam);
+    const yearParamB = parseInt(param);
+    if (!isNaN(yearParamB)) {
+        const improvementsByYear = datosB.filter(i => i.year === improvementsByYear);
 
         if (improvementsByYear.length > 0) {
             return res.status(200).send(improvementsByYear);
         } else {
             return res.status(404).send({
                 error: "No se encontraron mejoras en el suministro de agua para el año proporcionado",
-                message: `No se encontraron datos de mejoras en el año ${yearParam}`
+                message: `No se encontraron datos de mejoras en el año ${yearParamB}`
             });
         }
     }
@@ -230,10 +230,10 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
 app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     let newImprovements = req.body;
     const missingFieldsB=[];
-    if(!newImprovements.autonomous_community) missing_fields.push("autonomous_comunity");
-    if(!newImprovements.amount) missing_fields.push("amount");
-    if(!newImprovements.benefited_population) missing_fields.push("benefited_population");
-    if(!newImprovements.project_count) missing_fields.push("project_count");
+    if(!newImprovements.autonomous_community) missingFieldsB.push("autonomous_comunity");
+    if(!newImprovements.amount) missingFieldsB.push("amount");
+    if(!newImprovements.benefited_population) missingFieldsB.push("benefited_population");
+    if(!newImprovements.project_count) missingFieldsB.push("project_count");
  
     if(missingFieldsB>0){
         return res.status(400).send({
