@@ -93,12 +93,7 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
 });
 
 
-/*
-14. La API debe cumplir con las buenas prácticas definidas en los laboratorios:
-    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
-    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
-    -No se debe devolver HTML en ningún caso
-*/
+
 
 //GET 1.- Creación petición get
 
@@ -224,6 +219,12 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     }
 });
 
+/*
+14. La API debe cumplir con las buenas prácticas definidas en los laboratorios:
+    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
+    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
+    -No se debe devolver HTML en ningún caso
+*/
 
 //POST 1.- Si falta algún campo -> error 
 
@@ -265,34 +266,139 @@ app.post(BASE_API+ "/water-supply-improvements:year",(req,res)=>{
 });
 
 
+//GET 1.- 
 
-/*
-app.get(BASE_API + "/water-supply-improvements", (req, res) => {
-    console.log("Has accedido a la API de blagaralo - water-supply-improvements");
-    response.send(JSON.stringify(datosB,null,2));
-    response.sendStatus(200);
+app.get(BASE_API + "/water-supply-improvements/:name", (req, res) => {
+    console.log("New GET to /water-supply-improvements/:name");
+
+    let nameParam = req.params.name; // Parámetro de la URL
+    // Buscar en datosB usando el parámetro 'name' (puede ser una comunidad autónoma o un año)
     
+    // Intentar buscar si es una comunidad autónoma
+    let improvementsByCommunity = datosB.filter(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
+    
+    // Si no es una comunidad autónoma, intentar buscar si es un año
+    if (improvementsByCommunity.length === 0) {
+        let yearParam = parseInt(nameParam);
+        if (!isNaN(yearParam)) {
+            improvementsByCommunity = datosB.filter(i => i.year === yearParam);
+        }
+    }
+    
+    // Si se encuentran datos correspondientes a la comunidad autónoma o el año, devolver los resultados
+    if (improvementsByCommunity.length > 0) {
+        return response.status(200).send(improvementsByCommunity);
+    }
+
+    // Si no se encuentra ningún dato, devolver 404
+    return response.status(404).send({
+        error: "No se encontró el recurso",
+        message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
+    });
 });
 
-app.post(BASE_API+ "/water-supply-improvements/loadInitialData",(req,res)=>{
-    console.log("POST to + /water-supply-improvements/loadInitialData");
-    console.log(`<${req.body}>`);
-    let newImprovements = req.body;
-    nuevasAyudas.push(newImprovements);
-    res.sendStatus(201);
+//PUT 1.- Cambiar todo el dato
+
+app.put(BASE_API +"/water-supply-improvements", (req,res) =>{
+    console.log("New PUT to /water-supply-improvements");
+    return res.status(405).send({
+        error:"No se puede hacer PUT a un conjunto de recursos"
+    })
 })
 
-app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
-    console.log("POST to + /water-supply-improvements");
-    console.log(`<${req.body}>`);
-    let newImprovements = req.body;
-    nuevasAyudas.push(newImprovements);
-    res.sendStatus(201);
-})
+//PUT 2.- Cambiar un recurso
+
+app.put(BASE_API + "/water-supply-improvements/:name", (req, res) => {
+    console.log("New PUT to /water-supply-improvements/:name");
+
+    let nameParam = req.params.name;
+
+    // Intentar encontrar el recurso en datosB
+    let improvement = datosB.find(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
+    
+    // Si no existe, devolver error 404
+    if (!improvement) {
+        return res.status(404).send({
+            error: "Mejora de suministro no encontrada",
+            message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${nameParam}`
+        });
+    }
+
+    // Obtener el body de la petición
+    let improvement_body = request.body;
+
+    // Si el body de la petición está vacío, devolver error 400
+    if (!improvement_body || Object.keys(improvement_body).length === 0) {
+        return res.status(400).send({
+            error: "Petición mal formada",
+            message: "No hay datos en el body de la solicitud"
+        });
+    }
+
+    // Comprobar si se intenta cambiar el nombre de la comunidad autónoma
+    if (improvement_body.autonomous_community && improvement_body.autonomous_community !== nameParam) {
+        // Verificar si ya existe una comunidad con ese nombre
+        let existingImprovement = datosB.find(i => i.autonomous_community === improvement_body.autonomous_community);
+        if (existingImprovement) {
+            return response.status(409).send({
+                error: "Conflicto: Ya existe una mejora de suministro para esa comunidad"
+            });
+        }
+    }
+
+    // Actualizar el recurso con los nuevos datos
+    Object.assign(improvement, improvement_body);
+    return response.sendStatus(200);
+});
+
+// DELETE 1.-Borrar un dato completo
+app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
+    console.log("New DELETE to /water-supply-improvements");
+
+    // Comprobar que hay datos para eliminar
+    if (datosB.length === 0) {
+        return res.status(404).send({
+            error: "No hay mejoras de suministro para eliminar",
+            message: "No hay datos cargados en el sistema"
+        });
+    }
+
+    // Eliminar todos los datos
+    datosB = [];
+    return response.status(200).send({
+        message: "Todas las mejoras de suministro han sido eliminadas correctamente"
+    });
+});
+
+// DELETE 2.-  Borar un recurso
+app.delete(BASE_API + "/water-supply-improvements/:name", (req, res) => {
+    console.log("New DELETE to /water-supply-improvements/:name");
+    
+    let nameParam = req.params.name;
+
+    // Buscar el recurso por nombre de comunidad autónoma
+    let improvement = datosB.find(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
+
+    if (!improvement) {
+        return res.status(404).send({
+            error: "Mejora de suministro no encontrada",
+            message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${nameParam}`
+        });
+    }
+
+    // Eliminar el recurso de datosB
+    datosB = datosB.filter(i => i.autonomous_community.toLowerCase() !== nameParam.toLowerCase());
+    return res.status(200).send({
+        message: "Mejora de suministro eliminada correctamente",
+        data: improvement
+    });
+});
 
 
 
-*/
+
+
+
 
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
 
