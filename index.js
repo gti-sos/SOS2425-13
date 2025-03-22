@@ -261,7 +261,7 @@ app.put(BASE_API + "/national-parks/:name", (request, response) => {
     
     let park = datosD.find(p => p.national_park === parkName);
     //Si no existe el parque, devuelvo un error 404
-    if(park.length === 0){
+    if(!park){
         return response.status(404).send({error: "Parque no encontrado. No puedo actualizarlo"});
     }
     let park_body = request.body;
