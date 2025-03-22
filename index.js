@@ -236,7 +236,7 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     if(!newImprovements.benefited_population) missingFieldsB.push("benefited_population");
     if(!newImprovements.project_count) missingFieldsB.push("project_count");
  
-    if(missingFieldsB>0){
+    if(missingFieldsB.length>0){
         return res.status(400).send({
             error: "Faltan campos",
             missing_fields:missingFieldsB
