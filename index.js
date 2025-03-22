@@ -68,6 +68,7 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     if (datosB.length === 0) {
         // Si está vacío, agregar 10 datos de ejemplo
         let nuevosDatos = [
+            {year: 2009, autonomous_community: "galicia", amount: 9874563, benefited_population: 21456, project_count: 100 },
             { year: 2010, autonomous_community: "andalucia", amount: 5447744, benefited_population: 13599, project_count: 60 },
             { year: 2011, autonomous_community: "aragon", amount: 4827353, benefited_population: 12135, project_count: 55 },
             { year: 2012, autonomous_community: "asturias", amount: 3325841, benefited_population: 10347, project_count: 45 },
@@ -90,6 +91,54 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         res.status(200).send({ message: "Ya existen datos en el array", data: datosB });
     }
 });
+
+
+/*
+14. La API debe cumplir con las buenas prácticas definidas en los laboratorios:
+    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
+    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
+    -No se debe devolver HTML en ningún caso
+*/
+
+//POST 1.- Si falta algún campo -> error 
+
+app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
+    let newImprovements = req.body;
+    const missingFieldsB=[];
+    if(!newImprovements.autonomous_community) missing_fields.push("autonomous_comunity");
+    if(!newImprovements.amount) missing_fields.push("amount");
+    if(!newImprovements.benefited_population) missing_fields.push("benefited_population");
+    if(!newImprovements.project_count) missing_fields.push("project_count");
+ 
+    if(missingFieldsB>0){
+        return res.status(400).send({
+            error: "Faltan campos",
+            missing_fields:missingFieldsB
+
+        });
+    }
+    
+//POST 2.- Si está repetido el campo -> error
+
+let improvementsExist= datosB.find(i => i.year == newImprovements.year 
+    && i.autonomous_community== newImprovements.autonomous_community);
+    if(improvementsExist){
+        return res.status(409).send({error:"Ya existe una ayuda para esa comunidad en ese año"})
+    }
+
+    datosB.push(newImprovements);
+    res.sendStatus(201);
+});
+
+//POST 3.- Error para recurso especifico
+app.post(BASE_API+ "/water-supply-improvements:year",(req,res)=>{
+    console.log("New POST to /water-supply-improvements:year");
+
+    returnres.status(405).send({
+        error: "Métodod no permitido. No se pueden hacer POST a recursos especificos"
+    });
+});
+
 
 
 /*
