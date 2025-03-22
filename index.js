@@ -92,7 +92,7 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
 
 
-const datosD = require("./index-DLV.js");
+let datosD = require("./index-DLV.js");
     
 //L04 - Media de todas las áreas de los parques naturales por comunidad autónoma
 function mediaParquesPorComunidad (){
