@@ -141,15 +141,12 @@ app.get(BASE_API + "/national-parks", (request, response) => {
     
 });
 
-// GET al recurso /national-parks/loadInitialData
-/*
-El recurso debe contener una ruta /api/v1/FFFFF/loadInitialData que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
+//loadInitialData
 
-*/
 app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
     console.log("New GET to /national-parks/loadInitialData");
 
-    if(datosD.length ===0){
+    if (datosD.length === 0) {
         let nuevosParques = [
             { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
             { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
@@ -162,16 +159,22 @@ app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
             { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
             { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
         ];
-        console.log("Datos iniciales cargados correctamente");
-        response.send({message: "Datos iniciales cargados correctamente", data: nuevosParques});
-        response.sendStatus(200);   
-    }else{
-        console.log("Ya existen datos en el array. No se sobreescriben");
-        response.send({message: "Ya existen datos en el array", data: nuevosParques});
-        response.sendStatus(200);
-    }
 
-   
+        // Actualizamos datosD con los nuevos datos
+        /*
+        Se usa el operador "spread" o de propagación para añadir los nuevos parques al array de datosD
+        Si solo se usara datosD.push(nuevosParques), se añadiría un array dentro de otro array (arrays anidados)
+        y eso no es lo que se desea.
+        En su lugar, "spread" desempaqueta los elementos de nuevosParques y los añade uno a uno al array datosD
+        */
+        datosD.push(...nuevosParques);
+
+        console.log("Datos iniciales cargados correctamente");
+        response.status(200).send({ message: "Datos iniciales cargados correctamente", data: datosD });
+    } else {
+        console.log("Ya existen datos en el array. No se sobreescriben");
+        response.status(200).send({ message: "Ya existen datos en el array", data: datosD });
+    }
 });
 
 
@@ -184,16 +187,24 @@ La API debe cumplir con las buenas prácticas definidas en los laboratorios:
 
 */
 
-// -Deben implementarse todos los métodos de la tabla azul (vistos en el L05) + Códigos de estado
-// a- POST a /api/v1/national-parks
+// a- POST a api/v1/national-parks
 app.post(BASE_API + "/national-parks", (request, response) => {
     console.log("New POST to /national-parks");
     let newPark = request.body;
 
     //Si el body de la petición no tiene al menos alguno de los campos obligatorios, devolvemos un error 400 (mala sintaxis)
-    if(!newPark.national_park || !newPark.declaration_date || !newPark.autonomous_community || !newPark.initial_area || !newPark.current_area){
-        return response.status(400).send({error: "Faltan campos obligatorios"});
-
+    const missingFields = [];
+    if(!newPark.national_park) missingFields.push("national_park");
+    if(!newPark.declaration_date) missingFields.push("declaration_date");
+    if(!newPark.autonomous_community) missingFields.push("autonomous_community");
+    if(!newPark.initial_area) missingFields.push("initial_area");
+    if(!newPark.current_area) missingFields.push("current_area");
+    
+    if(missingFields.length > 0) {
+      return response.status(400).send({
+        error: "Faltan campos obligatorios",
+        missing_fields: missingFields
+      });
     }
 
     //Verifico que no exista ya un parque con el mismo nombre
@@ -206,20 +217,21 @@ app.post(BASE_API + "/national-parks", (request, response) => {
     datosD.push(newPark);
     response.status(201).send({message: "Parque añadido correctamente", data: newPark});
 });
-// a- POST a /api/v1/national-parks/Teide
+
+// a- POST a api/v1/national-parks/Teide
 app.post(BASE_API + "/national-parks/:name", (request, response) => {
     console.log("New POST to /national-parks/:name");
 
-    return response.status(405).send({error: "Método no permitido"});
+    return response.status(405).send({error: "Método no permitido. No se puede hacer un POST a un recurso específico"});
 });
 
 
-//b- GET a /api/v1/national-parks/Teide
+//b- GET a api/v1/national-parks/Teide
 app.get(BASE_API + "/national-parks/:name", (request, response) => {
     console.log("New GET to /national-parks/:name");
     let parkName = request.params.name; //request params es un objeto que contiene los valores de los parámetros de la URL
     let park = datosD.find(p => p.national_park === parkName);
-    if(park.length === 0){
+    if (!park) {
         return response.status(404).send({error: "Parque no encontrado"});
     }else{
        
@@ -227,13 +239,13 @@ app.get(BASE_API + "/national-parks/:name", (request, response) => {
     }
 });
 
-//c- PUT a /api/v1/national-parks
+//c- PUT a api/v1/national-parks
 app.put(BASE_API + "/national-parks", (request, response) => {
     console.log("New PUT to /national-parks");
-    return response.status(405).send({error: "Método no permitido"});
+    return response.status(405).send({error: "Método no permitido. No se puede hacer un PUT a un conjunto de recursos"});
 });
 
-//c- PUT a /api/v1/national-parks/Teide
+//c- PUT a api/v1/national-parks/Teide
 app.put(BASE_API + "/national-parks/:name", (request, response) => {
     console.log("New PUT to /national-parks/:name");
     let parkName = request.params.name;
@@ -250,7 +262,61 @@ app.put(BASE_API + "/national-parks/:name", (request, response) => {
         return response.status(400).send({error: "Petición mal formada: No hay datos en el array de la solicitud"});
     }
 
+    // Comprobar si está intentando cambiar el nombre de un parque a uno que ya existe:
+    /*
+    park_body.national_park: ver si el campo del nombre del parque "national_park" está presente en el body de la petición
+    park_body.national_park !== parkName: si el campo del nombre del parque es diferente al nombre del parque que se quiere actualizar
+        (por ejemplo: en mi PUT indico en la URL Teide, pero en el array del body he puesto "Sierra de las Nieves")
+
+
+    */
+    if (park_body.national_park && park_body.national_park !== parkName) {
+        // Verificar si el nuevo nombre ya existe en otro parque
+        let existingPark = datosD.find(p => p.national_park === park_body.national_park);
+        if (existingPark) {
+            return response.status(409).send({
+                error: "Conflicto: Ya existe otro parque con el nombre proporcionado"
+            });
+        }
+    }
+
+    //En cualquier otro caso, actualizo los datos del parque (todo bien)
+    Object.assign(park, park_body);
+    response.status(200).send({message: "Parque actualizado correctamente", data: park});
+
+
 });
+
+//d- DELETE a api/v1/national-parks
+app.delete(BASE_API + "/national-parks", (request, response) => {
+    console.log("New DELETE to /national-parks");
+
+    //Comprobar que todos los recursos que se quieren eliminar, existen ya en el array de datos
+    if(datosD.length === 0){
+        return response.status(404).send({error: "No hay parques para eliminar"});
+    }
+
+    //En cualquier otro caso, sí hay datos, y borramos todo
+    datosD = [];
+    response.status(200).send({message: "Todos los parques han sido eliminados correctamente"});
+});
+
+//d- DELETE a api/v1/national-parks/Teide
+app.delete(BASE_API + "/national-parks/:name", (request, response) => {
+    console.log("New DELETE to /national-parks/:name");
+    let parkName = request.params.name;
+    let park = datosD.find(p => p.national_park === parkName);
+    if (!park) {
+        return response.status(404).send({error: "Parque no encontrado. No puedo eliminarlo"});
+    }
+
+    //Si el parque existe, lo borro
+    datosD = datosD.filter(p => p.national_park !== parkName);
+    response.status(200).send({message: "Parque eliminado correctamente", data: park});
+}
+);
+
+
                             /*  -----------------------------------     PARTE ALVARO     ----------------------------------------  */
 
 
