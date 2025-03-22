@@ -231,6 +231,7 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
 app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     let newImprovements = req.body;
     const missingFieldsB=[];
+    if(!newImprovements.year) missingFieldsB.push("year");
     if(!newImprovements.autonomous_community) missingFieldsB.push("autonomous_comunity");
     if(!newImprovements.amount) missingFieldsB.push("amount");
     if(!newImprovements.benefited_population) missingFieldsB.push("benefited_population");
