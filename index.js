@@ -54,14 +54,53 @@ function calcularMediaProyectos(comunidad) {
 
 //L05
 
-let nuevasAyudas=[
-    {year: 2010,autonomous_community:"andalucia",amount:5447744,benefited_population:13599,project_count:60}];
+/*
+  13.-El recurso debe contener una ruta /api/v1/FFFFF/loadInitialData 
+  que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
+*/
 
-app.get(BASE_API + "/water-supply-improvements/loadInitialData", (request, response) => {
+
+// Define el array donde almacenarás los datos
+let nuevasAyudas = [];  // Este array está vacío inicialmente
+
+// Ruta para cargar datos iniciales si el array está vacío
+app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     console.log("Devolviendo 10 datos iniciales");
-    response.send(JSON.stringify(nuevasAyudas,null,2));
+
+    // Verificar si el array está vacío
+    if (nuevasAyudas.length === 0) {
+        // Si está vacío, añadir 10 datos de ejemplo
+        let nuevosDatos = [
+            { year: 2010, autonomous_community: "andalucia", amount: 5447744, benefited_population: 13599, project_count: 60 },
+            { year: 2011, autonomous_community: "aragon", amount: 4827353, benefited_population: 12135, project_count: 55 },
+            { year: 2012, autonomous_community: "asturias", amount: 3325841, benefited_population: 10347, project_count: 45 },
+            { year: 2013, autonomous_community: "baleares", amount: 2389652, benefited_population: 7500, project_count: 30 },
+            { year: 2014, autonomous_community: "canarias", amount: 4996435, benefited_population: 11230, project_count: 40 },
+            { year: 2015, autonomous_community: "cantabria", amount: 1812394, benefited_population: 4500, project_count: 20 },
+            { year: 2016, autonomous_community: "castilla y leon", amount: 6567891, benefited_population: 15780, project_count: 70 },
+            { year: 2017, autonomous_community: "castilla-la mancha", amount: 4087325, benefited_population: 10540, project_count: 50 },
+            { year: 2018, autonomous_community: "catalunya", amount: 7021578, benefited_population: 17560, project_count: 85 },
+            { year: 2019, autonomous_community: "comunidad de madrid", amount: 9871234, benefited_population: 24200, project_count: 90 }
+        ];
+
+        // Agregar estos datos al array nuevasAyudas
+        nuevasAyudas.push(...nuevosDatos);
+
+        // Responder con un mensaje de éxito
+        return res.status(201).send({
+            message: "Datos iniciales cargados correctamente",
+            data: nuevasAyudas
+        });
+    } else {
+        // Si ya hay datos, simplemente devolver los datos existentes
+        return res.status(200).send({
+            message: "Ya existen datos en el array",
+            data: nuevasAyudas
+        });
+    }
 });
 
+/*
 app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("Has accedido a la API de blagaralo - water-supply-improvements");
     response.send(JSON.stringify(datosB,null,2));
@@ -87,7 +126,7 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
 
 
 
-
+*/
 
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
 
