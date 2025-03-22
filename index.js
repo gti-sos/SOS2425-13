@@ -100,7 +100,7 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     -No se debe devolver HTML en ningún caso
 */
 
-//GET 1
+//GET 1.- Creación petición get
 
 app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
     console.log("New GET to /water-supply-improvements");
@@ -151,9 +151,81 @@ app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
 });
 
 
+//GET 2.- Petición GET por parametros
+
+app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
+    console.log("New GET to /water-supply-improvements/:param");
+    const param = req.params.param;
+
+    // 1. Verificar si es una comunidad autónoma
+    const improvementsComunidad = datosB.filter(i => i.autonomous_community.toLowerCase() === param.toLowerCase());
+
+    // Si es una comunidad, devolver las mejoras correspondientes
+    if (improvementsComunidad.length > 0) {
+        return res.status(200).send(improvementsComunidad);
+    }
+
+    // 2. Verificar si es una fecha (año)
+    const yearParam = parseInt(param);
+    if (!isNaN(yearParam)) {
+        const improvementsByYear = datosB.filter(i => i.year === yearParam);
+
+        if (improvementsByYear.length > 0) {
+            return res.status(200).send(improvementsByYear);
+        } else {
+            return res.status(404).send({
+                error: "No se encontraron mejoras en el suministro de agua para el año proporcionado",
+                message: `No se encontraron datos de mejoras en el año ${yearParam}`
+            });
+        }
+    }
+
+    // 3. Si no es ni comunidad ni fecha, devolver 404
+    return res.status(404).send({
+        error: "Recurso no encontrado",
+        message: `No se encontró una comunidad autónoma o año con el nombre '${param}'`
+    });
+});
+
+//GET 3.- Busqueda por 2 parametros: Fecha:Comunidad
+
+app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
+    console.log("New GET to /water-supply-improvements/:year/:autonomous_community");
+
+    const year = parseInt(req.params.year);
+    const community = req.params.autonomous_community;
+
+    // Verificar si la fecha (año) es válida
+    if (isNaN(year)) {
+        return res.status(400).send({
+            error: "Año inválido",
+            message: "El primer parámetro debe ser un número válido para el año"
+        });
+    }
+
+    // Filtrar los datos según el año y la comunidad autónoma
+    const filteredImprovements = datosB.filter(improvement =>
+        improvement.year === year &&
+        improvement.autonomous_community.toLowerCase() === community.toLowerCase()
+    );
+
+    // Si no se encuentran mejoras para ese año y comunidad
+    if (filteredImprovements.length === 0) {
+        return res.status(404).send({
+            error: "No se encontraron mejoras",
+            message: `No hay mejoras en ${community} para el año ${year}`
+        });
+    } else if (filteredImprovements.length === 1) {
+        // Si solo hay un resultado, devolver el objeto directamente
+        return res.status(200).send(filteredImprovements[0]);
+    } else {
+        // Si hay múltiples resultados, devolver el array
+        return res.status(200).send(filteredImprovements);
+    }
+});
 
 
-//POST 2.- Si falta algún campo -> error 
+//POST 1.- Si falta algún campo -> error 
 
 app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
     let newImprovements = req.body;
@@ -183,7 +255,7 @@ let improvementsExist= datosB.find(i => i.year === newImprovements.year
     res.sendStatus(201);
 });
 
-//POST 2.- Error para recurso especifico
+//POST 3.- Error para recurso especifico
 app.post(BASE_API+ "/water-supply-improvements:year",(req,res)=>{
     console.log("New POST to /water-supply-improvements:year");
 
