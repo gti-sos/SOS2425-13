@@ -258,7 +258,7 @@ let improvementsExist= datosB.find(i => i.year === newImprovements.year
 });
 
 //POST 3.- Error para recurso especifico
-app.post(BASE_API+ "/water-supply-improvements:year",(req,res)=>{
+app.post(BASE_API+ "/water-supply-improvements/:year",(req,res)=>{
     console.log("New POST to /water-supply-improvements:year");
 
     returnres.status(405).send({
