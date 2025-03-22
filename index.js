@@ -127,7 +127,7 @@ app.get("/samples/DLV", (req, res) => {
 //L05
 
 
-//GET a /national-parks
+//GET a /national-parks y también GET a /national-parks?from=1950&to=1980
 /*
 Si se hace una petición GET a /national-parks, se devolverá un array con todos los parques nacionales
 pero si no hay datos (por ejemplo, luego de hacer un DELETE a /national-parks), se devolverá un error 404
@@ -146,35 +146,91 @@ app.get(BASE_API + "/national-parks", (request, response) => {
         });
     }
 
-     // Verificar si hay parámetros de consulta
-     if(Object.keys(request.query).length > 0) {
-        // Crear una copia del array original para no modificarlo
-        let filteredData = [...datosD];
-        
-        // Filtrar por cada parámetro de consulta presente
-        for (const [key, value] of Object.entries(request.query)) {
-            if (filteredData.length > 0 && key in filteredData[0]) {
-                // Si el campo es numérico, comparar con valores numéricos
-                if (typeof filteredData[0][key] === 'number') {
-                    filteredData = filteredData.filter(park => park[key] === parseInt(value));
-                } else {
-                    // Para campos de texto, hacer búsqueda exacta
-                    filteredData = filteredData.filter(park => park[key] === value);
-                }
-            }
-        }
-        
-        // Enviar datos filtrados
-        return response.status(200).send(filteredData);
-    } else {
-        // Si no hay parámetros de consulta, devolver todos los datos
-        return response.status(200).send(datosD);
-    }
+     // Crear una copia del array original para no modificarlo
+     let filteredData = [...datosD];
+    
+     // Procesar parámetros especiales from y to
+     const fromYear = request.query.from ? parseInt(request.query.from) : null;
+     const toYear = request.query.to ? parseInt(request.query.to) : null;
+     
+     // Aplicar filtros de rango si están presentes
+     if (fromYear !== null && !isNaN(fromYear)) {
+         filteredData = filteredData.filter(park => park.declaration_date >= fromYear);
+     }
+     
+     if (toYear !== null && !isNaN(toYear)) {
+         filteredData = filteredData.filter(park => park.declaration_date <= toYear);
+     }
+     
+     // Eliminar from y to de los query params para procesarlos separadamente
+     const { from, to, ...otherParams } = request.query;
+ 
+     // Procesar el resto de parámetros de consulta
+     if(Object.keys(otherParams).length > 0) {
+         for (const [key, value] of Object.entries(otherParams)) {
+             if (filteredData.length > 0 && key in filteredData[0]) {
+                 // Si el campo es numérico, comparar con valores numéricos
+                 if (typeof filteredData[0][key] === 'number') {
+                     filteredData = filteredData.filter(park => park[key] === parseInt(value));
+                 } else {
+                     // Para campos de texto, hacer búsqueda exacta
+                     filteredData = filteredData.filter(park => park[key] === value);
+                 }
+             }
+         }
+     }
+     
+     // Enviar datos filtrados (array vacío si no hay coincidencias)
+     return response.status(200).send(filteredData);
 });
 
-//Disenyo API REST para fuentes de datos: Acceder a una estadística concreta (devolver OBJECT)
+//Disenyo API REST para fuentes de datos
 
-// Buscar por comunidad autónoma y fecha de declaración en la ruta
+//GET a /national-parks/Canarias?from=1950&to=1980
+
+app.get(BASE_API + "/national-parks/:param", (request, response) => {
+    console.log("New GET to /national-parks/:param");
+    const param = request.params.param;
+    
+    // 1. Verificar si es un nombre de parque
+    const parkByName = datosD.find(p => p.national_park === param);
+    
+    // Si es un nombre de parque, devolver el parque
+    if (parkByName) {
+        return response.status(200).send(parkByName);
+    }
+    
+    // 2. Si no es un nombre de parque, verificar si es una comunidad autónoma
+    const parksByCommunity = datosD.filter(p => p.autonomous_community === param);
+    
+    // Si hay parques en esa comunidad, procesar posibles filtros por año
+    if (parksByCommunity.length > 0) {
+        let filteredParks = parksByCommunity;
+        
+        // Procesar filtros from y to si existen
+        const fromYear = request.query.from ? parseInt(request.query.from) : null;
+        const toYear = request.query.to ? parseInt(request.query.to) : null;
+        
+        if (fromYear !== null && !isNaN(fromYear)) {
+            filteredParks = filteredParks.filter(p => p.declaration_date >= fromYear);
+        }
+        
+        if (toYear !== null && !isNaN(toYear)) {
+            filteredParks = filteredParks.filter(p => p.declaration_date <= toYear);
+        }
+        
+        return response.status(200).send(filteredParks);
+    }
+    
+    // 3. Si no es ni parque ni comunidad, devolver 404
+    return response.status(404).send({
+        error: "Recurso no encontrado",
+        message: `No se encontró un parque o comunidad autónoma con el nombre '${param}'`
+    });
+});
+
+
+// GET a /national-parks/Canarias/1954
 app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (request, response) => {
     console.log("New GET to /national-parks/:autonomous_community/:declaration_date");
     
@@ -284,7 +340,7 @@ app.post(BASE_API + "/national-parks", (request, response) => {
 
     //Si todo está correcto, añado el nuevo parque al array de datos
     datosD.push(newPark);
-    response.status(201).send({message: "Parque añadido correctamente", data: newPark});
+    response.sendStatus(201);
 });
 
 // a- POST a api/v1/national-parks/Teide
@@ -351,7 +407,7 @@ app.put(BASE_API + "/national-parks/:name", (request, response) => {
 
     //En cualquier otro caso, actualizo los datos del parque (todo bien)
     Object.assign(park, park_body);
-    response.status(200).send({message: "Parque actualizado correctamente", data: park});
+    response.sendStatus(200);
 
 
 });
