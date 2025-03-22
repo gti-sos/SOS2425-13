@@ -60,16 +60,13 @@ function calcularMediaProyectos(comunidad) {
 */
 
 
-// Define el array donde almacenarás los datos
-let nuevasAyudas = [];  // Este array está vacío inicialmente
-
-// Ruta para cargar datos iniciales si el array está vacío
+// Ruta para cargar los datos iniciales de mejoras en el suministro de agua
 app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     console.log("Devolviendo 10 datos iniciales");
 
-    // Verificar si el array está vacío
-    if (nuevasAyudas.length === 0) {
-        // Si está vacío, añadir 10 datos de ejemplo
+    // Verificar si el array 'datosB' está vacío
+    if (datosB.length === 0) {
+        // Si está vacío, agregar 10 datos de ejemplo
         let nuevosDatos = [
             { year: 2010, autonomous_community: "andalucia", amount: 5447744, benefited_population: 13599, project_count: 60 },
             { year: 2011, autonomous_community: "aragon", amount: 4827353, benefited_population: 12135, project_count: 55 },
@@ -83,22 +80,17 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
             { year: 2019, autonomous_community: "comunidad de madrid", amount: 9871234, benefited_population: 24200, project_count: 90 }
         ];
 
-        // Agregar estos datos al array nuevasAyudas
-        nuevasAyudas.push(...nuevosDatos);
+        // Usamos el operador spread para agregar los nuevos datos al array 'datosB'
+        datosB.push(...nuevosDatos);
 
-        // Responder con un mensaje de éxito
-        return res.status(201).send({
-            message: "Datos iniciales cargados correctamente",
-            data: nuevasAyudas
-        });
+        console.log("Datos iniciales cargados correctamente");
+        res.status(200).send({ message: "Datos iniciales cargados correctamente", data: datosB });
     } else {
-        // Si ya hay datos, simplemente devolver los datos existentes
-        return res.status(200).send({
-            message: "Ya existen datos en el array",
-            data: nuevasAyudas
-        });
+        console.log("Ya existen datos en el array. No se sobreescriben");
+        res.status(200).send({ message: "Ya existen datos en el array", data: datosB });
     }
 });
+
 
 /*
 app.get(BASE_API + "/water-supply-improvements", (req, res) => {
