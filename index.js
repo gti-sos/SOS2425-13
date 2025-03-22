@@ -92,7 +92,8 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
                             /*  -----------------------------------     PARTE DARÍO     ----------------------------------------  */
 
 
-let datosD = require("./index-DLV.js");
+const datos_darlopvil = require("./index-DLV.js");
+let datosD = datos_darlopvil;   //datosD es el array de datos que se usará en la API
     
 //L04 - Media de todas las áreas de los parques naturales por comunidad autónoma
 function mediaParquesPorComunidad (){
@@ -144,10 +145,70 @@ app.get(BASE_API + "/national-parks", (request, response) => {
             message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales"
         });
     }
-    
-    // Si hay datos, los enviamos
-    return response.status(200).send(datosD);
+
+     // Verificar si hay parámetros de consulta
+     if(Object.keys(request.query).length > 0) {
+        // Crear una copia del array original para no modificarlo
+        let filteredData = [...datosD];
+        
+        // Filtrar por cada parámetro de consulta presente
+        for (const [key, value] of Object.entries(request.query)) {
+            if (filteredData.length > 0 && key in filteredData[0]) {
+                // Si el campo es numérico, comparar con valores numéricos
+                if (typeof filteredData[0][key] === 'number') {
+                    filteredData = filteredData.filter(park => park[key] === parseInt(value));
+                } else {
+                    // Para campos de texto, hacer búsqueda exacta
+                    filteredData = filteredData.filter(park => park[key] === value);
+                }
+            }
+        }
+        
+        // Enviar datos filtrados
+        return response.status(200).send(filteredData);
+    } else {
+        // Si no hay parámetros de consulta, devolver todos los datos
+        return response.status(200).send(datosD);
+    }
 });
+
+//Disenyo API REST para fuentes de datos: Acceder a una estadística concreta (devolver OBJECT)
+
+// Buscar por comunidad autónoma y fecha de declaración en la ruta
+app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (request, response) => {
+    console.log("New GET to /national-parks/:autonomous_community/:declaration_date");
+    
+    const community = request.params.autonomous_community;
+    const year = parseInt(request.params.declaration_date);
+    
+    if (isNaN(year)) {
+        return response.status(400).send({
+            error: "Año inválido",
+            message: "El segundo parámetro debe ser un número válido"
+        });
+    }
+    
+    // Filtrar los datos según los parámetros de la URL
+    const filteredParks = datosD.filter(park => 
+        park.autonomous_community === community && 
+        park.declaration_date === year
+    );
+    
+    if (filteredParks.length === 0) {
+        return response.status(404).send({
+            error: "No se encontraron parques",
+            message: `No hay parques en ${community} declarados en ${year}`
+        });
+    } else if (filteredParks.length === 1) {
+        // Si solo hay un resultado, devolver el objeto directamente
+        return response.status(200).send(filteredParks[0]);
+    } else {
+        // Si hay múltiples resultados, devolver el array
+        return response.status(200).send(filteredParks);
+    }
+});
+
+
 
 //loadInitialData
 
@@ -323,6 +384,8 @@ app.delete(BASE_API + "/national-parks/:name", (request, response) => {
     response.status(200).send({message: "Parque eliminado correctamente", data: park});
 }
 );
+
+
 
 
                             /*  -----------------------------------     PARTE ALVARO     ----------------------------------------  */
