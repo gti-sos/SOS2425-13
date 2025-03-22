@@ -126,19 +126,27 @@ app.get("/samples/DLV", (req, res) => {
 //L05
 
 
-// GET al recurso /national-parks
+//GET a /national-parks
 /*
-Debe tener desplegado en Render una API REST funcional ofreciendo su fuente de datos. 
-La API debe estar desplegada (e integrada con los compañeros de grupo) en la dirección: https://sos2425-XX.onrender.com/api/v1/FFFFF  
-(Siendo XX el numero de grupo relleno con ceros y FFFFF el nombre del recurso).
+Si se hace una petición GET a /national-parks, se devolverá un array con todos los parques nacionales
+pero si no hay datos (por ejemplo, luego de hacer un DELETE a /national-parks), se devolverá un error 404
+indicando que no hay datos para devolver
 
 */
+
 app.get(BASE_API + "/national-parks", (request, response) => {
     console.log("New GET to /national-parks");
 
-    response.send(JSON.stringify(datosD,null,2));
-    response.sendStatus(200);
+    // Comprobar si hay datos para mostrar
+    if(datosD.length === 0) {
+        return response.status(404).send({
+            error: "No hay datos que mostrar",
+            message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales"
+        });
+    }
     
+    // Si hay datos, los enviamos
+    return response.status(200).send(datosD);
 });
 
 //loadInitialData
