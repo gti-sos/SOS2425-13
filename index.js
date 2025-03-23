@@ -250,7 +250,7 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
 
 
     // Si no se encuentra ningún dato, devolver 404
-    return response.status(404).send({
+    return res.status(404).send({
         error: "No se encontró el recurso",
         message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
     });
