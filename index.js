@@ -309,19 +309,20 @@ app.put(BASE_API +"/water-supply-improvements", (req,res) =>{
 
 //PUT 2.- Cambiar un recurso
 
-app.put(BASE_API + "/water-supply-improvements/:name", (req, res) => {
-    console.log("New PUT to /water-supply-improvements/:name");
+app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
+    console.log("New PUT to /water-supply-improvements/:year/:autonomous_community");
 
-    let nameParam = req.params.name;
+    let yearParam = parseInt(req.params.year);  // Año de la mejora
+    let communityParam = req.params.autonomous_community.toLowerCase();  // Comunidad autónoma
 
     // Intentar encontrar el recurso en datosB
-    let improvement = datosB.find(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
-    
-    // Si no existe, devolver error 404
+    let improvement = datosB.find(i => i.year === yearParam && i.autonomous_community.toLowerCase() === communityParam);
+
+    // Si no existe el recurso, devolver error 404
     if (!improvement) {
         return res.status(404).send({
             error: "Mejora de suministro no encontrada",
-            message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${nameParam}`
+            message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${communityParam} en el año ${yearParam}`
         });
     }
 
@@ -336,21 +337,22 @@ app.put(BASE_API + "/water-supply-improvements/:name", (req, res) => {
         });
     }
 
-    // Comprobar si se intenta cambiar el nombre de la comunidad autónoma
-    if (improvement_body.autonomous_community && improvement_body.autonomous_community !== nameParam) {
-        // Verificar si ya existe una comunidad con ese nombre
-        let existingImprovement = datosB.find(i => i.autonomous_community === improvement_body.autonomous_community);
+    // Comprobar si se intenta cambiar la comunidad autónoma o el año
+    if (improvement_body.year && improvement_body.year !== yearParam) {
+        // Verificar si ya existe una mejora con el nuevo año y comunidad autónoma
+        let existingImprovement = datosB.find(i => i.year === improvement_body.year && i.autonomous_community === improvement_body.autonomous_community);
         if (existingImprovement) {
             return res.status(409).send({
-                error: "Conflicto: Ya existe una mejora de suministro para esa comunidad"
+                error: "Conflicto: Ya existe una mejora de suministro para esa comunidad en ese año"
             });
         }
     }
 
     // Actualizar el recurso con los nuevos datos
     Object.assign(improvement, improvement_body);
-    return response.sendStatus(200);
+    return res.sendStatus(200);
 });
+
 
 // DELETE 1.-Borrar un dato completo
 app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
