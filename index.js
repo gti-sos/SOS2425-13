@@ -361,7 +361,7 @@ app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
 });
 
 
-// DELETE 1.-Borrar un dato completo
+// DELETE 1.- Borrar todos los datos
 app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New DELETE to /water-supply-improvements");
 
@@ -387,6 +387,22 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     const yearParam = parseInt(req.params.year);  // Año recibido
     const communityParam = req.params.autonomous_community.toLowerCase();  // Comunidad autónoma recibida
 
+    // Verificar que el año es un número válido
+    if (isNaN(yearParam)) {
+        return res.status(400).send({
+            error: "Año inválido",
+            message: "El parámetro 'year' debe ser un número válido"
+        });
+    }
+
+    // Verificar que la comunidad autónoma no esté vacía
+    if (!communityParam || communityParam.trim() === "") {
+        return res.status(400).send({
+            error: "Comunidad autónoma inválida",
+            message: "El parámetro 'autonomous_community' no puede estar vacío"
+        });
+    }
+
     // Filtrar los datos que coinciden con el año y la comunidad autónoma
     let improvementsToDelete = datosB.filter(i => i.year === yearParam && i.autonomous_community.toLowerCase() === communityParam);
 
@@ -407,14 +423,21 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     });
 });
 
-
 // DELETE 3.- Eliminar todos los datos de un año específico
 app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
     console.log("New DELETE to /water-supply-improvements/:year");
 
     const yearParam = parseInt(req.params.year);  // Año recibido
 
-    // Filtrar los datos que coinciden con el año
+    // Verificar que el año es un número válido
+    if (isNaN(yearParam)) {
+        return res.status(400).send({
+            error: "Año inválido",
+            message: "El parámetro 'year' debe ser un número válido"
+        });
+    }
+
+    // Buscar el recurso por año
     let improvementsToDelete = datosB.filter(i => i.year === yearParam);
 
     // Si no se encuentra el recurso, devolver error 404
@@ -433,6 +456,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
         data: improvementsToDelete
     });
 });
+
 
 
 
