@@ -135,14 +135,14 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     // Verificar que los parámetros 'from' y 'to' sean válidos
     if (fromYearB && isNaN(fromYearB)) {
         return res.status(400).send({
-            error: "Parámetro 'from' inválido",
+            error: "ERROR 400: Parámetro 'from' inválido",
             message: "El parámetro 'from' debe ser un número válido para el año"
         });
     }
 
     if (toYearB && isNaN(toYearB)) {
         return res.status(400).send({
-            error: "Parámetro 'to' inválido",
+            error: "ERROR 400: Parámetro 'to' inválido",
             message: "El parámetro 'to' debe ser un número válido para el año"
         });
     }
@@ -182,7 +182,7 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     // Verificar si no se encuentran mejoras dentro del rango de fechas solicitado
     if (filterDataB.length === 0) {
         return res.status(404).send({
-            error: "No se encontraron mejoras de suministro",
+            error: "ERROR 404: No se encontraron mejoras de suministro",
             message: `No se encontraron datos para las fechas de ${fromYearB || 'cualquier'} a ${toYearB || 'cualquier'}`
         });
     }
@@ -215,7 +215,7 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
             return res.status(200).send(improvementsByYear);
         } else {
             return res.status(404).send({
-                error: "No se encontraron mejoras en el suministro de agua para el año proporcionado",
+                error: "ERROR 404: No se encontraron mejoras en el suministro de agua para el año proporcionado",
                 message: `No se encontraron datos de mejoras en el año ${yearParamB}`
             });
         }
@@ -223,7 +223,7 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
 
     // 3. Si no es ni comunidad ni fecha, devolver 404
     return res.status(404).send({
-        error: "Recurso no encontrado",
+        error: "ERROR 404: Recurso no encontrado",
         message: `No se encontró una comunidad autónoma o año con el nombre '${param}'`
     });
 });
@@ -238,7 +238,7 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     // Verificar si la fecha (año) es válida
     if (isNaN(year)) {
         return res.status(400).send({
-            error: "Año inválido",
+            error: "ERROR 400: Año inválido",
             message: "El primer parámetro debe ser un número válido para el año"
         });
     }
@@ -252,7 +252,7 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     // Si no se encuentran mejoras para ese año y comunidad
     if (filteredImprovements.length === 0) {
         return res.status(404).send({
-            error: "No se encontraron mejoras",
+            error: "ERROR 404: No se encontraron mejoras",
             message: `No hay mejoras en ${community} para el año ${year}`
         });
     } else if (filteredImprovements.length === 1) {
@@ -288,7 +288,7 @@ app.post(BASE_API+ "/water-supply-improvements",(req,res)=>{
 let improvementsExist= datosB.find(i => i.year === newImprovements.year 
     && i.autonomous_community === newImprovements.autonomous_community);
     if(improvementsExist){
-        return res.status(409).send({error:"Ya existe una ayuda para esa comunidad en ese año"})
+        return res.status(409).send({error:"ERROR 409: Ya existe una ayuda para esa comunidad en ese año"})
     }
 
     datosB.push(newImprovements);
@@ -300,7 +300,7 @@ app.post(BASE_API+ "/water-supply-improvements/:year",(req,res)=>{
     console.log("New POST to /water-supply-improvements:year");
 
     return res.status(405).send({
-        error: "Métodod no permitido. No se pueden hacer POST a recursos especificos"
+        error: "ERROR 405: Métodod no permitido. No se pueden hacer POST a recursos especificos"
     });
 });
 
@@ -310,7 +310,7 @@ app.post(BASE_API+ "/water-supply-improvements/:year",(req,res)=>{
 app.put(BASE_API +"/water-supply-improvements", (req,res) =>{
     console.log("New PUT to /water-supply-improvements");
     return res.status(405).send({
-        error:"No se puede hacer PUT a un conjunto de recursos"
+        error:"ERROR 405: No se puede hacer PUT a un conjunto de recursos"
     })
 })
 
@@ -328,7 +328,7 @@ app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     // Si no existe el recurso, devolver error 404
     if (!improvement) {
         return res.status(404).send({
-            error: "Mejora de suministro no encontrada",
+            error: "ERROR 404: Mejora de suministro no encontrada",
             message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${communityParam} en el año ${yearParam}`
         });
     }
@@ -339,7 +339,7 @@ app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     // Si el body de la petición está vacío, devolver error 400
     if (!improvement_body || Object.keys(improvement_body).length === 0) {
         return res.status(400).send({
-            error: "Petición mal formada",
+            error: "ERROR 400: Petición mal formada",
             message: "No hay datos en el body de la solicitud"
         });
     }
@@ -368,7 +368,7 @@ app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
     // Comprobar que hay datos para eliminar
     if (datosB.length === 0) {
         return res.status(404).send({
-            error: "No hay mejoras de suministro para eliminar",
+            error: "ERROR 404: No hay mejoras de suministro para eliminar",
             message: "No hay datos cargados en el sistema"
         });
     }
@@ -390,7 +390,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     // Verificar que el año es un número válido
     if (isNaN(yearParam)) {
         return res.status(400).send({
-            error: "Año inválido",
+            error: "ERROR 400: Año inválido",
             message: "El parámetro 'year' debe ser un número válido"
         });
     }
@@ -398,7 +398,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     // Verificar que la comunidad autónoma no esté vacía
     if (!communityParam || communityParam.trim() === "") {
         return res.status(400).send({
-            error: "Comunidad autónoma inválida",
+            error: "ERROR 400: Comunidad autónoma inválida",
             message: "El parámetro 'autonomous_community' no puede estar vacío"
         });
     }
@@ -409,7 +409,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     // Si no se encuentra el recurso, devolver error 404
     if (improvementsToDelete.length === 0) {
         return res.status(404).send({
-            error: "Mejoras de suministro no encontradas",
+            error: "ERROR 404: Mejoras de suministro no encontradas",
             message: `No se encontró ninguna mejora de suministro de agua para la comunidad autónoma ${communityParam} en el año ${yearParam}`
         });
     }
@@ -432,7 +432,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
     // Verificar que el año es un número válido
     if (isNaN(yearParam)) {
         return res.status(400).send({
-            error: "Año inválido",
+            error: "ERROR 400: Año inválido",
             message: "El parámetro 'year' debe ser un número válido"
         });
     }
@@ -443,7 +443,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
     // Si no se encuentra el recurso, devolver error 404
     if (improvementsToDelete.length === 0) {
         return res.status(404).send({
-            error: "Mejoras de suministro no encontradas",
+            error: "ERROR 404: Mejoras de suministro no encontradas",
             message: `No se encontraron mejoras de suministro para el año ${yearParam}`
         });
     }
