@@ -326,7 +326,7 @@ app.put(BASE_API + "/water-supply-improvements/:name", (req, res) => {
     }
 
     // Obtener el body de la petición
-    let improvement_body = request.body;
+    let improvement_body = req.body;
 
     // Si el body de la petición está vacío, devolver error 400
     if (!improvement_body || Object.keys(improvement_body).length === 0) {
@@ -341,7 +341,7 @@ app.put(BASE_API + "/water-supply-improvements/:name", (req, res) => {
         // Verificar si ya existe una comunidad con ese nombre
         let existingImprovement = datosB.find(i => i.autonomous_community === improvement_body.autonomous_community);
         if (existingImprovement) {
-            return response.status(409).send({
+            return res.status(409).send({
                 error: "Conflicto: Ya existe una mejora de suministro para esa comunidad"
             });
         }
