@@ -254,7 +254,7 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
         error: "No se encontró el recurso",
         message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
     });
-});
+
 
 //POST 1.- Si falta algún campo -> error 
 
