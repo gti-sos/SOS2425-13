@@ -170,7 +170,7 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
     // 2. Verificar si es una fecha (año)
     const yearParamB = parseInt(param);
     if (!isNaN(yearParamB)) {
-        const improvementsByYear = datosB.filter(i => i.year === improvementsByYear);
+        const improvementsByYear = datosB.filter(i => i.year === yearParamB);
 
         if (improvementsByYear.length > 0) {
             return res.status(200).send(improvementsByYear);
