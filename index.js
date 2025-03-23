@@ -387,7 +387,7 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     const yearParam = parseInt(req.params.year);  // Año recibido
     const communityParam = req.params.autonomous_community.toLowerCase();  // Comunidad autónoma recibida
 
-    // Buscar el recurso por comunidad autónoma y año
+    // Filtrar los datos que coinciden con el año y la comunidad autónoma
     let improvementsToDelete = datosB.filter(i => i.year === yearParam && i.autonomous_community.toLowerCase() === communityParam);
 
     // Si no se encuentra el recurso, devolver error 404
@@ -407,13 +407,14 @@ app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", 
     });
 });
 
+
 // DELETE 3.- Eliminar todos los datos de un año específico
 app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
     console.log("New DELETE to /water-supply-improvements/:year");
 
     const yearParam = parseInt(req.params.year);  // Año recibido
 
-    // Buscar el recurso por año
+    // Filtrar los datos que coinciden con el año
     let improvementsToDelete = datosB.filter(i => i.year === yearParam);
 
     // Si no se encuentra el recurso, devolver error 404
