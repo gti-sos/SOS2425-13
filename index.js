@@ -380,27 +380,56 @@ app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
     });
 });
 
-// DELETE 2.-  Borar un recurso
-app.delete(BASE_API + "/water-supply-improvements/:name", (req, res) => {
-    console.log("New DELETE to /water-supply-improvements/:name");
-    
-    let nameParam = req.params.name;
+// DELETE 2.- Eliminar por comunidad autónoma en una fecha específica
+app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
+    console.log("New DELETE to /water-supply-improvements/:year/:autonomous_community");
 
-    // Buscar el recurso por nombre de comunidad autónoma
-    let improvement = datosB.find(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
+    const yearParam = parseInt(req.params.year);  // Año recibido
+    const communityParam = req.params.autonomous_community.toLowerCase();  // Comunidad autónoma recibida
 
-    if (!improvement) {
+    // Buscar el recurso por comunidad autónoma y año
+    let improvementsToDelete = datosB.filter(i => i.year === yearParam && i.autonomous_community.toLowerCase() === communityParam);
+
+    // Si no se encuentra el recurso, devolver error 404
+    if (improvementsToDelete.length === 0) {
         return res.status(404).send({
-            error: "Mejora de suministro no encontrada",
-            message: `No se encontró una mejora de suministro de agua para la comunidad autónoma ${nameParam}`
+            error: "Mejoras de suministro no encontradas",
+            message: `No se encontró ninguna mejora de suministro de agua para la comunidad autónoma ${communityParam} en el año ${yearParam}`
         });
     }
 
     // Eliminar el recurso de datosB
-    datosB = datosB.filter(i => i.autonomous_community.toLowerCase() !== nameParam.toLowerCase());
+    datosB = datosB.filter(i => !(i.year === yearParam && i.autonomous_community.toLowerCase() === communityParam));
+
     return res.status(200).send({
-        message: "Mejora de suministro eliminada correctamente",
-        data: improvement
+        message: `Mejoras de suministro para la comunidad autónoma ${communityParam} en el año ${yearParam} han sido eliminadas correctamente`,
+        data: improvementsToDelete
+    });
+});
+
+// DELETE 3.- Eliminar todos los datos de un año específico
+app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {
+    console.log("New DELETE to /water-supply-improvements/:year");
+
+    const yearParam = parseInt(req.params.year);  // Año recibido
+
+    // Buscar el recurso por año
+    let improvementsToDelete = datosB.filter(i => i.year === yearParam);
+
+    // Si no se encuentra el recurso, devolver error 404
+    if (improvementsToDelete.length === 0) {
+        return res.status(404).send({
+            error: "Mejoras de suministro no encontradas",
+            message: `No se encontraron mejoras de suministro para el año ${yearParam}`
+        });
+    }
+
+    // Eliminar el recurso de datosB
+    datosB = datosB.filter(i => i.year !== yearParam);
+
+    return res.status(200).send({
+        message: `Todas las mejoras de suministro para el año ${yearParam} han sido eliminadas correctamente`,
+        data: improvementsToDelete
     });
 });
 
