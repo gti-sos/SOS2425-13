@@ -47,9 +47,28 @@ app.get("/samples/BGA", (req, res) => {
 
 function calcularMediaProyectos(autonomous_community) {
     let datosFiltrados = datosB.filter(d => d.autonomous_community === autonomous_community);
-    let totalAmount = datosFiltrados.reduce((acc, d) => acc + d.project_count, 0);
+    
+    // Comprobar si hay datos filtrados
+    if (datosFiltrados.length === 0) {
+        return "No hay datos disponibles para esta comunidad";
+    }
+
+    // Calcular la suma de project_count solo si es un número válido
+    let totalAmount = datosFiltrados.reduce((acc, d) => {
+        if (typeof d.project_count === 'number' && !isNaN(d.project_count)) {
+            return acc + d.project_count;
+        } else {
+            console.log(`Valor no válido para project_count en ${autonomous_community}:`, d.project_count);
+            return acc;
+        }
+    }, 0);
+
+    // Calcular la media
     let media = totalAmount / datosFiltrados.length;
     return media.toFixed(2);
+
+
+    
 }
 
 //L05

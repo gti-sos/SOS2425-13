@@ -57,7 +57,7 @@ let datosB = [
 
 module.exports = datosB;
 
-
+/*
 
 // Función para calcular la media del amount por comunidad y año
 function calcularMediaProyectos(comunidad) {
@@ -68,6 +68,39 @@ function calcularMediaProyectos(comunidad) {
 }
 
 
+
+log("\n MEDIA DE PROYECTOS POR COMUNIDAD \n");
+["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"].forEach(comunidad => {
+    log(`Media de project_count en ${comunidad}: ${calcularMediaProyectos(comunidad)}`);
+});
+
+*/
+
+function calcularMediaProyectos(autonomous_community) {
+    let datosFiltrados = datosB.filter(d => d.autonomous_community === autonomous_community);
+    
+    // Comprobar si hay datos filtrados
+    if (datosFiltrados.length === 0) {
+        return "No hay datos disponibles para esta comunidad";
+    }
+
+    // Calcular la suma de project_count solo si es un número válido
+    let totalAmount = datosFiltrados.reduce((acc, d) => {
+        if (typeof d.project_count === 'number' && !isNaN(d.project_count)) {
+            return acc + d.project_count;
+        } else {
+            console.log(`Valor no válido para project_count en ${autonomous_community}:`, d.project_count);
+            return acc;
+        }
+    }, 0);
+
+    // Calcular la media
+    let media = totalAmount / datosFiltrados.length;
+    return media.toFixed(2);
+
+
+    
+}
 
 log("\n MEDIA DE PROYECTOS POR COMUNIDAD \n");
 ["andalucia","aragon","asturias","baleares","canarias","cantabria","castilla y leon","castilla-La mancha","catalunia","valencia","extremadura","galicia","madrid","murcia","pais vasco"].forEach(comunidad => {
