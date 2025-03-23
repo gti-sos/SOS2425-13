@@ -95,53 +95,60 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
 
 
 
-//GET 1.- Creación petición get
-
-app.get(BASE_API +"/water-supply-improvements",(req, res)=>{
+app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New GET to /water-supply-improvements");
 
-    if(datosB.length===0){
+    if (datosB.length === 0) {
         return res.status(404).send({
             error: "No hay datos cargados",
-            message: "Hacer GET a loadInitalData para cargar datos de prueba"
+            message: "Hacer GET a loadInitialData para cargar datos de prueba"
         });
     }
 
-    //Creación de copia para no machacar datos
-    let filterDataB =[...datosB];
+    // Creación de copia para no machacar datos
+    let filterDataB = [...datosB];
 
-    //Parametros especiales
+    // Parámetros especiales
     const fromYearB = req.query.from ? parseInt(req.query.from) : null;
     const toYearB = req.query.to ? parseInt(req.query.to) : null;
 
+    // Log para verificar los valores de los parámetros
+    console.log(`Parametros recibidos: from = ${fromYearB}, to = ${toYearB}`);
+
     // Aplicar filtros de rango si están presentes
     if (fromYearB !== null && !isNaN(fromYearB)) {
-        filterDataB = filterDataB.filter(improvements => improvements.declaration_date >= fromYearB);
+        console.log(`Filtrando por desde el año: ${fromYearB}`);
+        filterDataB = filterDataB.filter(improvements => improvements.year >= fromYearB);
     }
-    
+
     if (toYearB !== null && !isNaN(toYearB)) {
-        filterDataB = filterDataB.filter(improvements => improvements.declaration_date <= toYearB);
+        console.log(`Filtrando por hasta el año: ${toYearB}`);
+        filterDataB = filterDataB.filter(improvements => improvements.year <= toYearB);
     }
-    
+
     // Eliminar from y to de los query params para procesarlos separadamente
     const { from, to, ...otherParams } = req.query;
 
     // Procesar el resto de parámetros de consulta
-    if(Object.keys(otherParams).length > 0) {
+    if (Object.keys(otherParams).length > 0) {
+        console.log("Otros parámetros recibidos:", otherParams);
+
         for (const [key, value] of Object.entries(otherParams)) {
+            console.log(`Filtrando por ${key}: ${value}`);
             if (filterDataB.length > 0 && key in filterDataB[0]) {
                 // Si el campo es numérico, comparar con valores numéricos
                 if (typeof filterDataB[0][key] === 'number') {
                     filterDataB = filterDataB.filter(improvements => improvements[key] === parseInt(value));
                 } else {
                     // Para campos de texto, hacer búsqueda exacta
-                    filterDataB = filterDataB.filter(improvements => improvements[key] === value);
+                    filterDataB = filterDataB.filter(improvements => improvements[key].toLowerCase() === value.toLowerCase());
                 }
             }
         }
     }
-    
+
     // Enviar datos filtrados (array vacío si no hay coincidencias)
+    console.log("Datos filtrados:", filterDataB);
     return res.status(200).send(filterDataB);
 });
 
