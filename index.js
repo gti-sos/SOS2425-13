@@ -59,7 +59,7 @@ function calcularMediaProyectos(autonomous_community) {
   que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
 */
 
-// Ruta para cargar los datos iniciales de mejoras en el suministro de agua
+// Ruta para cargar los datos iniciales de mejoras en el suministro de agua// Ruta para cargar los datos iniciales de mejoras en el suministro de agua
 app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     console.log("Devolviendo 10 datos iniciales");
 
@@ -92,7 +92,7 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
 });
 
 
-//GET 1.- Petición GET por parámetros (comunidad autónoma o año)
+// GET 1.- Petición GET por parámetros (comunidad autónoma o año)
 app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New GET to /water-supply-improvements");
 
@@ -174,8 +174,7 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
 });
 
 
-//GET 2.- Petición GET por parametros
-
+// GET 2.- Petición GET por parámetros
 app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
     console.log("New GET to /water-supply-improvements/:param");
     const param = req.params.param;
@@ -210,9 +209,7 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
     });
 });
 
-
-//GET 3.- Busqueda por 2 parametros: Fecha:Comunidad
-
+// GET 3.- Búsqueda por 2 parámetros: Fecha:Comunidad
 app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
     console.log("New GET to /water-supply-improvements/:year/:autonomous_community");
 
@@ -247,14 +244,6 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
         return res.status(200).send(filteredImprovements);
     }
 });
-
-
-    // Si no se encuentra ningún dato, devolver 404
-    return res.status(404).send({
-        error: "No se encontró el recurso",
-        message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
-    });
-
 
 //POST 1.- Si falta algún campo -> error 
 
