@@ -368,7 +368,7 @@ app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
 
     // Eliminar todos los datos
     datosB = [];
-    return response.status(200).send({
+    return res.status(200).send({
         message: "Todas las mejoras de suministro han sido eliminadas correctamente"
     });
 });
