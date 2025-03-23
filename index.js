@@ -30,7 +30,7 @@ app.get("/cool", (req, res) => {
 
                             /*  -----------------------------------     PARTE BLANCA     ----------------------------------------  */
 
-const datosB = require("./index-BGA.js");
+let datosB = require("./index-BGA.js");
 
 //L04
 app.get("/samples/BGA", (req, res) => {
