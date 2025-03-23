@@ -824,31 +824,410 @@ app.delete(BASE_API + "/national-parks/:name", (request, response) => {
 
 const datosAlvaro = require("./index-AMN.js");
 
+//L04 - Media de los accidentes foestales por comunidad autónoma
+                                                        
 function calcularMediaNumeroDeIncendios(comunidad) {
     const datosFiltrados = datosAlvaro.filter(d => d.comunidad === comunidad);
     if (datosFiltrados.length === 0) return "No hay datos disponibles";
     const totalAccidentes = datosFiltrados.map(d => d.number_of_accidents).reduce((acc, num) => acc + num, 0);
     return (totalAccidentes / datosFiltrados.length).toFixed(2);
 }
-
-
+                                                        
+                                                        
 app.get("/samples/AMN", (req, res) => {
     const comunidades = [
-        "Andalucía", "Aragón", "Asturias", "Canarias", "Cantabria", "Castilla y León", "Castilla-La Mancha", "Cataluña", "Comunidad Valenciana", "Ceuta", "Comunidad de Madrid"
+            "Andalucía", "Aragón", "Asturias", "Canarias", "Cantabria", "Castilla y León", "Castilla-La Mancha", "Cataluña", "Comunidad Valenciana", "Ceuta", "Comunidad de Madrid"
     ];
-
+                                                        
     const resultado = `
         <h2>MEDIA DE ACCIDENTES FORESTALES POR COMUNIDAD</h2>
         ${comunidades.map(comunidad => `
             <p><strong>Media de número de accidentes forestales en ${comunidad}:</strong> ${calcularMediaNumeroDeIncendios(comunidad)}</p>
         `).join("")}
     `;
-
+                                                        
     res.send(resultado);
 });
-
-
-
+                                                        
+//L05
+                            
+/*
+  13.-El recurso debe contener una ruta /api/v1/FFFFF/loadInitialData 
+  que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
+*/
+                            
+                            
+// Ruta para cargar los datos iniciales de nuevos accidentes forestales
+app.get(BASE_API + "/forest-fires/loadInitialData", (req, res) => {
+    console.log("Devolviendo 11 datos iniciales");
+                            
+    // Verificar si el array 'datosAlvaro' está vacío
+    if (datosAlvaro.length === 0) {
+        // Si está vacío, agregar 11 datos de ejemplo
+        let nuevosAccidentesForestales = [
+            { year: 2024, comunidad: "Andalucía", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
+            { year: 2024, comunidad: "Aragón", number_of_accidents: 5877, percentage_of_large_fires: 0.59 },
+            { year: 2024, comunidad: "Asturias", number_of_accidents: 19003, percentage_of_large_fires: 0.25 },
+            { year: 2024, comunidad: "Comunidad Valenciana", number_of_accidents: 6982, percentage_of_large_fires: 0.68 },
+            { year: 2024, comunidad: "Canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
+            { year: 2024, comunidad: "Cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
+            { year: 2024, comunidad: "Castilla-La Mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
+            { year: 2024, comunidad: "Castilla y León", number_of_accidents: 20343, percentage_of_large_firest: 0.47 },
+            { year: 2024, comunidad: "Cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
+            { year: 2024, comunidad: "Ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
+            { year: 2024, comunidad: "Comunidad de Madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
+        ];
+                            
+        // Utilizamos el operador spread para insertar los nuevos datos en el array, manteniendo los elementos existentes. 
+        datosAlvaro.push(...nuevosAccidentesForestales);
+                            
+        console.log("Los datos iniciales se han añadido con éxito.");
+        res.status(200).send({ message: "Los datos iniciales se han añadido con éxito.", data: datosAlvaro });
+    } else {
+        console.log("El array ya contiene datos, por lo que no se modifican.");
+        res.status(200).send({ message: "El array ya contiene datos", data: datosAlvaro });
+    }
+});
+                            
+//GET 1 - Creación petición get
+                            
+app.get(BASE_API + "/forest-fires", (req, res) => {
+    console.log("New GET request to /forest-fires");
+                            
+    if (datosAlvaro.length === 0) {
+        return res.status(404).json({
+            error: "No hay datos cargados",
+            message: "Realice un GET a /loadInitialData para cargar datos de prueba"
+        });
+    }
+                            
+    // Copiar datos para no modificar el array original
+    let filteredData = [...datosAlvaro];
+                            
+    // Extraer y convertir los parámetros de consulta
+    const fromYear = req.query.from ? parseInt(req.query.from) : null;
+    const toYear = req.query.to ? parseInt(req.query.to) : null;
+                            
+    // Aplicar filtros de rango de año si están presentes y son válidos
+    if (!isNaN(fromYear)) {
+        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+    }
+                            
+    if (!isNaN(toYear)) {
+        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
+    }
+                            
+    // Eliminar parámetros "from" y "to" de la consulta para procesar los demás
+    const { from, to, ...otherFilters } = req.query;
+                            
+    // Aplicar filtros adicionales basados en otros parámetros de consulta
+    for (const [key, value] of Object.entries(otherFilters)) {
+        if (filteredData.length > 0 && key in filteredData[0]) {
+            // Filtrar por valores numéricos o de texto según el tipo de dato
+            filteredData = typeof filteredData[0][key] === "number"
+                ? filteredData.filter(entry => entry[key] === parseInt(value))
+                : filteredData.filter(entry => entry[key] === value);
+        }
+    }
+                            
+    // Responder con los datos filtrados
+    return res.status(200).json(filteredData);
+});                  
+                            
+// GET 2 - Petición GET por parametros
+app.get(BASE_API + "/forest-fires", (req, res) => {
+    console.log("New GET request to /forest-fires");
+                            
+    if (datosAlvaro.length === 0) {
+        return res.status(404).json({
+            error: "No hay datos disponibles",
+            message: "Realice un GET a /loadInitialData para cargar datos de prueba"
+        });
+    }
+                            
+    // Copiar datos para evitar modificar el array original
+    let filteredData = [...datosAlvaro];
+                            
+    // Extraer y convertir parámetros de consulta
+    const fromYear = parseInt(req.query.from) || null;
+    const toYear = parseInt(req.query.to) || null;
+                            
+    // Aplicar filtros de rango si están presentes
+    if (fromYear) {
+        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+    }
+    if (toYear) {
+        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
+    }
+                            
+    // Remover parámetros "from" y "to" para procesar los demás
+    const { from, to, ...otherFilters } = req.query;
+                            
+    // Aplicar filtros adicionales basados en otros parámetros de consulta
+    Object.entries(otherFilters).forEach(([key, value]) => {
+        if (filteredData.length > 0 && key in filteredData[0]) {
+            filteredData = filteredData.filter(entry => 
+                typeof entry[key] === "number" ? entry[key] === parseInt(value) : entry[key] === value
+            );
+        }
+    });
+                            
+    // Enviar respuesta
+    return res.json(filteredData);
+});
+                            
+//GET 3 - Busqueda por 2 parametros: Fecha:Comunidad
+                            
+app.get(BASE_API + "/forest-fires", (req, res) => {
+    console.log("Received GET request to /forest-fires");
+                            
+    if (!datosAlvaro || datosAlvaro.length === 0) {
+        return res.status(404).json({
+            error: "No hay datos disponibles",
+            message: "Ejecute un GET a /loadInitialData para cargar datos de prueba"
+        });
+    }
+                            
+    // Copia del array original para aplicar filtros
+    let filteredData = [...datosAlvaro];
+                            
+    // Extraer parámetros de consulta y convertirlos a número si es necesario
+    const { from, to, ...filters } = req.query;
+    const fromYear = from ? parseInt(from) : null;
+    const toYear = to ? parseInt(to) : null;
+                            
+    // Aplicar filtros de año
+    if (fromYear && !isNaN(fromYear)) {
+        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+    }
+    if (toYear && !isNaN(toYear)) {
+        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
+    }
+                            
+    // Aplicar filtros adicionales según los parámetros de la consulta
+    Object.keys(filters).forEach(key => {
+        filteredData = filteredData.filter(entry => 
+            entry[key] == filters[key] // Comparación flexible para manejar números y strings
+        );
+    });
+                            
+    return res.status(200).json(filteredData);
+});
+                            
+                            
+/*
+14. La API debe cumplir con las buenas prácticas definidas en los laboratorios:
+    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
+    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
+    -No se debe devolver HTML en ningún caso
+*/
+                            
+// POST 1 - Añadir un nuevo registro, verificando que todos los campos estén presentes
+app.post(BASE_API + "/forest-fires", (req, res) => {
+    const newEntry = req.body;
+                            
+    // Definir los campos obligatorios
+    const requiredFields = [
+        "year",
+        "autonomous_community",
+        "number_of_accidents",
+        "percentage_of_large_fires"
+    ];
+                            
+    // Identificar los campos faltantes
+    const missingFields = requiredFields.filter(field => !newEntry[field]);
+                            
+    if (missingFields.length > 0) {
+        return res.status(400).json({
+            error: "Faltan campos obligatorios",
+            missing_fields: missingFields
+        });
+    }
+                            
+    // Agregar el nuevo dato al array
+    datosAlvaro.push(newEntry);
+    return res.status(201).json({
+        message: "Nuevo registro añadido correctamente",
+        data: newEntry
+    });
+});
+                            
+                                
+// POST 2 - Si el recurso ya existe, devolver error 409
+app.post(BASE_API + "/forest-fires", (req, res) => {
+    const newEntry = req.body;
+                            
+    // Verificar si el recurso ya existe en el array
+    const exists = datosAlvaro.some(entry => 
+        entry.year === newEntry.year && entry.autonomous_community === newEntry.autonomous_community
+    );
+                            
+    if (exists) {
+        return res.status(409).json({ 
+            error: "Ya existe un registro para esa comunidad en ese año" 
+        });
+    }
+                            
+    // Agregar nuevo dato si no está duplicado
+    datosAlvaro.push(newEntry);
+    return res.sendStatus(201);
+});
+                            
+// POST 3 - Error para recurso específico (no permitido)
+    app.post(BASE_API + "/forest-fires/:year", (req, res) => {
+    // Log para rastrear la solicitud al recurso específico
+    console.log(`Intento de POST a /forest-fires/${req.params.year}`);
+                            
+    // Enviar respuesta con código 405: Método no permitido
+    return res.status(405).json({
+        error: "Método no permitido",
+        message: "No se pueden realizar peticiones POST a un recurso específico"
+    });
+});
+                            
+                            
+// PUT 1 - Intento de actualización a un conjunto de recursos
+app.put(BASE_API + "/forest-fires", (req, res) => {
+    console.log(`Intento de PUT a /forest-fires`);
+                            
+    // Responder con un error indicando que no se puede hacer PUT a todo el conjunto de recursos
+    res.status(405).json({
+        error: "Método no permitido",
+        message: "No se puede realizar un PUT a un conjunto de recursos. Por favor, especifique un recurso individual."
+    });
+});
+                            
+                            
+// PUT 2 - Actualizar un recurso específico (Accidente forestal por año y comunidad autónoma)
+app.put(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
+    console.log("PUT request received for /forest-fires/:year/:autonomous_community");
+                            
+    // Extraer parámetros de la URL
+    const yearParam = parseInt(req.params.year); // Año de la mejora
+    const communityParam = req.params.autonomous_community.toLowerCase(); // Comunidad autónoma
+                            
+    // Buscar el recurso en el array de datosAlvaro
+    const existingImprovement = datosAlvaro.find(item => item.year === yearParam && item.autonomous_community.toLowerCase() === communityParam);
+                            
+    // Si el recurso no se encuentra, devolver error 404
+    if (!existingImprovement) {
+        return res.status(404).json({
+            error: "Recurso no encontrado",
+            message: `No se han encontrado registros para ${communityParam} en el año ${yearParam}`
+        });
+    }
+                            
+    // Verificar que los datos enviados en el body no están vacíos
+    const requestBody = req.body;
+    if (!requestBody || Object.keys(requestBody).length === 0) {
+        return res.status(400).json({
+            error: "Solicitud mal formada",
+            message: "El cuerpo de la solicitud está vacío"
+        });
+    }
+                            
+    // Comprobar si se está intentando actualizar el año o comunidad autónoma
+    if (requestBody.year && requestBody.year !== yearParam) {
+        // Verificar si el nuevo año y comunidad ya están registrados
+        const conflict = datosAlvaro.find(item => item.year === requestBody.year && item.autonomous_community === requestBody.autonomous_community);
+        if (conflict) {
+            return res.status(409).json({
+                error: "Conflicto de datos",
+                message: `Ya existe un accidente forestal registrado para ${requestBody.autonomous_community} en el año ${requestBody.year}`
+            });
+        }
+    }
+                            
+    // Actualizar el recurso con los nuevos valores del cuerpo de la solicitud
+    Object.assign(existingImprovement, requestBody);
+                            
+    // Responder con un código de éxito (200) y el recurso actualizado
+    return res.status(200).json({
+        message: "Accidente forestal actualizado exitosamente",
+        updatedResource: existingImprovement
+        });
+    });
+                            
+                            
+// DELETE 1 - Eliminar todos los registros de accidentes forestales
+app.delete(BASE_API + "/forest-fires", (req, res) => {
+    console.log("DELETE request received at /forest-fires");
+                            
+    // Verificar si hay datos disponibles en el sistema
+    if (datosAlvaro.length === 0) {
+        return res.status(404).json({
+            error: "Datos no encontrados",
+            message: "No hay registros de accidentes forestales en el sistema para eliminar"
+        });
+    }
+                            
+    // Eliminar todos los registros de accidentes forestales
+    datosAlvaro.length = 0;  // Otra forma de limpiar el array
+                            
+    // Confirmar que los datos han sido eliminados correctamente
+    return res.status(200).json({
+        message: "Todos los registros de accidentes forestales han sido eliminados satisfactoriamente"
+    });
+});
+                            
+                            
+// DELETE 2 - Eliminar todos los registros de accidentes forestales
+app.delete(BASE_API + "/forest-fires", (req, res) => {
+    console.log("Received DELETE request to /forest-fires");
+                            
+    // Comprobar si hay datos en la base
+    if (datosAlvaro.length === 0) {
+        return res.status(404).json({
+            error: "No se encontraron registros",
+            message: "No hay datos de accidentes forestales para eliminar"
+        });
+    }
+                            
+    // Alternativa para eliminar todos los elementos del array: "Splice"
+    while (datosAlvaro.length > 0) {
+        datosAlvaro.pop(); // Eliminar el último elemento hasta que el array esté vacío
+    }
+                            
+    // Responder con el mensaje de éxito
+    return res.status(200).json({
+        message: "Todos los registros de accidentes forestales han sido eliminados"
+    });
+});
+                            
+// DELETE 3 - Eliminar todos los datos de un año específico
+app.delete(BASE_API + "/forest-fires/:year", (req, res) => {
+    console.log("Received DELETE request to /forest-fires/:year");
+                            
+    const yearParam = parseInt(req.params.year);  // Año recibido desde la URL
+                            
+    // Validar que el parámetro de año sea un número válido
+    if (isNaN(yearParam)) {
+        return res.status(400).json({
+            error: "Año inválido",
+            message: "El parámetro 'year' debe ser un número válido"
+        });
+    }
+                            
+    // Filtrar los registros del año solicitado
+    const filteredData = datosAlvaro.filter(i => i.year === yearParam);
+                            
+    // Si no hay registros para ese año, responder con error 404
+    if (filteredData.length === 0) {
+        return res.status(404).json({
+            error: "No se encontraron registros para el año solicitado",
+            message: `No hay accidentes forestales registrados para el año ${yearParam}`
+        });
+    }
+                            
+    // Eliminar los registros del año especificado
+    datosAlvaro = datosAlvaro.filter(i => i.year !== yearParam);
+                            
+    // Enviar una respuesta exitosa con los registros eliminados
+    return res.status(200).json({
+        message: `Los registros de accidentes forestales del año ${yearParam} han sido eliminados correctamente`,
+        deletedData: filteredData  // Mostrar los registros eliminados
+    });
+});
 
 // Iniciar el servidor
 app.listen(PORT, () => {
