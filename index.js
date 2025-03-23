@@ -59,7 +59,6 @@ function calcularMediaProyectos(autonomous_community) {
   que al hacer un GET cree 10 o más datos en el array de NodeJS si está vacío.
 */
 
-
 // Ruta para cargar los datos iniciales de mejoras en el suministro de agua
 app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
     console.log("Devolviendo 10 datos iniciales");
@@ -93,8 +92,7 @@ app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
 });
 
 
-
-
+//GET 1.- Petición GET por parámetros (comunidad autónoma o año)
 app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New GET to /water-supply-improvements");
 
@@ -114,6 +112,21 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
 
     // Log para verificar los valores de los parámetros
     console.log(`Parametros recibidos: from = ${fromYearB}, to = ${toYearB}`);
+
+    // Verificar que los parámetros 'from' y 'to' sean válidos
+    if (fromYearB && isNaN(fromYearB)) {
+        return res.status(400).send({
+            error: "Parámetro 'from' inválido",
+            message: "El parámetro 'from' debe ser un número válido para el año"
+        });
+    }
+
+    if (toYearB && isNaN(toYearB)) {
+        return res.status(400).send({
+            error: "Parámetro 'to' inválido",
+            message: "El parámetro 'to' debe ser un número válido para el año"
+        });
+    }
 
     // Aplicar filtros de rango si están presentes
     if (fromYearB !== null && !isNaN(fromYearB)) {
@@ -145,6 +158,14 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
                 }
             }
         }
+    }
+
+    // Verificar si no se encuentran mejoras dentro del rango de fechas solicitado
+    if (filterDataB.length === 0) {
+        return res.status(404).send({
+            error: "No se encontraron mejoras de suministro",
+            message: `No se encontraron datos para las fechas de ${fromYearB || 'cualquier'} a ${toYearB || 'cualquier'}`
+        });
     }
 
     // Enviar datos filtrados (array vacío si no hay coincidencias)
@@ -189,6 +210,7 @@ app.get(BASE_API + "/water-supply-improvements/:param", (req, res) => {
     });
 });
 
+
 //GET 3.- Busqueda por 2 parametros: Fecha:Comunidad
 
 app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
@@ -226,12 +248,13 @@ app.get(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (re
     }
 });
 
-/*
-14. La API debe cumplir con las buenas prácticas definidas en los laboratorios:
-    -Deben implementarse todos los métodos de la tabla azul (vistos en el L05)
-    -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
-    -No se debe devolver HTML en ningún caso
-*/
+
+    // Si no se encuentra ningún dato, devolver 404
+    return response.status(404).send({
+        error: "No se encontró el recurso",
+        message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
+    });
+});
 
 //POST 1.- Si falta algún campo -> error 
 
@@ -273,37 +296,6 @@ app.post(BASE_API+ "/water-supply-improvements/:year",(req,res)=>{
     });
 });
 
-
-//GET 1.- 
-
-app.get(BASE_API + "/water-supply-improvements/:name", (req, res) => {
-    console.log("New GET to /water-supply-improvements/:name");
-
-    let nameParam = req.params.name; // Parámetro de la URL
-    // Buscar en datosB usando el parámetro 'name' (puede ser una comunidad autónoma o un año)
-    
-    // Intentar buscar si es una comunidad autónoma
-    let improvementsByCommunity = datosB.filter(i => i.autonomous_community.toLowerCase() === nameParam.toLowerCase());
-    
-    // Si no es una comunidad autónoma, intentar buscar si es un año
-    if (improvementsByCommunity.length === 0) {
-        let yearParam = parseInt(nameParam);
-        if (!isNaN(yearParam)) {
-            improvementsByCommunity = datosB.filter(i => i.year === yearParam);
-        }
-    }
-    
-    // Si se encuentran datos correspondientes a la comunidad autónoma o el año, devolver los resultados
-    if (improvementsByCommunity.length > 0) {
-        return response.status(200).send(improvementsByCommunity);
-    }
-
-    // Si no se encuentra ningún dato, devolver 404
-    return response.status(404).send({
-        error: "No se encontró el recurso",
-        message: `No se encontraron mejoras de suministro de agua para '${nameParam}'`
-    });
-});
 
 //PUT 1.- Cambiar todo el dato
 
