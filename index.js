@@ -116,12 +116,9 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New GET to /water-supply-improvements");
 
     if (datosB.length === 0) {
-        return res.status(404).send({
-            error: "No hay datos cargados",
-            message: "Hacer GET a loadInitialData para cargar datos de prueba"
-        });
+        return res.status(200).send([]);
     }
-
+    
     // Creación de copia para no machacar datos
     let filterDataB = [...datosB];
 
