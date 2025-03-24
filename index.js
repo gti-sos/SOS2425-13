@@ -497,7 +497,41 @@ app.get("/samples/DLV", (req, res) => {
 });
 
 //L05
+//loadInitialData
 
+app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
+    console.log("New GET to /national-parks/loadInitialData");
+
+    if (datosD.length === 0) {
+        let nuevosParques = [
+            { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
+            { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
+            { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
+            { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
+            { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
+            { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
+        ];
+
+        // Actualizamos datosD con los nuevos datos
+        /*
+        Se usa el operador "spread" o de propagación para añadir los nuevos parques al array de datosD
+        Si solo se usara datosD.push(nuevosParques), se añadiría un array dentro de otro array (arrays anidados)
+        y eso no es lo que se desea.
+        En su lugar, "spread" desempaqueta los elementos de nuevosParques y los añade uno a uno al array datosD
+        */
+        datosD.push(...nuevosParques);
+
+        console.log("Datos iniciales cargados correctamente");
+        response.status(200).send({ message: "Datos iniciales cargados correctamente", data: datosD });
+    } else {
+        console.log("Ya existen datos en el array. No se sobreescriben");
+        response.status(200).send({ message: "Ya existen datos en el array", data: datosD });
+    }
+});
 
 //GET a /national-parks y también GET a /national-parks?from=1950&to=1980
 /*
@@ -638,41 +672,7 @@ app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (r
 
 
 
-//loadInitialData
 
-app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
-    console.log("New GET to /national-parks/loadInitialData");
-
-    if (datosD.length === 0) {
-        let nuevosParques = [
-            { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
-            { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
-            { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
-            { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
-            { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
-            { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-            { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-            { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-            { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-            { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
-        ];
-
-        // Actualizamos datosD con los nuevos datos
-        /*
-        Se usa el operador "spread" o de propagación para añadir los nuevos parques al array de datosD
-        Si solo se usara datosD.push(nuevosParques), se añadiría un array dentro de otro array (arrays anidados)
-        y eso no es lo que se desea.
-        En su lugar, "spread" desempaqueta los elementos de nuevosParques y los añade uno a uno al array datosD
-        */
-        datosD.push(...nuevosParques);
-
-        console.log("Datos iniciales cargados correctamente");
-        response.status(200).send({ message: "Datos iniciales cargados correctamente", data: datosD });
-    } else {
-        console.log("Ya existen datos en el array. No se sobreescriben");
-        response.status(200).send({ message: "Ya existen datos en el array", data: datosD });
-    }
-});
 
 
 /*
