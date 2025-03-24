@@ -547,13 +547,10 @@ indicando que no hay datos para devolver
 app.get(BASE_API + "/national-parks", (request, response) => {
     console.log("New GET to /national-parks");
 
-    // Comprobar si hay datos para mostrar
-    if(datosD.length === 0) {
-        return response.status(404).send({
-            error: "No hay datos que mostrar",
-            message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales"
-        });
-    }
+       // Comprobar si hay datos para mostrar
+        if(datosD.length === 0) {
+            return response.status(200).send([]);
+        }
 
      // Crear una copia del array original para no modificarlo
      let filteredData = [...datosD];
