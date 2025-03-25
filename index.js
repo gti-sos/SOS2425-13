@@ -929,8 +929,8 @@ app.get(BASE_API + "/forest-fires", (req, res) => {
 });                  
                             
 // GET 2 - Petición GET por parametros
-app.get(BASE_API + "/forest-fires", (req, res) => {
-    console.log("New GET request to /forest-fires");
+app.get(BASE_API + "/forest-fires/:param", (req, res) => {
+    console.log("New GET request to /forest-fires/:param");
                             
     if (datosAlvaro.length === 0) {
         return res.status(404).json({
@@ -972,8 +972,8 @@ app.get(BASE_API + "/forest-fires", (req, res) => {
                             
 //GET 3 - Busqueda por 2 parametros: Fecha:Comunidad
                             
-app.get(BASE_API + "/forest-fires", (req, res) => {
-    console.log("Received GET request to /forest-fires");
+app.get(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
+    console.log("Received GET request to /forest-fires/:year/:autonomous_community");
                             
     if (!datosAlvaro || datosAlvaro.length === 0) {
         return res.status(404).json({
