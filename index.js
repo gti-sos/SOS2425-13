@@ -866,7 +866,7 @@ app.get(BASE_API + "/forest-fires/loadInitialData", (req, res) => {
             { year: 2024, comunidad: "Canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
             { year: 2024, comunidad: "Cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
             { year: 2024, comunidad: "Castilla-La Mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
-            { year: 2024, comunidad: "Castilla y León", number_of_accidents: 20343, percentage_of_large_firest: 0.47 },
+            { year: 2024, comunidad: "Castilla y León", number_of_accidents: 20343, percentage_of_large_fires: 0.47 },
             { year: 2024, comunidad: "Cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
             { year: 2024, comunidad: "Ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
             { year: 2024, comunidad: "Comunidad de Madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
@@ -904,11 +904,11 @@ app.get(BASE_API + "/forest-fires", (req, res) => {
                             
     // Aplicar filtros de rango de año si están presentes y son válidos
     if (!isNaN(fromYear)) {
-        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+        filteredData = filteredData.filter(entry => entry.year >= fromYear);
     }
                             
     if (!isNaN(toYear)) {
-        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
+        filteredData = filteredData.filter(entry => entry.year <= toYear);
     }
                             
     // Eliminar parámetros "from" y "to" de la consulta para procesar los demás
@@ -929,82 +929,80 @@ app.get(BASE_API + "/forest-fires", (req, res) => {
 });                  
                             
 // GET 2 - Petición GET por parametros
+
 app.get(BASE_API + "/forest-fires/:param", (req, res) => {
     console.log("New GET request to /forest-fires/:param");
-                            
+
     if (datosAlvaro.length === 0) {
         return res.status(404).json({
             error: "No hay datos disponibles",
             message: "Realice un GET a /loadInitialData para cargar datos de prueba"
         });
     }
-                            
-    // Copiar datos para evitar modificar el array original
-    let filteredData = [...datosAlvaro];
-                            
-    // Extraer y convertir parámetros de consulta
-    const fromYear = parseInt(req.query.from) || null;
-    const toYear = parseInt(req.query.to) || null;
-                            
-    // Aplicar filtros de rango si están presentes
-    if (fromYear) {
-        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+
+    const param = req.params.param.toLowerCase();
+
+    // Verificar si el parámetro es un número (año) o una cadena (comunidad autónoma)
+    let filteredData = isNaN(param)
+        ? datosAlvaro.filter(entry => entry.comunidad.toLowerCase() === param)
+        : datosAlvaro.filter(entry => entry.year === parseInt(param));
+
+    if (filteredData.length === 0) {
+        return res.status(404).json({
+            error: "No se encontraron registros",
+            message: `No hay registros para el parámetro: ${param}`
+        });
     }
-    if (toYear) {
-        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
-    }
-                            
-    // Remover parámetros "from" y "to" para procesar los demás
-    const { from, to, ...otherFilters } = req.query;
-                            
-    // Aplicar filtros adicionales basados en otros parámetros de consulta
-    Object.entries(otherFilters).forEach(([key, value]) => {
-        if (filteredData.length > 0 && key in filteredData[0]) {
-            filteredData = filteredData.filter(entry => 
-                typeof entry[key] === "number" ? entry[key] === parseInt(value) : entry[key] === value
-            );
-        }
-    });
-                            
-    // Enviar respuesta
-    return res.json(filteredData);
+
+    return res.status(200).json(filteredData);
 });
+
                             
 //GET 3 - Busqueda por 2 parametros: Fecha:Comunidad
-                            
+
 app.get(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
     console.log("Received GET request to /forest-fires/:year/:autonomous_community");
-                            
-    if (!datosAlvaro || datosAlvaro.length === 0) {
+
+    if (datosAlvaro.length === 0) {
         return res.status(404).json({
             error: "No hay datos disponibles",
             message: "Ejecute un GET a /loadInitialData para cargar datos de prueba"
         });
     }
-                            
-    // Copia del array original para aplicar filtros
-    let filteredData = [...datosAlvaro];
-                            
-    // Extraer parámetros de consulta y convertirlos a número si es necesario
+
+    // Extraer parámetros de la URL
+    const yearParam = parseInt(req.params.year);
+    const communityParam = req.params.autonomous_community.toLowerCase();
+
+    // Filtrar por año y comunidad autónoma
+    let filteredData = datosAlvaro.filter(entry => 
+        entry.year === yearParam && entry.comunidad.toLowerCase() === communityParam
+    );
+
+    // Aplicar filtros adicionales desde la consulta (query params)
     const { from, to, ...filters } = req.query;
     const fromYear = from ? parseInt(from) : null;
     const toYear = to ? parseInt(to) : null;
-                            
-    // Aplicar filtros de año
+
     if (fromYear && !isNaN(fromYear)) {
-        filteredData = filteredData.filter(entry => entry.declaration_date >= fromYear);
+        filteredData = filteredData.filter(entry => entry.year >= fromYear);
     }
     if (toYear && !isNaN(toYear)) {
-        filteredData = filteredData.filter(entry => entry.declaration_date <= toYear);
+        filteredData = filteredData.filter(entry => entry.year <= toYear);
     }
-                            
-    // Aplicar filtros adicionales según los parámetros de la consulta
-    Object.keys(filters).forEach(key => {
-        filteredData = filteredData.filter(entry => 
-            entry[key] == filters[key] // Comparación flexible para manejar números y strings
-        );
+
+    // Aplicar filtros adicionales
+    Object.entries(filters).forEach(([key, value]) => {
+        filteredData = filteredData.filter(entry => entry[key] == value);
     });
-                            
+
+    if (filteredData.length === 0) {
+        return res.status(404).json({
+            error: "No se encontraron registros",
+            message: `No hay accidentes forestales registrados para ${communityParam} en el año ${yearParam}`
+        });
+    }
+
     return res.status(200).json(filteredData);
 });
                             
@@ -1015,29 +1013,52 @@ app.get(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
     -Deben usarse todos los códigos de estado del cuadro verde (vistos en el L05)
     -No se debe devolver HTML en ningún caso
 */
-                            
-// POST 1 - Añadir un nuevo registro, verificando que todos los campos estén presentes
+                        
+
+// POST 1 - Añadir un nuevo registro, verificando que todos los campos estén presentes y sean válidos
 app.post(BASE_API + "/forest-fires", (req, res) => {
     const newEntry = req.body;
-                            
-    // Definir los campos obligatorios
-    const requiredFields = [
-        "year",
-        "autonomous_community",
-        "number_of_accidents",
-        "percentage_of_large_fires"
-    ];
-                            
-    // Identificar los campos faltantes
-    const missingFields = requiredFields.filter(field => !newEntry[field]);
-                            
-    if (missingFields.length > 0) {
+
+    // Definir los campos obligatorios y sus tipos esperados
+    const requiredFields = {
+        year: 'number',
+        autonomous_community: 'string',
+        number_of_accidents: 'number',
+        percentage_of_large_fires: 'number'
+    };
+
+    // Identificar los campos faltantes o con tipo incorrecto
+    const missingFields = [];
+    const invalidFields = [];
+
+    for (const [field, type] of Object.entries(requiredFields)) {
+        if (!newEntry[field]) {
+            missingFields.push(field);
+        } else if (typeof newEntry[field] !== type) {
+            invalidFields.push({ field, expectedType: type, actualType: typeof newEntry[field] });
+        }
+    }
+
+    // Si faltan campos o hay tipos incorrectos, devolver los errores
+    if (missingFields.length > 0 || invalidFields.length > 0) {
         return res.status(400).json({
-            error: "Faltan campos obligatorios",
-            missing_fields: missingFields
+            error: "Faltan o son inválidos algunos campos",
+            missing_fields: missingFields,
+            invalid_fields: invalidFields
         });
     }
-                            
+
+    // Verificar si ya existe un registro con los mismos valores
+    const exists = datosAlvaro.some(entry =>
+        entry.year === newEntry.year && entry.autonomous_community === newEntry.autonomous_community
+    );
+
+    if (exists) {
+        return res.status(409).json({
+            error: "Conflicto: Ya existe un registro para esa comunidad en ese año"
+        });
+    }
+
     // Agregar el nuevo dato al array
     datosAlvaro.push(newEntry);
     return res.status(201).json({
@@ -1045,29 +1066,9 @@ app.post(BASE_API + "/forest-fires", (req, res) => {
         data: newEntry
     });
 });
+                                                           
                             
-                                
-// POST 2 - Si el recurso ya existe, devolver error 409
-app.post(BASE_API + "/forest-fires", (req, res) => {
-    const newEntry = req.body;
-                            
-    // Verificar si el recurso ya existe en el array
-    const exists = datosAlvaro.some(entry => 
-        entry.year === newEntry.year && entry.autonomous_community === newEntry.autonomous_community
-    );
-                            
-    if (exists) {
-        return res.status(409).json({ 
-            error: "Ya existe un registro para esa comunidad en ese año" 
-        });
-    }
-                            
-    // Agregar nuevo dato si no está duplicado
-    datosAlvaro.push(newEntry);
-    return res.sendStatus(201);
-});
-                            
-// POST 3 - Error para recurso específico (no permitido)
+// POST 2 - Error para recurso específico (no permitido)
     app.post(BASE_API + "/forest-fires/:year", (req, res) => {
     // Log para rastrear la solicitud al recurso específico
     console.log(`Intento de POST a /forest-fires/${req.params.year}`);
