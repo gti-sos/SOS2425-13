@@ -1080,149 +1080,126 @@ app.post(BASE_API + "/forest-fires", (req, res) => {
     });
 });
                             
-                            
+
 // PUT 1 - Intento de actualización a un conjunto de recursos
 app.put(BASE_API + "/forest-fires", (req, res) => {
     console.log(`Intento de PUT a /forest-fires`);
-                            
+
     // Responder con un error indicando que no se puede hacer PUT a todo el conjunto de recursos
-    res.status(405).json({
+    return res.status(405).json({
         error: "Método no permitido",
-        message: "No se puede realizar un PUT a un conjunto de recursos. Por favor, especifique un recurso individual."
+        message: "No se puede realizar un PUT a un conjunto de recursos. Por favor, especifique un recurso individual utilizando el año y la comunidad autónoma."
     });
 });
-                            
-                            
+
 // PUT 2 - Actualizar un recurso específico (Accidente forestal por año y comunidad autónoma)
 app.put(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
     console.log("PUT request received for /forest-fires/:year/:autonomous_community");
-                            
+
     // Extraer parámetros de la URL
     const yearParam = parseInt(req.params.year); // Año de la mejora
     const communityParam = req.params.autonomous_community.toLowerCase(); // Comunidad autónoma
-                            
+
     // Buscar el recurso en el array de datosAlvaro
     const existingImprovement = datosAlvaro.find(item => item.year === yearParam && item.autonomous_community.toLowerCase() === communityParam);
-                            
+
     // Si el recurso no se encuentra, devolver error 404
     if (!existingImprovement) {
         return res.status(404).json({
             error: "Recurso no encontrado",
-            message: `No se han encontrado registros para ${communityParam} en el año ${yearParam}`
+            message: `No se han encontrado registros para ${communityParam} en el año ${yearParam}.`
         });
     }
-                            
+
     // Verificar que los datos enviados en el body no están vacíos
     const requestBody = req.body;
     if (!requestBody || Object.keys(requestBody).length === 0) {
         return res.status(400).json({
             error: "Solicitud mal formada",
-            message: "El cuerpo de la solicitud está vacío"
+            message: "El cuerpo de la solicitud está vacío. Por favor, proporcione los datos a actualizar."
         });
     }
-                            
+
     // Comprobar si se está intentando actualizar el año o comunidad autónoma
     if (requestBody.year && requestBody.year !== yearParam) {
         // Verificar si el nuevo año y comunidad ya están registrados
-        const conflict = datosAlvaro.find(item => item.year === requestBody.year && item.autonomous_community === requestBody.autonomous_community);
+        const conflict = datosAlvaro.find(item => item.year === requestBody.year && item.autonomous_community.toLowerCase() === requestBody.autonomous_community.toLowerCase());
         if (conflict) {
             return res.status(409).json({
                 error: "Conflicto de datos",
-                message: `Ya existe un accidente forestal registrado para ${requestBody.autonomous_community} en el año ${requestBody.year}`
+                message: `Ya existe un accidente forestal registrado para ${requestBody.autonomous_community} en el año ${requestBody.year}.`
             });
         }
     }
-                            
+
     // Actualizar el recurso con los nuevos valores del cuerpo de la solicitud
     Object.assign(existingImprovement, requestBody);
-                            
+
     // Responder con un código de éxito (200) y el recurso actualizado
     return res.status(200).json({
-        message: "Accidente forestal actualizado exitosamente",
+        message: "Accidente forestal actualizado exitosamente.",
         updatedResource: existingImprovement
-        });
     });
+});
                             
-                            
+ 
 // DELETE 1 - Eliminar todos los registros de accidentes forestales
 app.delete(BASE_API + "/forest-fires", (req, res) => {
     console.log("DELETE request received at /forest-fires");
-                            
+
     // Verificar si hay datos disponibles en el sistema
     if (datosAlvaro.length === 0) {
         return res.status(404).json({
             error: "Datos no encontrados",
-            message: "No hay registros de accidentes forestales en el sistema para eliminar"
+            message: "No hay registros de accidentes forestales en el sistema para eliminar."
         });
     }
-                            
+
     // Eliminar todos los registros de accidentes forestales
-    datosAlvaro.length = 0;  // Otra forma de limpiar el array
-                            
+    datosAlvaro.length = 0; // Limpiar el array
+
     // Confirmar que los datos han sido eliminados correctamente
     return res.status(200).json({
-        message: "Todos los registros de accidentes forestales han sido eliminados satisfactoriamente"
+        message: "Todos los registros de accidentes forestales han sido eliminados satisfactoriamente."
     });
 });
-                            
-                            
-// DELETE 2 - Eliminar todos los registros de accidentes forestales
-app.delete(BASE_API + "/forest-fires", (req, res) => {
-    console.log("Received DELETE request to /forest-fires");
-                            
-    // Comprobar si hay datos en la base
-    if (datosAlvaro.length === 0) {
-        return res.status(404).json({
-            error: "No se encontraron registros",
-            message: "No hay datos de accidentes forestales para eliminar"
-        });
-    }
-                            
-    // Alternativa para eliminar todos los elementos del array: "Splice"
-    while (datosAlvaro.length > 0) {
-        datosAlvaro.pop(); // Eliminar el último elemento hasta que el array esté vacío
-    }
-                            
-    // Responder con el mensaje de éxito
-    return res.status(200).json({
-        message: "Todos los registros de accidentes forestales han sido eliminados"
-    });
-});
-                            
-// DELETE 3 - Eliminar todos los datos de un año específico
+
+
+// DELETE 2 - Eliminar todos los datos de un año específico
 app.delete(BASE_API + "/forest-fires/:year", (req, res) => {
-    console.log("Received DELETE request to /forest-fires/:year");
-                            
+    console.log(`DELETE request received at /forest-fires/${req.params.year}`);
+
     const yearParam = parseInt(req.params.year);  // Año recibido desde la URL
-                            
+
     // Validar que el parámetro de año sea un número válido
     if (isNaN(yearParam)) {
         return res.status(400).json({
             error: "Año inválido",
-            message: "El parámetro 'year' debe ser un número válido"
+            message: "El parámetro 'year' debe ser un número válido."
         });
     }
-                            
+
     // Filtrar los registros del año solicitado
     const filteredData = datosAlvaro.filter(i => i.year === yearParam);
-                            
+
     // Si no hay registros para ese año, responder con error 404
     if (filteredData.length === 0) {
         return res.status(404).json({
             error: "No se encontraron registros para el año solicitado",
-            message: `No hay accidentes forestales registrados para el año ${yearParam}`
+            message: `No hay accidentes forestales registrados para el año ${yearParam}.`
         });
     }
-                            
+
     // Eliminar los registros del año especificado
     datosAlvaro = datosAlvaro.filter(i => i.year !== yearParam);
-                            
+
     // Enviar una respuesta exitosa con los registros eliminados
     return res.status(200).json({
-        message: `Los registros de accidentes forestales del año ${yearParam} han sido eliminados correctamente`,
+        message: `Los registros de accidentes forestales del año ${yearParam} han sido eliminados correctamente.`,
         deletedData: filteredData  // Mostrar los registros eliminados
     });
 });
+
 
 // Iniciar el servidor
 app.listen(PORT, () => {
