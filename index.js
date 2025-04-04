@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/about", (req, res) => {
-    res.sendFile(__dirname + "/public/about.html");
+    res.sendFile("/public/about.html");
 });
 
 // ---- PARTE BLANCA (modularizada correctamente) ----
