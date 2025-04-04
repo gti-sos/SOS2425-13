@@ -8,12 +8,11 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send(`
-        <h1>Bienvenido a la API del Grupo 13</h1>
-    `);
+        <h1>Bienvenido a la API del Grupo 13</h1>`);
 });
 
 app.get("/about", (req, res) => {
-    res.sendFile("/public/about.html");
+    res.sendFile(__dirname + "/public/about.html");
 });
 
 // ---- PARTE BLANCA (modularizada correctamente) ----

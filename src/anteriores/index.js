@@ -11,9 +11,7 @@ app.use(express.json()); //Para que pueda interpretar el body de las peticiones 
 
 app.get("/", (req, res) => {
     res.send(`
-        <h1>Bienvenido a la API del Grupo 13</h1>
-       
-    `);
+        <h1>Bienvenido a la API del Grupo 13</h1>`);
 });
 
 app.get("/about", (req, res) => {
