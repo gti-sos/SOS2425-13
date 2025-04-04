@@ -55,7 +55,7 @@ let datosB = [
 ];
 
 
-module.exports = datosB;
+export default datosB;
 
 /*
 

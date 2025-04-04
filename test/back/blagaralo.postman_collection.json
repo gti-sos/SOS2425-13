@@ -1,0 +1,837 @@
+{
+	"info": {
+		"_postman_id": "34084764-cfee-4c38-afc1-ecfd8d8c425e",
+		"name": "blagaralo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42334859",
+		"_collection_link": "https://sos2425-13.postman.co/workspace/SOS2425-13-~b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/42334859-34084764-cfee-4c38-afc1-ecfd8d8c425e?action=share&source=collection_link&creator=42334859"
+	},
+	"item": [
+		{
+			"name": "loadInitialData",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/loadInitialData",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "water-supply-improvements",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dos parametros",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/cantabria",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"cantabria"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Por fecha",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2018",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2018"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Por comunidad",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ayudas por claves",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?autonomous_community=andalucia&year=2012",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					],
+					"query": [
+						{
+							"key": "autonomous_community",
+							"value": "andalucia"
+						},
+						{
+							"key": "year",
+							"value": "2012"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ayudas por claves comunidad y fecha",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?year=2012&autonomous_community=andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2012"
+						},
+						{
+							"key": "autonomous_community",
+							"value": "andalucia"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ayudas por comunidad y rango de fechas",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?autonomous_community=andalucia&from=2009&to=2017",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					],
+					"query": [
+						{
+							"key": "autonomous_community",
+							"value": "andalucia"
+						},
+						{
+							"key": "from",
+							"value": "2009"
+						},
+						{
+							"key": "to",
+							"value": "2017"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 400: búsqueda por año primero",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/hola/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"hola",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 404 :claves inexistentes",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?from=2018&to=2020",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					],
+					"query": [
+						{
+							"key": "autonomous_community",
+							"value": "andalucia",
+							"disabled": true
+						},
+						{
+							"key": "from",
+							"value": "2018"
+						},
+						{
+							"key": "to",
+							"value": "2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "water-supply-improvements",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2012,\"autonomous_community\":\"andalucia\",\"amount\":5447744,\"benefited_population\":13599,\"project_count\":60}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 400: Faltan campos",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 405: Petición dato especifico",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2015,\"autonomous_community\":\"andalucia\",\"amount\":12604168,\"benefited_population\":25208,\"project_count\":45}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 409: Dato repetido",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2015,\"autonomous_community\":\"andalucia\",\"amount\":12604168,\"benefited_population\":25208,\"project_count\":45}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cambio de dato por fecha y comunidad",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2015,\"autonomous_community\":\"andalucia\",\"amount\":123456789,\"benefited_population\":25208,\"project_count\":45}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 400: Datos originales",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 400: Datos loadInitialData",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/cantabria",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"cantabria"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 404: Dato inexistente",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2015,\"autonomous_community\":\"andalucia\",\"amount\":12604168,\"benefited_population\":25208,\"project_count\":45}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/salteras",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"salteras"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 405: Dato entero",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2015,\"autonomous_community\":\"andalucia\",\"amount\":12604168,\"benefited_population\":25208,\"project_count\":45}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 409: Fallo por dato existente, datos originales",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2016,\"autonomous_community\":\"aragon\",\"amount\":12646637,\"benefited_population\":157577,\"project_count\":50}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 409: Fallo por dato existente, datos originales Copy",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"year\": 2016,\"autonomous_community\":\"aragon\",\"amount\":12646637,\"benefited_population\":157577,\"project_count\":50}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar datos",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar dato concreto en fecha y comunidad",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 400: Borrar datos con fecha y coumidad",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/hola/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"hola",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 404: Borrar dato concreto en fecha y comunidad, datos loadInitialDat",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2015/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2015",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 404: Borrar dato concreto en fecha y comunidad, datos originales",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements/2014/andalucia",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"2014",
+						"andalucia"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
