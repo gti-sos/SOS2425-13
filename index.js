@@ -17,7 +17,7 @@ app.get("/about", (req, res) => {
 });
 
 // ---- PARTE BLANCA (modularizada correctamente) ----
-import { loadBackend } from "./src/back/index-BGA.js";
+import { loadBackend } from "./src/back_D01/index-BGA.js";
 loadBackend(app);
 
 // Aquí puedes incluir otras partes modularizadas también (Darío, Álvaro...)

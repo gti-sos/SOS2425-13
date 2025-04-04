@@ -70,8 +70,9 @@ let datosB = [
 ];
 
 
+export function loadBackend(app) {
     // LoadInitialData
-    app.get(BASE_API + RESOURCE + "/loadInitialData", (req, res) => {
+    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         db.find({}, (err, datosB) => {
             if (datosB.length === 0) {
                 db.insert(initialData);
@@ -82,7 +83,6 @@ let datosB = [
         });
     });
 
-    function loadBackend(app) {
     // GET genérico
     app.get(BASE_API + RESOURCE, (req, res) => {
         let query = {};
@@ -207,6 +207,10 @@ let datosB = [
             }
         });
     });
+
+    app.get(BASE_API + RESOURCE +"/docs",(req,res)=>{
+        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUAhnf");
+    });
 }
 
-export { loadBackend };
+
