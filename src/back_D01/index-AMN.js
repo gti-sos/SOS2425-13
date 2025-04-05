@@ -47,7 +47,7 @@ const datosAlvaro = [
 ];
 
 
-export function loadBackendA(app) {
+export function loadBackend(app) {
 
     // Cargar datos iniciales
     app.get(`${BASE_API}${RESOURCE}/loadInitialData`, (req, res) => {
@@ -168,8 +168,10 @@ export function loadBackendA(app) {
         });
     });
 
-    // Documentación
-    app.get(`${BASE_API}${RESOURCE}/docs`, (req, res) => {
-        res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
-    });
+// Documentación
+app.get(`${BASE_API}${RESOURCE}/docs`, (req, res) => {
+    res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
+});
 }
+
+export { loadBackend };
