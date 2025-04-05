@@ -8,12 +8,12 @@ app.use(express.json());
 
 //Acceder al homepage lanza un index.html de forma estatica
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/public/index.html");
+    res.sendFile(__dirname + "./public/index.html");
 });
 
 //Acceder al homepage lanza el about.html de forma estatica
 app.get("/about", (req, res) => {
-    res.sendFile(__dirname + "/public/about.html");
+    res.sendFile(__dirname + "./public/about.html");
 });
 
 
