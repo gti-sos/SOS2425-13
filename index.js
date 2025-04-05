@@ -15,7 +15,12 @@ loadBackend(app);
 import { loadBackend as loadBackendD} from "./src/back_D01/index-DLV.js";
 loadBackendD(app);
 
-// Aquí puedes incluir otras partes modularizadas también (Darío, Álvaro...)
+
+// ---- PARTE ÁLVARO (modularizada correctamente) ----
+
+import { loadBackend } from "./src/back_D01/index-AMN.js";
+loadBackend(app);
+
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
