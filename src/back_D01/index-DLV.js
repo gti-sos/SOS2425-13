@@ -406,6 +406,11 @@ app.delete(BASE_API + "/national-parks/:name", (request, response) => {
     });
 });
 
+app.get(BASE_API + "/docs", (request, response) => {
+    response.redirect("https://documenter.getpostman.com/view/14944672/2sB2cUBNyt");
+
+});
+
 }
 
 export { loadBackend };
