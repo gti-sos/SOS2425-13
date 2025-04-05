@@ -123,10 +123,10 @@ app.get(BASE_API + "/national-parks", (request, response) => {
             });
         }
         
-        // Si no hay datos que coincidan con la búsqueda, devolver 200 y array vacío
+       /*  // Si no hay datos que coincidan con la búsqueda, devolver 200 y array vacío
         if (docs.length === 0) {
             return response.status(200).send([]);
-        }
+        } */
         
         // Transformar los documentos para eliminar el campo _id
         const transformedDocs = docs.map(doc => {
