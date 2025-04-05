@@ -18,8 +18,8 @@ loadBackendD(app);
 
 // ---- PARTE ÁLVARO (modularizada correctamente) ----
 
-import { loadBackend as loadBackendDA } from "./src/back_D01/index-AMN.js";
-loadBackendDA(app);
+import { loadBackend as loadBackendA } from "./src/back_D01/index-AMN.js";
+loadBackendA(app);
 
 
 app.listen(PORT, () => {
