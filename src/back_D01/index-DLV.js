@@ -31,10 +31,11 @@ const datosIniciales = [
     { national_park: "Archipiélago de Cabrera", declaration_date: 1991, autonomous_community: "Baleares", initial_area: 10021, current_area: 10021 },
 ];
 
-// Cargar los datos iniciales en la base de datos
-db.insert(datosIniciales);
 
 function loadBackend(app) {
+
+
+   
 
 //loadInitialData
 app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
@@ -46,29 +47,28 @@ app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
             return response.status(500).send({ error: "Error interno del servidor al consultar la base de datos" });
         }
         
+        // Si la base de datos está vacía, insertar los datos iniciales
         if (count === 0) {
-            // Insertar nuevos datos si la base de datos está vacía
-            db.insert(nuevosParques, (err, insertedDocs) => {
+            db.insert(datosIniciales, (err, insertedDocs) => {
                 if (err) {
                     return response.status(500).send({ error: "Error al cargar datos iniciales" });
                 }
                 console.log("Datos iniciales cargados correctamente");
+                
+                // Transformar los documentos para eliminar el campo _id
+                const transformedDocs = insertedDocs.map(doc => {
+                    const { _id, ...rest } = doc;
+                    return rest;
+                });
+                
                 response.status(200).send({ 
                     message: "Datos iniciales cargados correctamente", 
-                    data: insertedDocs 
+                    data: transformedDocs
                 });
             });
         } else {
-            // Si ya hay datos, no sobrescribir
-            db.find({}, (err, docs) => {
-                if (err) {
-                    return response.status(500).send({ error: "Error al obtener los datos existentes" });
-                }
-                console.log("Ya existen datos en la BD. No se sobreescriben");
-                response.status(200).send({ 
-                    message: "Ya existen datos en la base de datos", 
-                    data: docs 
-                });
+            response.status(405).send({ 
+                message: "No se permite volver a cargar los datos iniciales", 
             });
         }
     });
@@ -78,68 +78,28 @@ app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
 app.get(BASE_API + "/national-parks", (request, response) => {
     console.log("New GET to /national-parks");
 
-    // Construir la consulta para la base de datos
-    let query = {};
-    
-    // Procesar parámetros especiales from y to
-    const fromYear = request.query.from ? parseInt(request.query.from) : null;
-    const toYear = request.query.to ? parseInt(request.query.to) : null;
-    
-    if (fromYear !== null && !isNaN(fromYear)) {
-        query.declaration_date = query.declaration_date || {};
-        query.declaration_date.$gte = fromYear;
-    }
-    
-    if (toYear !== null && !isNaN(toYear)) {
-        query.declaration_date = query.declaration_date || {};
-        query.declaration_date.$lte = toYear;
-    }
-    
-    // Procesar el resto de parámetros de consulta
-    const { from, to, ...otherParams } = request.query;
-    
-    for (const [key, value] of Object.entries(otherParams)) {
-        // Convertir valores numéricos
-        const numValue = parseInt(value);
-        if (!isNaN(numValue) && String(numValue) === String(value)) {
-            query[key] = numValue;
-        } else {
-            query[key] = value;
-        }
-    }
-    
-    // Ejecutar la consulta en la base de datos
-    db.find(query, (err, docs) => {
+    // Verificar primero si hay datos en la base de datos
+    db.count({}, (err, count) => {
         if (err) {
-            return response.status(500).send({ error: "Error al consultar la base de datos" });
-        }
-        // Siempre enviar un array (vacío si no hay resultados)
-        return response.status(200).send(docs);
-    });
-});
-
-// GET avanzado para diferenciar parque por nombre o comunidad
-app.get(BASE_API + "/national-parks/:param", (request, response) => {
-    console.log("New GET to /national-parks/:param");
-    const param = request.params.param;
-    
-    // 1. Verificar si es un nombre de parque
-    db.findOne({ national_park: param }, (err, park) => {
-        if (err) {
-            return response.status(500).send({ error: "Error al consultar la base de datos" });
+            return response.status(500).send({ error: "Error interno del servidor al consultar la base de datos" });
         }
         
-        // Si encontramos un parque con ese nombre, lo devolvemos
-        if (park) {
-            return response.status(200).send(park);
+        // Si no hay datos, devolver 404 con un mensaje y array vacío
+        if (count === 0) {
+            return response.status(404).send({
+                error: "No hay datos que mostrar",
+                message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales",
+                data: []
+            });
         }
         
-        // 2. Si no es un parque, buscamos por comunidad autónoma
+        // Si hay datos, continuar con el procesamiento normal
+        // Construir la consulta para la base de datos
+        let query = {};
+        
+        // Procesar parámetros especiales from y to
         const fromYear = request.query.from ? parseInt(request.query.from) : null;
         const toYear = request.query.to ? parseInt(request.query.to) : null;
-        
-        // Construir consulta para filtrar por comunidad y posiblemente por años
-        let query = { autonomous_community: param };
         
         if (fromYear !== null && !isNaN(fromYear)) {
             query.declaration_date = query.declaration_date || {};
@@ -151,15 +111,88 @@ app.get(BASE_API + "/national-parks/:param", (request, response) => {
             query.declaration_date.$lte = toYear;
         }
         
-        db.find(query, (err, parks) => {
+        // Procesar el resto de parámetros de consulta
+        const { from, to, ...otherParams } = request.query;
+        
+        for (const [key, value] of Object.entries(otherParams)) {
+            // Convertir valores numéricos
+            const numValue = parseInt(value);
+            if (!isNaN(numValue) && String(numValue) === String(value)) {
+                query[key] = numValue;
+            } else {
+                query[key] = value;
+            }
+        }
+        
+        // Ejecutar la consulta en la base de datos
+        db.find(query, (err, docs) => {
             if (err) {
                 return response.status(500).send({ error: "Error al consultar la base de datos" });
             }
             
-            if (parks.length > 0) {
-                return response.status(200).send(parks);
-            }
+            // Transformar los documentos para eliminar el campo _id
+            const transformedDocs = docs.map(doc => {
+                const { _id, ...rest } = doc;
+                return rest;
+            });
             
+            // Siempre enviar un array (vacío si no hay resultados)
+            return response.status(200).send(transformedDocs);
+        });
+    });
+});
+
+
+// GET avanzado para diferenciar parque por nombre o comunidad
+// TAMBIEN ES EL GET que devuelve un parque en específico (GET normal)
+app.get(BASE_API + "/national-parks/:param", (request, response) => {
+    console.log("New GET to /national-parks/:param");
+    const param = request.params.param;
+
+    // 1. Verificar si es un nombre de parque
+    db.findOne({ national_park: param }, (err, park) => {
+        if (err) {
+            return response.status(500).send({ error: "Error al consultar la base de datos" });
+        }
+
+        // Si encontramos un parque con ese nombre, lo devolvemos
+        if (park) {
+            // Transformar el documento para eliminar el campo _id
+            const { _id, ...rest } = park;
+            return response.status(200).send(rest);
+        }
+
+        // 2. Si no es un parque, buscamos por comunidad autónoma
+        const fromYear = request.query.from ? parseInt(request.query.from) : null;
+        const toYear = request.query.to ? parseInt(request.query.to) : null;
+
+        // Construir consulta para filtrar por comunidad y posiblemente por años
+        let query = { autonomous_community: param };
+
+        if (fromYear !== null && !isNaN(fromYear)) {
+            query.declaration_date = query.declaration_date || {};
+            query.declaration_date.$gte = fromYear;
+        }
+
+        if (toYear !== null && !isNaN(toYear)) {
+            query.declaration_date = query.declaration_date || {};
+            query.declaration_date.$lte = toYear;
+        }
+
+        db.find(query, (err, parks) => {
+            if (err) {
+                return response.status(500).send({ error: "Error al consultar la base de datos" });
+            }
+
+            if (parks.length > 0) {
+                // Transformar los documentos para eliminar el campo _id
+                const transformedParks = parks.map(park => {
+                    const { _id, ...rest } = park;
+                    return rest;
+                });
+                return response.status(200).send(transformedParks);
+            }
+
             // 3. Si no es ni parque ni comunidad, devolver 404
             return response.status(404).send({
                 error: "Recurso no encontrado",
@@ -168,6 +201,7 @@ app.get(BASE_API + "/national-parks/:param", (request, response) => {
         });
     });
 });
+
 
 // GET por comunidad y año específico
 app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (request, response) => {
@@ -206,6 +240,7 @@ app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (r
         }
     });
 });
+
 
 // POST para crear un nuevo parque
 app.post(BASE_API + "/national-parks", (request, response) => {
@@ -254,23 +289,6 @@ app.post(BASE_API + "/national-parks/:name", (request, response) => {
     return response.status(405).send({error: "Método no permitido. No se puede hacer un POST a un recurso específico"});
 });
 
-// GET a un parque específico por nombre
-app.get(BASE_API + "/national-parks/:name", (request, response) => {
-    console.log("New GET to /national-parks/:name");
-    let parkName = request.params.name;
-    
-    db.findOne({ national_park: parkName }, (err, park) => {
-        if (err) {
-            return response.status(500).send({ error: "Error al consultar la base de datos" });
-        }
-        
-        if (!park) {
-            return response.status(404).send({ error: "Parque no encontrado" });
-        }
-        
-        return response.status(200).send(park);
-    });
-});
 
 // PUT al conjunto de recursos (no permitido)
 app.put(BASE_API + "/national-parks", (request, response) => {
@@ -381,9 +399,12 @@ app.delete(BASE_API + "/national-parks/:name", (request, response) => {
                 return response.status(500).send({ error: "Error al eliminar el parque" });
             }
             
+            // Transformar el documento para eliminar el campo _id
+            const { _id, ...rest } = park;
+            
             response.status(200).send({
                 message: "Parque eliminado correctamente", 
-                data: park
+                data: rest
             });
         });
     });
