@@ -47,7 +47,7 @@ const datosAlvaro = [
 ];
 
 
-export function loadForestFiresBackend(app) {
+export function loadBackendA(app) {
 
     // Cargar datos iniciales
     app.get(`${BASE_API}${RESOURCE}/loadInitialData`, (req, res) => {
