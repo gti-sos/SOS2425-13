@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "34084764-cfee-4c38-afc1-ecfd8d8c425e",
+		"_postman_id": "0edc088a-ad76-44ac-a773-576bd41b2c39",
 		"name": "blagaralo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42334859",
-		"_collection_link": "https://sos2425-13.postman.co/workspace/SOS2425-13-~b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/42334859-34084764-cfee-4c38-afc1-ecfd8d8c425e?action=share&source=collection_link&creator=42334859"
+		"_collection_link": "https://sos2425-13.postman.co/workspace/b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/42334859-0edc088a-ad76-44ac-a773-576bd41b2c39?action=share&source=collection_link&creator=42334859"
 	},
 	"item": [
 		{
@@ -282,7 +282,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?from=2018&to=2020",
+					"raw": "https://sos2425-13.onrender.com/api/v1/water-supply-improvements?from=2025&to=2027",
 					"protocol": "https",
 					"host": [
 						"sos2425-13",
@@ -302,11 +302,11 @@
 						},
 						{
 							"key": "from",
-							"value": "2018"
+							"value": "2025"
 						},
 						{
 							"key": "to",
-							"value": "2020"
+							"value": "2027"
 						}
 					]
 				}

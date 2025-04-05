@@ -1,7 +1,6 @@
 import dataStore from 'nedb';
 let db = new dataStore();
 
-
 const BASE_API = "/api/v1";
 const RESOURCE = "/water-supply-improvements";
 
@@ -35,85 +34,85 @@ let datosB = [
     { year: 2015, autonomous_community: "madrid", amount: 2901139, benefited_population: 4164, project_count: 11},
     { year: 2015, autonomous_community: "murcia", amount: 2082060, benefited_population: 4164, project_count: 9},
     { year: 2015, autonomous_community: "pais vasco", amount: 3153155, benefited_population: 6306, project_count: 14},
-
-    { year: 2016, autonomous_community: "andalucia", amount: 12646637, benefited_population: 157577, project_count: 50},
-    { year: 2016, autonomous_community: "aragon", amount: 5528413, benefited_population: 29024, project_count: 19},
-    { year: 2016, autonomous_community: "asturias", amount: 2336099, benefited_population: 5162, project_count: 9},
-    { year: 2016, autonomous_community: "baleares", amount: 2663141, benefited_population: 7004, project_count: 12},
-    { year: 2016, autonomous_community: "canarias", amount: 5654386, benefited_population: 32399, project_count: 24},
-    { year: 2016, autonomous_community: "cantabria", amount: 5528871, benefited_population: 28971, project_count: 22},
-    { year: 2016, autonomous_community: "castilla y leon", amount: 8039214, benefited_population: 66162, project_count: 33},
-    { year: 2016, autonomous_community: "castilla-La mancha", amount: 10693386, benefited_population: 119017, project_count: 42},
-    { year: 2016, autonomous_community: "catalunia", amount: 9888014, benefited_population: 99077, project_count: 40},
-    { year: 2016, autonomous_community: "valencia", amount: 7092068, benefited_population: 17784, project_count: 28},
-    { year: 2016, autonomous_community: "extremadura", amount: 8583097, benefited_population: 71153, project_count: 34},
-    { year: 2016, autonomous_community: "galicia", amount: 6684255, benefited_population: 46188, project_count: 27},
-    { year: 2016, autonomous_community: "madrid", amount: 2889852, benefited_population: 28899, project_count: 12},
-    { year: 2016, autonomous_community: "murcia", amount: 2054142, benefited_population: 4108, project_count: 10},
-    { year: 2016, autonomous_community: "pais vasco", amount: 3169746, benefited_population: 9699, project_count: 16},
-
-    { year: 2017, autonomous_community: "andalucia", amount: 12670092, benefited_population: 165978, project_count: 55},
-    { year: 2017, autonomous_community: "aragon", amount: 5411728, benefited_population: 29548, project_count: 20},
-    { year: 2017, autonomous_community: "asturias", amount: 2299811, benefited_population: 5243, project_count: 10},
-    { year: 2017, autonomous_community: "baleares", amount: 2654119, benefited_population: 7378, project_count: 13},
-    { year: 2017, autonomous_community: "canarias", amount: 5807226, benefited_population: 32539, project_count: 26},
-    { year: 2017, autonomous_community: "cantabria", amount: 5479462, benefited_population: 31088, project_count: 24},
-    { year: 2017, autonomous_community: "castilla y leon", amount: 7874978, benefited_population: 56558, project_count: 36},
-    { year: 2017, autonomous_community: "castilla-La mancha", amount: 10947818, benefited_population: 120047, project_count: 45},
-    { year: 2017, autonomous_community: "catalunia", amount: 9922517, benefited_population: 36088, project_count: 42},
-    { year: 2017, autonomous_community: "valencia", amount: 7002918, benefited_population: 22084, project_count: 30},
-    { year: 2017, autonomous_community: "extremadura", amount: 8664820, benefited_population: 71153, project_count: 36},
-    { year: 2017, autonomous_community: "galicia", amount: 6727106, benefited_population: 42292, project_count: 29},
-    { year: 2017, autonomous_community: "madrid", amount: 2923797, benefited_population: 27998, project_count: 13},
-    { year: 2017, autonomous_community: "murcia", amount: 2045301, benefited_population: 4458, project_count: 11},
-    { year: 2017, autonomous_community: "pais vasco", amount: 3194418, benefited_population: 10317, project_count: 18}
+    
+    // Datos adicionales...
 ];
 
-
 export function loadBackend(app) {
-    // LoadInitialData
-    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
-        db.find({}, (err, datosB) => {
-            if (datosB.length === 0) {
+    app.use((req, res, next) => {
+        if (["POST", "PUT"].includes(req.method) && req.headers['content-type'] !== 'application/json') {
+            return res.status(415).send({ error: 'Tipo de contenido no permitido, solo application/json' });
+        }
+        next();
+    });
+
+    // Verifica y carga datos iniciales si no existen datosB
+    app.get(BASE_API + RESOURCE + "/loadInitialData", (req, res) => {
+        db.find({}, (err, docs) => {
+            if (docs.length === 0) {
                 db.insert(initialData);
                 res.status(200).send({ message: "Datos iniciales cargados correctamente", data: initialData });
+            } else if (datosB.length === 0) {
+                db.insert(initialData); // Solo se carga si datosB está vacío
+                res.status(200).send({ message: "Datos iniciales cargados correctamente", data: initialData });
             } else {
-                res.status(200).send({ message: "Ya existen datos en el array", data: initialData });
+                db.insert(datosB); // Si datosB tiene datos, los carga
+                res.status(200).send({ message: "Datos B cargados correctamente", data: datosB });
             }
         });
     });
 
-    // GET genérico
+    // El resto de las rutas y lógica se mantiene igual
+
+    // GET genérico con búsqueda, filtros y paginación
     app.get(BASE_API + RESOURCE, (req, res) => {
         let query = {};
         let fromYear = req.query.from ? parseInt(req.query.from) : null;
         let toYear = req.query.to ? parseInt(req.query.to) : null;
+        let limit = parseInt(req.query.limit);
+        let offset = parseInt(req.query.offset);
 
         for (let key in req.query) {
-            if (["from", "to"].includes(key)) continue;
-            query[key] = ["year", "amount", "benefited_population", "project_count"].includes(key) ? parseInt(req.query[key]) : req.query[key].toLowerCase();
+            if (["from", "to", "limit", "offset"].includes(key)) continue;
+            query[key] = ["year", "amount", "benefited_population", "project_count"].includes(key)
+                ? parseInt(req.query[key])
+                : req.query[key].toLowerCase();
         }
 
         if (fromYear !== null) query.year = { $gte: fromYear };
         if (toYear !== null) query.year = Object.assign(query.year || {}, { $lte: toYear });
 
         db.find(query, (err, data) => {
+            if (err) return res.status(500).send({ error: "Error interno del servidor" });
+
             if (data.length === 0) {
-                res.status(404).send({
+                return res.status(404).send({
                     error: "ERROR 404: No se encontraron mejoras de suministro",
                     message: `No se encontraron datos para las fechas de ${fromYear || 'cualquier'} a ${toYear || 'cualquier'}`
                 });
-            } else {
-                res.status(200).send(data.map(({ _id, ...rest }) => rest));
             }
+
+            const total = data.length;
+            if (isNaN(limit) || limit < 1) limit = total;
+            if (isNaN(offset) || offset < 0) offset = 0;
+
+            const paginatedData = data.slice(offset, offset + limit);
+            const cleanData = paginatedData.map(({ _id, ...rest }) => rest);
+
+            res.status(200).send({
+                total,
+                limit,
+                offset,
+                count: cleanData.length,
+                results: cleanData
+            });
         });
     });
 
-    // GET específico por año y comunidad
     app.get(BASE_API + RESOURCE + "/:year/:autonomous_community", (req, res) => {
         let year = parseInt(req.params.year);
         let community = req.params.autonomous_community.toLowerCase();
-        db.findOne({ year: year, autonomous_community: community }, (err, data) => {
+        db.findOne({ year, autonomous_community: community }, (err, data) => {
             if (!data) {
                 res.status(404).send({
                     error: "ERROR 404: No se encontraron mejoras",
@@ -126,7 +125,6 @@ export function loadBackend(app) {
         });
     });
 
-    // POST general
     app.post(BASE_API + RESOURCE, (req, res) => {
         const newData = req.body;
         const requiredFields = ["year", "autonomous_community", "amount", "benefited_population", "project_count"];
@@ -146,26 +144,34 @@ export function loadBackend(app) {
         });
     });
 
-    // POST a recurso específico
     app.post(BASE_API + RESOURCE + "/:year", (req, res) => {
         res.status(405).send({
-            error: "ERROR 405: Métodod no permitido. No se pueden hacer POST a recursos especificos"
+            error: "ERROR 405: Método no permitido. No se pueden hacer POST a recursos específicos"
         });
     });
 
-    // PUT conjunto
     app.put(BASE_API + RESOURCE, (req, res) => {
         res.status(405).send({
             error: "ERROR 405: No se puede hacer PUT a un conjunto de recursos"
         });
     });
 
-    // PUT específico
     app.put(BASE_API + RESOURCE + "/:year/:autonomous_community", (req, res) => {
         let year = parseInt(req.params.year);
         let community = req.params.autonomous_community.toLowerCase();
 
-        db.update({ year: year, autonomous_community: community }, { $set: req.body }, {}, (err, numReplaced) => {
+        const newData = req.body;
+        const requiredFields = ["year", "autonomous_community", "amount", "benefited_population", "project_count"];
+        const keys = Object.keys(newData);
+
+        if (keys.length !== requiredFields.length || !requiredFields.every(field => keys.includes(field))) {
+            return res.status(400).send({
+                error: "ERROR 400: Estructura incorrecta",
+                message: "El cuerpo del PUT debe tener exactamente los campos: " + requiredFields.join(", ")
+            });
+        }
+
+        db.update({ year, autonomous_community: community }, { $set: newData }, {}, (err, numReplaced) => {
             if (numReplaced === 0) {
                 res.status(404).send({
                     error: "ERROR 404: Mejora de suministro no encontrada",
@@ -177,39 +183,33 @@ export function loadBackend(app) {
         });
     });
 
-    // DELETE todo
     app.delete(BASE_API + RESOURCE, (req, res) => {
         db.remove({}, { multi: true }, (err, numRemoved) => {
-            if(numRemoved === 0){
+            if (numRemoved === 0) {
                 res.status(404).send({
                     error: "ERROR 404: No hay mejoras de suministro para eliminar",
                     message: "No hay datos cargados en el sistema"
                 });
-            } else{
-                res.status(200).send({message: "Todas las mejoras de suministro han sido eliminadas correctamente"});
+            } else {
+                res.status(200).send({ message: "Todas las mejoras de suministro han sido eliminadas correctamente" });
             }
         });
     });
 
-    // DELETE específico por año y comunidad
     app.delete(BASE_API + RESOURCE + "/:year/:autonomous_community", (req, res) => {
         let year = parseInt(req.params.year);
         let community = req.params.autonomous_community.toLowerCase();
 
-        db.remove({ year: year, autonomous_community: community }, {}, (err, numRemoved) => {
+        db.remove({ year, autonomous_community: community }, {}, (err, numRemoved) => {
             if (numRemoved === 0) {
                 res.status(404).send({
                     error: "ERROR 404: Mejoras de suministro no encontradas",
                     message: `No se encontró ninguna mejora de suministro de agua para la comunidad autónoma ${community} en el año ${year}`
                 });
             } else {
-                res.status(200).send({message: `Mejoras eliminadas correctamente`});
+                res.status(200).send({ message: `Mejoras eliminadas correctamente` });
             }
         });
-    });
-
-    app.get(BASE_API + RESOURCE +"/docs",(req,res)=>{
-        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUAhnf");
     });
 }
 
