@@ -1,9 +1,7 @@
 import dataStore from 'nedb';
 let db = new dataStore();
 
-
 const BASE_API = "/api/v1";
-const RESOURCE = "/forest-fires";
 
 const nuevosAccidentesForestales = [
     { year: 2024, autonomous_comunity: "Andalucia", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
@@ -31,7 +29,6 @@ const datosAlvaro = [
     { year: 2006, autonomous_comunity: "Cataluña", number_of_accidents: 5756, percentage_of_large_fires: 0.17 },
     { year: 2006, autonomous_comunity: "Ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
     { year: 2006, autonomous_comunity: "Comunidad de Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
-
     { year: 2016, autonomous_comunity: "Andalucia", number_of_accidents: 8347, percentage_of_large_fires: 0.17 },
     { year: 2016, autonomous_comunity: "Aragon", number_of_accidents: 3567, percentage_of_large_fires: 0.37 },
     { year: 2016, autonomous_comunity: "Asturias", number_of_accidents: 16200, percentage_of_large_fires: 0.04 },
@@ -43,18 +40,18 @@ const datosAlvaro = [
     { year: 2016, autonomous_comunity: "Cataluña", number_of_accidents: 5345, percentage_of_large_fires: 0.17 },
     { year: 2016, autonomous_comunity: "Ceuta", number_of_accidents: 4, percentage_of_large_fires: 0 },
     { year: 2016, autonomous_comunity: "Comunidad de Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
-
 ];
-
 
 export function loadBackend(app) {
 
     // Cargar datos iniciales
-    app.get(`${BASE_API}${RESOURCE}/loadInitialData`, (req, res) => {
+    app.get(BASE_API + "/forest-fires/loadInitialData", (req, res) => {
+        console.log("New GET to /forest-fires/loadInitialData");
+
         db.find({}, (err, data) => {
             if (data.length === 0) {
-                db.insert(initialData, () => {
-                    res.status(200).json({ message: "Datos cargados correctamente", data: initialData });
+                db.insert(nuevosAccidentesForestales, () => {
+                    res.status(200).json({ message: "Datos cargados correctamente", data: nuevosAccidentesForestales });
                 });
             } else {
                 res.status(409).json({ message: "Ya hay datos cargados", data });
@@ -63,7 +60,9 @@ export function loadBackend(app) {
     });
 
     // GET general con filtros y paginación
-    app.get(`${BASE_API}${RESOURCE}`, (req, res) => {
+    app.get(BASE_API + "/forest-fires", (req, res) => {
+        console.log("New GET request to /forest-fires");
+
         let query = {};
         let { from, to, offset, limit, ...filters } = req.query;
 
@@ -87,7 +86,9 @@ export function loadBackend(app) {
     });
 
     // GET por año y comunidad
-    app.get(`${BASE_API}${RESOURCE}/:year/:autonomous_community`, (req, res) => {
+    app.get(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
+        console.log("Received GET request to /forest-fires/:year/:autonomous_community");
+    
         const { year, autonomous_community } = req.params;
 
         db.findOne({ year: parseInt(year), autonomous_community: autonomous_community.toLowerCase() }, (err, data) => {
@@ -101,7 +102,7 @@ export function loadBackend(app) {
     });
 
     // POST nuevo recurso
-    app.post(`${BASE_API}${RESOURCE}`, (req, res) => {
+    app.post(BASE_API + "/forest-fires", (req, res) => {
         const newEntry = req.body;
         const required = ["year", "autonomous_community", "number_of_accidents", "percentage_of_large_fires"];
 
@@ -121,31 +122,40 @@ export function loadBackend(app) {
     });
 
     // POST a recurso específico (no permitido)
-    app.post(`${BASE_API}${RESOURCE}/:year`, (req, res) => {
+    app.post(BASE_API + "/forest-fires/:year", (req, res) => {
+        console.log(`Intento de POST a /forest-fires/${req.params.year}`);
         res.status(405).json({ error: "POST no permitido en recurso específico" });
     });
 
     // PUT para recurso específico
-    app.put(`${BASE_API}${RESOURCE}/:year/:autonomous_community`, (req, res) => {
+    app.put(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
         const { year, autonomous_community } = req.params;
         const updated = req.body;
 
-        db.update({ year: parseInt(year), autonomous_community: autonomous_community.toLowerCase() }, { $set: updated }, {}, (err, count) => {
-            if (count === 0) {
-                res.status(404).json({ error: "Dato no encontrado" });
-            } else {
-                res.status(200).json({ message: "Dato actualizado" });
+        db.update(
+            { year: parseInt(year), autonomous_community: autonomous_community.toLowerCase() },
+            { $set: updated },
+            {},
+            (err, count) => {
+                if (count === 0) {
+                    res.status(404).json({ error: "Dato no encontrado" });
+                } else {
+                    res.status(200).json({ message: "Dato actualizado" });
+                }
             }
-        });
+        );
     });
 
     // PUT a colección completa (no permitido)
-    app.put(`${BASE_API}${RESOURCE}`, (req, res) => {
+    app.put(BASE_API + "/forest-fires", (req, res) => {
+        console.log(`Intento de PUT a /forest-fires (no permitido)`);
         res.status(405).json({ error: "PUT no permitido en el recurso base" });
     });
 
     // DELETE todos los datos
-    app.delete(`${BASE_API}${RESOURCE}`, (req, res) => {
+    app.delete(BASE_API + "/forest-fires", (req, res) => {
+        console.log("DELETE request received at /forest-fires");
+
         db.remove({}, { multi: true }, (err, count) => {
             if (count === 0) {
                 res.status(404).json({ error: "No hay datos que eliminar" });
@@ -156,7 +166,9 @@ export function loadBackend(app) {
     });
 
     // DELETE por año y comunidad
-    app.delete(`${BASE_API}${RESOURCE}/:year/:autonomous_community`, (req, res) => {
+    app.delete(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
+        console.log(`DELETE request received at /forest-fires/${req.params.year}/${req.params.autonomous_community}`);
+    
         const { year, autonomous_community } = req.params;
 
         db.remove({ year: parseInt(year), autonomous_community: autonomous_community.toLowerCase() }, {}, (err, count) => {
@@ -168,10 +180,10 @@ export function loadBackend(app) {
         });
     });
 
-// Documentación
-app.get(`${BASE_API}${RESOURCE}/docs`, (req, res) => {
-    res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
-});
+    // Documentación
+    app.get(BASE_API + "/forest-fires/docs", (req, res) => {
+        res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
+    });
 }
 
 export { loadBackend };
