@@ -74,18 +74,48 @@ app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
     });
 });
 
-//GET a /national-parks con soporte para filtros y rangos de años
+///GET a /national-parks con soporte para filtros y rangos de años
 app.get(BASE_API + "/national-parks", (request, response) => {
     console.log("New GET to /national-parks");
 
-    // Verificar primero si hay datos en la base de datos
-    db.count({}, (err, count) => {
+    // Construir la consulta para la base de datos
+    let query = {};
+    
+    // Procesar parámetros especiales from y to
+    const fromYear = request.query.from ? parseInt(request.query.from) : null;
+    const toYear = request.query.to ? parseInt(request.query.to) : null;
+    
+    if (fromYear !== null && !isNaN(fromYear)) {
+        query.declaration_date = query.declaration_date || {};
+        query.declaration_date.$gte = fromYear;
+    }
+    
+    if (toYear !== null && !isNaN(toYear)) {
+        query.declaration_date = query.declaration_date || {};
+        query.declaration_date.$lte = toYear;
+    }
+    
+    // Procesar el resto de parámetros de consulta
+    const { from, to, ...otherParams } = request.query;
+    
+    for (const [key, value] of Object.entries(otherParams)) {
+        // Convertir valores numéricos
+        const numValue = parseInt(value);
+        if (!isNaN(numValue) && String(numValue) === String(value)) {
+            query[key] = numValue;
+        } else {
+            query[key] = value;
+        }
+    }
+    
+    // Ejecutar la consulta en la base de datos
+    db.find(query, (err, docs) => {
         if (err) {
-            return response.status(500).send({ error: "Error interno del servidor al consultar la base de datos" });
+            return response.status(500).send({ error: "Error al consultar la base de datos" });
         }
         
-        // Si no hay datos, devolver 404 con un mensaje y array vacío
-        if (count === 0) {
+        // Si no hay datos y no hay query params, devolver 404
+        if (docs.length === 0 && Object.keys(request.query).length === 0) {
             return response.status(404).send({
                 error: "No hay datos que mostrar",
                 message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales",
@@ -93,55 +123,21 @@ app.get(BASE_API + "/national-parks", (request, response) => {
             });
         }
         
-        // Si hay datos, continuar con el procesamiento normal
-        // Construir la consulta para la base de datos
-        let query = {};
-        
-        // Procesar parámetros especiales from y to
-        const fromYear = request.query.from ? parseInt(request.query.from) : null;
-        const toYear = request.query.to ? parseInt(request.query.to) : null;
-        
-        if (fromYear !== null && !isNaN(fromYear)) {
-            query.declaration_date = query.declaration_date || {};
-            query.declaration_date.$gte = fromYear;
+        // Si no hay datos que coincidan con la búsqueda, devolver 200 y array vacío
+        if (docs.length === 0) {
+            return response.status(200).send([]);
         }
         
-        if (toYear !== null && !isNaN(toYear)) {
-            query.declaration_date = query.declaration_date || {};
-            query.declaration_date.$lte = toYear;
-        }
-        
-        // Procesar el resto de parámetros de consulta
-        const { from, to, ...otherParams } = request.query;
-        
-        for (const [key, value] of Object.entries(otherParams)) {
-            // Convertir valores numéricos
-            const numValue = parseInt(value);
-            if (!isNaN(numValue) && String(numValue) === String(value)) {
-                query[key] = numValue;
-            } else {
-                query[key] = value;
-            }
-        }
-        
-        // Ejecutar la consulta en la base de datos
-        db.find(query, (err, docs) => {
-            if (err) {
-                return response.status(500).send({ error: "Error al consultar la base de datos" });
-            }
-            
-            // Transformar los documentos para eliminar el campo _id
-            const transformedDocs = docs.map(doc => {
-                const { _id, ...rest } = doc;
-                return rest;
-            });
-            
-            // Siempre enviar un array (vacío si no hay resultados)
-            return response.status(200).send(transformedDocs);
+        // Transformar los documentos para eliminar el campo _id
+        const transformedDocs = docs.map(doc => {
+            const { _id, ...rest } = doc;
+            return rest;
         });
+        
+        // Siempre enviar un array (vacío si no hay resultados)
+        return response.status(200).send(transformedDocs);
     });
 });
-
 
 // GET avanzado para diferenciar parque por nombre o comunidad
 // TAMBIEN ES EL GET que devuelve un parque en específico (GET normal)
