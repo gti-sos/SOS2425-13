@@ -77,7 +77,7 @@ app.get(BASE_API + "/national-parks/loadInitialData", (request, response) => {
     });
 });
 
-///GET a /national-parks con soporte para filtros y rangos de años
+///GET a /national-parks con soporte para filtros, rangos de años y paginación
 app.get(BASE_API + "/national-parks", (request, response) => {
     console.log("New GET to /national-parks");
 
@@ -98,8 +98,12 @@ app.get(BASE_API + "/national-parks", (request, response) => {
         query.declaration_date.$lte = toYear;
     }
     
-    // Procesar el resto de parámetros de consulta
-    const { from, to, ...otherParams } = request.query;
+    // Extraer parámetros de paginación
+    const limit = request.query.limit ? parseInt(request.query.limit) : null;
+    const offset = request.query.offset ? parseInt(request.query.offset) : 0;
+    
+    // Procesar el resto de parámetros de consulta (excluyendo parámetros especiales)
+    const { from, to, limit: limitParam, offset: offsetParam, ...otherParams } = request.query;
     
     for (const [key, value] of Object.entries(otherParams)) {
         // Convertir valores numéricos
@@ -112,24 +116,33 @@ app.get(BASE_API + "/national-parks", (request, response) => {
     }
     
     // Ejecutar la consulta en la base de datos
-    db.find(query, (err, docs) => {
+    let dbQuery = db.find(query);
+    
+    // Aplicar paginación si está especificada
+    if (offset !== null && !isNaN(offset)) {
+        dbQuery = dbQuery.skip(offset);
+    }
+    
+    if (limit !== null && !isNaN(limit)) {
+        dbQuery = dbQuery.limit(limit);
+    }
+    
+    dbQuery.exec((err, docs) => {
         if (err) {
             return response.status(500).send({ error: "Error al consultar la base de datos" });
         }
         
-        // Si no hay datos y no hay query params, devolver 404
-        if (docs.length === 0 && Object.keys(request.query).length === 0) {
+        // Si no hay datos y no hay query params (excepto limit y offset), devolver 404
+        const hasQueryParams = Object.keys(request.query)
+            .filter(key => key !== 'limit' && key !== 'offset').length > 0;
+        
+        if (docs.length === 0 && !hasQueryParams) {
             return response.status(404).send({
                 error: "No hay datos que mostrar",
                 message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales",
                 data: []
             });
         }
-        
-       /*  // Si no hay datos que coincidan con la búsqueda, devolver 200 y array vacío
-        if (docs.length === 0) {
-            return response.status(200).send([]);
-        } */
         
         // Transformar los documentos para eliminar el campo _id
         const transformedDocs = docs.map(doc => {
@@ -231,11 +244,16 @@ app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (r
                 message: `No hay parques en ${community} declarados en ${year}`
             });
         } else if (parks.length === 1) {
-            // Si solo hay un resultado, devolver el objeto directamente
-            return response.status(200).send(parks[0]);
+            // Si solo hay un resultado, devolver el objeto directamente sin _id
+            const { _id, ...parkData } = parks[0];
+            return response.status(200).send(parkData);
         } else {
-            // Si hay múltiples resultados, devolver el array
-            return response.status(200).send(parks);
+            // Si hay múltiples resultados, transformar cada uno para eliminar _id
+            const transformedParks = parks.map(park => {
+                const { _id, ...rest } = park;
+                return rest;
+            });
+            return response.status(200).send(transformedParks);
         }
     });
 });
@@ -288,6 +306,57 @@ app.post(BASE_API + "/national-parks/:name", (request, response) => {
     return response.status(405).send({error: "Método no permitido. No se puede hacer un POST a un recurso específico"});
 });
 
+
+// PUT para actualizar específicamente la fecha de declaración de un parque
+app.put(BASE_API + "/national-parks/:name/:declaration_date", (request, response) => {
+    console.log("New PUT to /national-parks/:name/:declaration_date");
+    const parkName = request.params.name;
+    const newDeclarationDate = parseInt(request.params.declaration_date);
+    
+    // Validar que el año es un número válido
+    if (isNaN(newDeclarationDate)) {
+        return response.status(400).send({
+            error: "Año inválido",
+            message: "El año debe ser un número válido"
+        });
+    }
+    
+    // Verificar que el parque existe
+    db.findOne({ national_park: parkName }, (err, park) => {
+        if (err) {
+            return response.status(500).send({ error: "Error al consultar la base de datos" });
+        }
+        
+        if (!park) {
+            return response.status(404).send({ 
+                error: "Parque no encontrado",
+                message: `No existe un parque con el nombre '${parkName}'`
+            });
+        }
+        
+        // Actualizar solo el campo declaration_date
+        db.update(
+            { national_park: parkName }, 
+            { $set: { declaration_date: newDeclarationDate } }, 
+            {}, 
+            (err, numUpdated) => {
+                if (err) {
+                    return response.status(500).send({ error: "Error al actualizar el parque" });
+                }
+                
+                // Si se actualizó correctamente, devolver 200
+                if (numUpdated > 0) {
+                    return response.status(200).send();
+                } else {
+                    return response.status(500).send({ 
+                        error: "No se pudo actualizar el parque",
+                        message: "La operación no modificó ningún registro"
+                    });
+                }
+            }
+        );
+    });
+});
 
 // PUT al conjunto de recursos (no permitido)
 app.put(BASE_API + "/national-parks", (request, response) => {
