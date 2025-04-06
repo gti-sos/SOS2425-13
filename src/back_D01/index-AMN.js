@@ -25,7 +25,7 @@ const datosAlvaro = [
     { year: 2006, autonomous_community: "canarias", number_of_accidents: 1113, percentage_of_large_fires: 0.72 },
     { year: 2006, autonomous_community: "cantabria", number_of_accidents: 6316, percentage_of_large_fires: 0.09 },
     { year: 2006, autonomous_community: "castilla-la mancha", number_of_accidents: 7864, percentage_of_large_fires: 0.22 },
-    { year: 2006, autonomous_community: "castilla y Leon", number_of_accidents: 18343, percentage_of_large_fires: 0.27 },
+    { year: 2006, autonomous_community: "castilla y leon", number_of_accidents: 18343, percentage_of_large_fires: 0.27 },
     { year: 2006, autonomous_community: "cataluña", number_of_accidents: 5756, percentage_of_large_fires: 0.17 },
     { year: 2006, autonomous_community: "ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
     { year: 2006, autonomous_community: "comunidad de madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
@@ -189,20 +189,42 @@ export function loadBackend(app) {
         res.status(405).json({ error: "POST no permitido en recurso específico" });
     });
 
-    // PUT para recurso específico
+    // PUT para recurso específico con manejo de errores 400 y 409
     app.put(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
         const { year, autonomous_community } = req.params;
         const updated = req.body;
+
+        // Validación básica: todos los campos deben estar presentes
+        if (
+            !updated ||
+            !updated.year ||
+            !updated.autonomous_community ||
+            updated.number_of_accidents === undefined ||
+            updated.percentage_of_large_fires === undefined
+        ) {
+            return res.status(400).json({ error: "Faltan campos obligatorios o están mal definidos" });
+    }
+
+    // Comprobar si las claves han sido modificadas (conflicto)
+        if (
+            parseInt(year) !== parseInt(updated.year) ||
+            autonomous_community.toLowerCase() !== updated.autonomous_community.toLowerCase()
+        ) {
+            return res.status(409).json({ error: "No se puede modificar la clave primaria (año o comunidad)" });
+        }
 
         db.update(
             { year: parseInt(year), autonomous_community: autonomous_community.toLowerCase() },
             { $set: updated },
             {},
             (err, count) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error interno del servidor" });
+                }
                 if (count === 0) {
                     res.status(404).json({ error: "Dato no encontrado" });
                 } else {
-                    res.status(200).json({ message: "Dato actualizado" });
+                    res.status(200).json({ message: "Dato actualizado correctamente" });
                 }
             }
         );
@@ -213,6 +235,7 @@ export function loadBackend(app) {
         console.log(`Intento de PUT a /forest-fires (no permitido)`);
         res.status(405).json({ error: "PUT no permitido en el recurso base" });
     });
+
 
     // DELETE todos los datos
     app.delete(BASE_API + "/forest-fires", (req, res) => {
