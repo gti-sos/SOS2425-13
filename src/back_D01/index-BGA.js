@@ -52,7 +52,7 @@ const datosInicialesB = [
     { year: 2017, autonomous_community: "pais vasco", amount: 3194418, benefited_population: 10317, project_count: 18}
 ];
 
-function loadBackend(app) {
+function loadBackendB(app) {
     // Load Initial Data
     app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         db.count({}, (err, count) => {
