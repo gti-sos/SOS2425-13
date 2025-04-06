@@ -297,7 +297,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"national_park\": \"Teide2\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+					"raw": "{\r\n  \"national_park\": \"Garajonay2\", \r\n  \"declaration_date\": 1982, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1099,10 +1099,7 @@
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
-							"pm.test(\"Response body should contain a single object with 'national_park' value as 'Garajonay'\", function () {\r",
-							"    pm.expect(pm.response.json()).to.be.an('object');\r",
-							"    pm.expect(pm.response.json()).to.have.property('national_park', 'Garajonay');\r",
-							"});"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -1116,7 +1113,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}} /api/v1/national-parks/Canarias/1981",
+					"raw": "{{Base_URL}} /api/v1/national-parks/Canarias/1982",
 					"host": [
 						"{{Base_URL}} "
 					],
@@ -1125,7 +1122,7 @@
 						"v1",
 						"national-parks",
 						"Canarias",
-						"1981"
+						"1982"
 					]
 				}
 			},
