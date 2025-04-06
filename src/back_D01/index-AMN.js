@@ -4,42 +4,42 @@ let db = new dataStore();
 const BASE_API = "/api/v1";
 
 const nuevosAccidentesForestales = [
-    { year: 2024, autonomous_comunity: "Andalucia", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
-    { year: 2024, autonomous_comunity: "Aragon", number_of_accidents: 5877, percentage_of_large_fires: 0.59 },
-    { year: 2024, autonomous_comunity: "Asturias", number_of_accidents: 19003, percentage_of_large_fires: 0.25 },
-    { year: 2024, autonomous_comunity: "Comunidad Valenciana", number_of_accidents: 6982, percentage_of_large_fires: 0.68 },
-    { year: 2024, autonomous_comunity: "Canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
-    { year: 2024, autonomous_comunity: "Cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
-    { year: 2024, autonomous_comunity: "Castilla La Mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
-    { year: 2024, autonomous_comunity: "Castilla y Leon", number_of_accidents: 20343, percentage_of_large_fires: 0.47 },
-    { year: 2024, autonomous_comunity: "Cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
-    { year: 2024, autonomous_comunity: "Ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
-    { year: 2024, autonomous_comunity: "Comunidad de Madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
+    { year: 2024, autonomous_community: "Andalucia", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
+    { year: 2024, autonomous_community: "Aragon", number_of_accidents: 5877, percentage_of_large_fires: 0.59 },
+    { year: 2024, autonomous_community: "Asturias", number_of_accidents: 19003, percentage_of_large_fires: 0.25 },
+    { year: 2024, autonomous_community: "Comunidad Valenciana", number_of_accidents: 6982, percentage_of_large_fires: 0.68 },
+    { year: 2024, autonomous_community: "Canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
+    { year: 2024, autonomous_community: "Cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
+    { year: 2024, autonomous_community: "Castilla La Mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
+    { year: 2024, autonomous_community: "Castilla y Leon", number_of_accidents: 20343, percentage_of_large_fires: 0.47 },
+    { year: 2024, autonomous_community: "Cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
+    { year: 2024, autonomous_community: "Ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
+    { year: 2024, autonomous_community: "Comunidad de Madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
 ];
 
 const datosAlvaro = [
-    { year: 2006, autonomous_comunity: "Andalucia", number_of_accidents: 8034, percentage_of_large_fires: 0.19 },
-    { year: 2006, autonomous_comunity: "Aragon", number_of_accidents: 3877, percentage_of_large_fires: 0.39 },
-    { year: 2006, autonomous_comunity: "Asturias", number_of_accidents: 17003, percentage_of_large_fires: 0.05 },
-    { year: 2006, autonomous_comunity: "Comunidad Valenciana", number_of_accidents: 3982, percentage_of_large_fires: 0.48 },
-    { year: 2006, autonomous_comunity: "Canarias", number_of_accidents: 1113, percentage_of_large_fires: 0.72 },
-    { year: 2006, autonomous_comunity: "Cantabria", number_of_accidents: 6316, percentage_of_large_fires: 0.09 },
-    { year: 2006, autonomous_comunity: "Castilla La Mancha", number_of_accidents: 7864, percentage_of_large_fires: 0.22 },
-    { year: 2006, autonomous_comunity: "Castilla y Leon", number_of_accidents: 18343, percentage_of_large_fires: 0.27 },
+    { year: 2006, autonomous_community: "Andalucia", number_of_accidents: 8034, percentage_of_large_fires: 0.19 },
+    { year: 2006, autonomous_community: "Aragon", number_of_accidents: 3877, percentage_of_large_fires: 0.39 },
+    { year: 2006, autonomous_community: "Asturias", number_of_accidents: 17003, percentage_of_large_fires: 0.05 },
+    { year: 2006, autonomous_community: "Comunidad Valenciana", number_of_accidents: 3982, percentage_of_large_fires: 0.48 },
+    { year: 2006, autonomous_community: "Canarias", number_of_accidents: 1113, percentage_of_large_fires: 0.72 },
+    { year: 2006, autonomous_community: "Cantabria", number_of_accidents: 6316, percentage_of_large_fires: 0.09 },
+    { year: 2006, autonomous_community: "Castilla La Mancha", number_of_accidents: 7864, percentage_of_large_fires: 0.22 },
+    { year: 2006, autonomous_community: "Castilla y Leon", number_of_accidents: 18343, percentage_of_large_fires: 0.27 },
     { year: 2006, autonomous_comunity: "Cataluña", number_of_accidents: 5756, percentage_of_large_fires: 0.17 },
-    { year: 2006, autonomous_comunity: "Ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
-    { year: 2006, autonomous_comunity: "Comunidad de Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
+    { year: 2006, autonomous_community: "Ceuta", number_of_accidents: 5, percentage_of_large_fires: 0 },
+    { year: 2006, autonomous_community: "Comunidad de Madrid", number_of_accidents: 4390, percentage_of_large_fires: 0.28 },
     { year: 2016, autonomous_comunity: "Andalucia", number_of_accidents: 8347, percentage_of_large_fires: 0.17 },
-    { year: 2016, autonomous_comunity: "Aragon", number_of_accidents: 3567, percentage_of_large_fires: 0.37 },
-    { year: 2016, autonomous_comunity: "Asturias", number_of_accidents: 16200, percentage_of_large_fires: 0.04 },
+    { year: 2016, autonomous_community: "Aragon", number_of_accidents: 3567, percentage_of_large_fires: 0.37 },
+    { year: 2016, autonomous_community: "Asturias", number_of_accidents: 16200, percentage_of_large_fires: 0.04 },
     { year: 2016, autonomous_comunity: "Comunidad Valenciana", number_of_accidents: 3802, percentage_of_large_fires: 0.46},
-    { year: 2016, autonomous_comunity: "Canarias", number_of_accidents: 1056, percentage_of_large_fires: 0.7 },
+    { year: 2016, autonomous_community: "Canarias", number_of_accidents: 1056, percentage_of_large_fires: 0.7 },
     { year: 2016, autonomous_comunity: "Cantabria", number_of_accidents: 6269, percentage_of_large_fires: 0.09 },
     { year: 2016, autonomous_comunity: "Castilla La Mancha", number_of_accidents: 7390, percentage_of_large_fires: 0.2 },
-    { year: 2016, autonomous_comunity: "Castilla y Leon", number_of_accidents: 19100, percentage_of_large_fires: 0.23 },
-    { year: 2016, autonomous_comunity: "Cataluña", number_of_accidents: 5345, percentage_of_large_fires: 0.17 },
-    { year: 2016, autonomous_comunity: "Ceuta", number_of_accidents: 4, percentage_of_large_fires: 0 },
-    { year: 2016, autonomous_comunity: "Comunidad de Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
+    { year: 2016, autonomous_community: "Castilla y Leon", number_of_accidents: 19100, percentage_of_large_fires: 0.23 },
+    { year: 2016, autonomous_community: "Cataluña", number_of_accidents: 5345, percentage_of_large_fires: 0.17 },
+    { year: 2016, autonomous_community: "Ceuta", number_of_accidents: 4, percentage_of_large_fires: 0 },
+    { year: 2016, autonomous_community: "Comunidad de Madrid", number_of_accidents: 4909, percentage_of_large_fires: 0.3 },
 ];
 
 export function loadBackend(app) {
@@ -66,7 +66,7 @@ export function loadBackend(app) {
     
         const datosFormateados = datosAlvaro.map(d => ({
             ...d,
-            autonomous_community: d.autonomous_comunity.toLowerCase()
+            autonomous_community: d.autonomous_community.toLowerCase()
         }));
     
         db.insert(datosFormateados, (err, newDocs) => {
