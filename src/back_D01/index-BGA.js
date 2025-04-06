@@ -60,108 +60,45 @@ function loadBackend(app) {
     });
 
     
-    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
-        console.log("New GET to /water-supply-improvements/loadInitialData");
-    
+     // Load Initial Data
+     app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         db.count({}, (err, count) => {
-            if (err) {
-                return res.status(500).send({ error: "Error interno del servidor al consultar la base de datos" });
-            }
-    
-            if (count === 0) {
-                db.insert(datosInicialesB, (err, insertedDocs) => {
-                    if (err) {
-                        return res.status(500).send({ error: "Error al cargar datos iniciales" });
-                    }
-    
-                    console.log("Datos iniciales cargados correctamente");
-    
-                    const transformedDocs = insertedDocs.map(doc => {
-                        const { _id, ...rest } = doc;
-                        return rest;
-                    });
-    
-                    res.status(200).send({ 
-                        message: "Datos iniciales cargados correctamente", 
-                        data: transformedDocs 
-                    });
-                });
-            } else {
-                res.status(405).send({ 
-                    message: "No se permite volver a cargar los datos iniciales" 
-                });
-            }
+            if (err) return res.status(500).send({ error: "Error al acceder a la base de datos" });
+            if (count > 0) return res.status(405).send({ message: "Ya existen datos. No se sobreescriben." });
+            db.insert(datosInicialesB, (err, newDocs) => {
+                if (err) return res.status(500).send({ error: "Error al insertar los datos" });
+                const transformed = newDocs.map(({ _id, ...rest }) => rest);
+                return res.status(200).send({ message: "Datos iniciales cargados correctamente", data: transformed });
+            });
         });
     });
     
 
-   // GET con filtros, paginación y rango de años
-app.get(BASE_API + "/water-supply-improvements", (req, res) => {
-    console.log("New GET to /water-supply-improvements");
-
-    let query = {};
-
-    const fromYear = req.query.from ? parseInt(req.query.from) : null;
-    const toYear = req.query.to ? parseInt(req.query.to) : null;
-
-    if (fromYear !== null && !isNaN(fromYear)) {
-        query.year = query.year || {};
-        query.year.$gte = fromYear;
-    }
-
-    if (toYear !== null && !isNaN(toYear)) {
-        query.year = query.year || {};
-        query.year.$lte = toYear;
-    }
-
-    const limit = req.query.limit ? parseInt(req.query.limit) : null;
-    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-
-    const { from, to, limit: l, offset: o, ...otherParams } = req.query;
-    for (const [key, value] of Object.entries(otherParams)) {
-        if (!value || value.trim() === "") continue;
-        const num = parseInt(value);
-        if (!isNaN(num) && String(num) === value) {
-            query[key] = num;
-        } else {
-            query[key] = value.toLowerCase();
+    // GET con filtros (from, to y otros campos)
+    app.get(BASE_API + "/water-supply-improvements", (req, res) => {
+        let query = {};
+        const from = req.query.from ? parseInt(req.query.from) : null;
+        const to = req.query.to ? parseInt(req.query.to) : null;
+        if (!isNaN(from)) query.year = { ...query.year, $gte: from };
+        if (!isNaN(to)) query.year = { ...query.year, $lte: to };
+        const { from: _f, to: _t, ...otherParams } = req.query;
+        for (const [key, value] of Object.entries(otherParams)) {
+            const num = parseInt(value);
+            query[key] = isNaN(num) ? value.toLowerCase() : num;
         }
-    }
-
-    let dbQuery = db.find(query);
-
-    if (offset !== null && !isNaN(offset)) {
-        dbQuery = dbQuery.skip(offset);
-    }
-
-    if (limit !== null && !isNaN(limit)) {
-        dbQuery = dbQuery.limit(limit);
-    }
-
-    dbQuery.exec((err, docs) => {
-        if (err) {
-            return res.status(500).send({ error: "Error al consultar la base de datos" });
-        }
-
-        const hasQueryParams = Object.keys(req.query)
-            .filter(key => !['limit', 'offset'].includes(key)).length > 0;
-
-        if (docs.length === 0 && !hasQueryParams) {
+        db.find(query, (err, docs) => {
+            if (err) return res.status(500).send({ error: "Error en la consulta" });
+            if (docs.length === 0) {
             return res.status(404).send({
-                error: "No hay datos que mostrar",
-                message: "Utiliza GET /api/v1/water-supply-improvements/loadInitialData para cargar datos iniciales",
+                error: "No se encontraron datos",
+                message: "Utiliza otros filtros o carga datos iniciales",
                 data: []
             });
         }
-
-        const transformedDocs = docs.map(doc => {
-            const { _id, ...rest } = doc;
-            return rest;
+            const transformed = docs.map(({ _id, ...rest }) => rest);
+            return res.status(200).send(transformed);
         });
-
-        return res.status(200).send(transformedDocs);
     });
-});
 
 
     // GET por parámetro (año o comunidad)
