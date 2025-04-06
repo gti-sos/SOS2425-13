@@ -857,17 +857,17 @@ app.get(BASE_API + "/forest-fires/loadInitialData", (req, res) => {
     if (datosAlvaro.length === 0) {
         // Si está vacío, agregar 11 datos de ejemplo
         let nuevosAccidentesForestales = [
-            { year: 2024, autonomous_community: "Andalucia", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
-            { year: 2024, autonomous_community: "Aragon", number_of_accidents: 5877, percentage_of_large_fires: 0.59 },
-            { year: 2024, autonomous_community: "Asturias", number_of_accidents: 19003, percentage_of_large_fires: 0.25 },
-            { year: 2024, autonomous_community: "Comunidad Valenciana", number_of_accidents: 6982, percentage_of_large_fires: 0.68 },
-            { year: 2024, autonomous_community: "Canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
-            { year: 2024, autonomous_community: "Cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
-            { year: 2024, autonomous_community: "Castilla La Mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
-            { year: 2024, autonomous_community: "Castilla y Leon", number_of_accidents: 20343, percentage_of_large_fires: 0.47 },
-            { year: 2024, autonomous_community: "Cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
-            { year: 2024, autonomous_community: "Ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
-            { year: 2024, autonomous_community: "Comunidad de Madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
+            { year: 2024, autonomous_community: "andalucia", number_of_accidents: 10034, percentage_of_large_fires: 0.39 },
+            { year: 2024, autonomous_community: "aragon", number_of_accidents: 5877, percentage_of_large_fires: 0.59 },
+            { year: 2024, autonomous_community: "asturias", number_of_accidents: 19003, percentage_of_large_fires: 0.25 },
+            { year: 2024, autonomous_community: "comunidad valenciana", number_of_accidents: 6982, percentage_of_large_fires: 0.68 },
+            { year: 2024, autonomous_community: "canarias", number_of_accidents: 1313, percentage_of_large_fires: 0.82 },
+            { year: 2024, autonomous_community: "cantabria", number_of_accidents: 8316, percentage_of_large_fires: 0.29 },
+            { year: 2024, autonomous_community: "castilla-la mancha", number_of_accidents: 9864, percentage_of_large_fires: 0.42 },
+            { year: 2024, autonomous_community: "castilla y leon", number_of_accidents: 20343, percentage_of_large_fires: 0.47 },
+            { year: 2024, autonomous_community: "cataluña", number_of_accidents: 7756, percentage_of_large_fires: 0.37 },
+            { year: 2024, autonomous_community: "ceuta", number_of_accidents: 7, percentage_of_large_fires: 0 },
+            { year: 2024, autonomous_community: "comunidad de madrid", number_of_accidents: 6390, percentage_of_large_fires: 0.48 },
         ];
                             
         // Utilizamos el operador spread para insertar los nuevos datos en el array, manteniendo los elementos existentes. 
