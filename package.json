@@ -27,7 +27,11 @@
     "test-datosB": "newman run test/back/blagaralo.postman_collection.json --environment test/back/online.postman_environment.json",
     "test-darlopvil-local": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
     "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
-    "test": "npm run test-BGA && npm run test-DLV"
+    "test-local-AMN": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
+    "test-online-AMN": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/online.postman_environment.json",
+    "test-local-AMN-L": "start-server-and-test start http://localhost:16078 test-local-AMN",
+    "test-AMN": "npm run test-local-AMN-L",
+    "test": "npm run test-BGA && npm run test-DLV && npm run test-AMN"
   },
   "keywords": [],
   "dependencies": {
