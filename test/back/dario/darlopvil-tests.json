@@ -1,0 +1,989 @@
+{
+	"info": {
+		"_postman_id": "734e29c8-c1ec-438b-ab7f-33968ce0d043",
+		"name": "API for national parks in Spain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14944672",
+		"_collection_link": "https://sos2425-13.postman.co/workspace/SOS2425-13-~b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/14944672-734e29c8-c1ec-438b-ab7f-33968ce0d043?action=share&source=collection_link&creator=14944672"
+	},
+	"item": [
+		{
+			"name": "national-parks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verify the status code is 404\r",
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"// Verify the response body contains the expected error message\r",
+							"pm.test(\"Response body contains error message\", function () {\r",
+							"    pm.expect(pm.response.json().error).to.equal(\"No hay datos que mostrar\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/loadInitialData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Ensure the length of the data returned is 10\r",
+							"pm.test(\"Data length is 10\", function () {\r",
+							"    pm.expect(pm.response.json().data.length).to.equal(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/loadInitialData",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/ after loaded InitialData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Array size is 10\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.lengthOf(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/loadInitialData (debido al DELETE de antes)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Ensure the length of the data returned is 10\r",
+							"pm.test(\"Data length is 10\", function () {\r",
+							"    pm.expect(pm.response.json().data.length).to.equal(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/loadInitialData",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks (sin body)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks (OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Ensure the response status code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Ensure the request body is not empty\r",
+							"pm.test(\"Request body is not empty\", function () {\r",
+							"    pm.expect(request.data).not.eql(null);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"national_park\": \"Teide2\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks (parque repetido)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {\r",
+							"    pm.response.to.have.status(409);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"national_park\": \"Teide\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide (prohibido)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 405\", function () {\r",
+							"    pm.response.to.have.status(405);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"national_park\": \"Test\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide (todo OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains a single data item\", function () {\r",
+							"    pm.expect(Object.keys(pm.response.json())).to.have.lengthOf(5);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Cabañeros (no existe)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Cabañeros2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks (error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 405\", function () {\r",
+							"    pm.response.to.have.status(405);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Cabañeros (no existe, error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function() {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message indicates park not found\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.error).to.eql(\"Parque no encontrado. No puedo actualizarlo\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " { \"national_park\": \"Cabañeros\", \"declaration_date\": 1995, \"autonomous_community\": \"Castilla-La Mancha\", \"initial_area\": 3984, \"current_area\": 3984 }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Cabañeros2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide (body vacío, error)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Request body is an empty object/array\", function () {\r",
+							"    const requestBody = pm.request.body.raw;\r",
+							"    const parsedBody = JSON.parse(requestBody || \"null\");\r",
+							"    \r",
+							"    // Verifica si es un objeto o array vacío\r",
+							"    const isEmpty = \r",
+							"        (Array.isArray(parsedBody) && parsedBody.length === 0) ||\r",
+							"        (parsedBody !== null && typeof parsedBody === 'object' && Object.keys(parsedBody).length === 0);\r",
+							"    \r",
+							"    pm.expect(isEmpty).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " { }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide (OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verify the status code is 200\r",
+							"pm.test(\"Status code is 409\", function () {\r",
+							"pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Verify that the request body contains data\r",
+							"pm.test(\"Request body contains data\", function () {\r",
+							"    pm.expect(pm.request.body).to.not.be.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " { \"national_park\": \"Teide\", \"declaration_date\": 1954, \"autonomous_community\": \"Canarias\", \"initial_area\": 3984, \"current_area\": 3984 }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Timanfaya (error 409, Garajonay exists!)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {\r",
+							"    pm.response.to.have.status(409);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"national_park\": \"Garajonay\",\r\n  \"autonomous_community\": \"Canarias\",\r\n  \"declaration_date\": 1974,\r\n  \"initial_area\": 5107,\r\n  \"current_area\": 5107\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Garajonay (borrado OK)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test for status code 200 OK\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Garajonay",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Garajonay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Sierra Nevada (404, no existe)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Sierra Nevada",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Sierra Nevada"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parques por CC.AA.",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/national-parks?autonomous_community=Canarias",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "autonomous_community",
+							"value": "Canarias"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Acceder a un parque concreto",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/national-parks/Canarias/1954",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias",
+						"1954"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parques por CC.AA. y periodo de años",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/national-parks/Canarias?from=1950&to=1980",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1950"
+						},
+						{
+							"key": "to",
+							"value": "1980"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parques por periodos de años",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/national-parks?from=1950&to=1980",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1950"
+						},
+						{
+							"key": "to",
+							"value": "1980"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parques por periodo (no hay)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sos2425-13.onrender.com/api/v1/national-parks?from=2000&to=2010",
+					"protocol": "https",
+					"host": [
+						"sos2425-13",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2000"
+						},
+						{
+							"key": "to",
+							"value": "2010"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

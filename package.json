@@ -16,8 +16,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test-datosB": "newman run test/back/blanca/blagaralo.postman_collection.json --environment test/back/blanca/local.postman_environment.json"
+    "test": "echo \"Error: no test specified\" && exit 1", 
+    "test-datosB": "newman run test/back/blanca/blagaralo.postman_collection.json --environment test/back/blanca/local.postman_environment.json",
+    "test-national-parks":"npx newman run ./test/back/dario/darlopvil-tests.json -e ./test/back/dario/local-env.json"
   
   },
   "keywords": [],
