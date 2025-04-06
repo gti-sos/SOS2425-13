@@ -220,7 +220,7 @@ function loadBackend(app) {
 
     // Docs
     app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
-        res.redirect("https://documenter.getpostman.com/view/14944672/2sB2cUBNyt");
+        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUC3V9");
     });
 }
 
