@@ -1,0 +1,19 @@
+name: CI /CD
+on: [push, pull_request]
+jobs:
+  ci-cd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run:  npm install
+      - name: Run darlopvil test @localhost
+        run: npm run test-national-parks
+      - name: Deploy to render
+        uses: jonharvey/render-deploy-action@v0.8.0
+        with:
+          service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.MY_RENDER_API_KEY }}
+       
+  
