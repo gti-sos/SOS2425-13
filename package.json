@@ -16,15 +16,18 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1", 
+    "test": "echo \"Error: no test specified\" && exit 1",
     "test-datosB": "newman run test/back/blanca/blagaralo.postman_collection.json --environment test/back/blanca/local.postman_environment.json",
-    "test-national-parks":"npx newman run ./test/back/dario/darlopvil-tests.json -e ./test/back/dario/local-env.json"
-  
+    "test-darlopvil-local": "npx newman run ./test/back/dario/darlopvil-tests.json -e ./test/back/dario/local-env.json",
+    "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local"
   },
   "keywords": [],
   "dependencies": {
     "cool-ascii-faces": "^1.3.4",
     "express": "^4.21.2",
     "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "start-server-and-test": "^2.0.11"
   }
 }
