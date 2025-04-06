@@ -224,5 +224,5 @@ function loadBackendB(app) {
     });
 }
 
-export { loadBackend };
+export { loadBackendB };
 
