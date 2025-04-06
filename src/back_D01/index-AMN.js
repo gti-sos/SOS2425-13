@@ -59,6 +59,26 @@ export function loadBackend(app) {
         });
     });
 
+    // Cargar datosAlvaro
+
+    app.get(BASE_API + "/forest-fires/loadAlvaroData", (req, res) => {
+        console.log("GET to /forest-fires/loadAlvaroData");
+    
+        const datosFormateados = datosAlvaro.map(d => ({
+            ...d,
+            autonomous_community: d.autonomous_comunity.toLowerCase()
+        }));
+    
+        db.insert(datosFormateados, (err, newDocs) => {
+            if (err) {
+                res.status(500).json({ message: "Error insertando datos", error: err });
+            } else {
+                res.status(200).json({ message: "Datos de Álvaro cargados correctamente", data: newDocs });
+            }
+        });
+    });
+    
+
     // GET general con filtros y paginación
     app.get(BASE_API + "/forest-fires", (req, res) => {
         console.log("New GET request to /forest-fires");
