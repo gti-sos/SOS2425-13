@@ -10,8 +10,8 @@ jobs:
         run:  npm install
       - name: Run darlopvil test @localhost
         run: npm run test-national-parks
-      - name: Deploy to render
-        uses: jonhbeynon/render-deploy-action@v0.8.0
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
           api-key: ${{ secrets.MY_RENDER_API_KEY }}
