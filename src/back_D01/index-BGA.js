@@ -54,7 +54,7 @@ const datosInicialesB = [
 
 function loadBackendB(app) {
     // Load Initial Data
-    app.get(BASE_API + "/water-supply-improvements", (req, res) => {
+    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         db.count({}, (err, count) => {
             if (err) return res.status(500).send({ error: "Error al acceder a la base de datos" });
             if (count > 0) return res.status(405).send({ message: "Ya existen datos. No se sobreescriben." });
@@ -214,7 +214,7 @@ function loadBackendB(app) {
         db.remove({ year }, { multi: true }, (err, numRemoved) => {
             if (err) return res.status(500).send({ error: "Error al eliminar" });
             if (numRemoved === 0) return res.status(404).send({ error: "No se encontraron datos para ese año" });
-            res.status(200).send({ message: Se eliminaron ${numRemoved} registros para el año ${year} });
+            res.status(200).send({ message: `Se eliminaron ${numRemoved} registros para el año ${year}` });
         });
     });
 
@@ -224,4 +224,4 @@ function loadBackendB(app) {
     });
 }
 
-export { loadBackend };
+export { loadBackendB };
