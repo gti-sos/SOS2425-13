@@ -264,19 +264,32 @@ app.post(BASE_API + "/national-parks", (request, response) => {
     console.log("New POST to /national-parks");
     let newPark = request.body;
 
+    // Validar que hay datos
+    if(!newPark || Object.keys(newPark).length === 0){
+        return response.status(400).send({error: "Petición mal formada: No hay datos en la solicitud"});
+    }
+
+    // Definir campos esperados
+    const expectedFields = ["national_park", "declaration_date", "autonomous_community", "initial_area", "current_area"];
+    
     // Validar campos obligatorios
     const missingFields = [];
-    if(!newPark.national_park) missingFields.push("national_park");
-    if(!newPark.declaration_date) missingFields.push("declaration_date");
-    if(!newPark.autonomous_community) missingFields.push("autonomous_community");
-    if(!newPark.initial_area) missingFields.push("initial_area");
-    if(!newPark.current_area) missingFields.push("current_area");
+    expectedFields.forEach(field => {
+        if(!newPark[field]) missingFields.push(field);
+    });
     
-    if(missingFields.length > 0) {
-      return response.status(400).send({
-        error: "Faltan campos obligatorios",
-        missing_fields: missingFields
-      });
+    // Validar campos extra
+    const extraFields = [];
+    Object.keys(newPark).forEach(field => {
+        if(!expectedFields.includes(field)) extraFields.push(field);
+    });
+    
+    // Si hay campos faltantes o extra, devolver 400
+    if(missingFields.length > 0 || extraFields.length > 0) {
+        const error = {error: "Estructura JSON incorrecta"};
+        if(missingFields.length > 0) error.missing_fields = missingFields;
+        if(extraFields.length > 0) error.extra_fields = extraFields;
+        return response.status(400).send(error);
     }
 
     // Verificar que no exista ya un parque con el mismo nombre
@@ -321,6 +334,14 @@ app.put(BASE_API + "/national-parks/:name/:declaration_date", (request, response
         });
     }
     
+    // Verificar que no se envían datos adicionales en el cuerpo de la petición
+    if (request.body && Object.keys(request.body).length > 0) {
+        return response.status(400).send({
+            error: "Estructura JSON incorrecta",
+            message: "Este endpoint no espera datos en el cuerpo de la petición"
+        });
+    }
+    
     // Verificar que el parque existe
     db.findOne({ national_park: parkName }, (err, park) => {
         if (err) {
@@ -346,7 +367,7 @@ app.put(BASE_API + "/national-parks/:name/:declaration_date", (request, response
                 
                 // Si se actualizó correctamente, devolver 200
                 if (numUpdated > 0) {
-                    return response.status(200).send();
+                    return response.sendStatus(200);
                 } else {
                     return response.status(500).send({ 
                         error: "No se pudo actualizar el parque",
@@ -372,7 +393,24 @@ app.put(BASE_API + "/national-parks/:name", (request, response) => {
     
     // Validar que hay datos en el cuerpo
     if(!park_body || Object.keys(park_body).length === 0){
-        return response.status(400).send({error: "Petición mal formada: No hay datos en el array de la solicitud"});
+        return response.status(400).send({error: "Petición mal formada: No hay datos en la solicitud"});
+    }
+    
+    // Definir campos permitidos
+    const allowedFields = ["national_park", "declaration_date", "autonomous_community", "initial_area", "current_area"];
+    
+    // Verificar campos no permitidos
+    const extraFields = [];
+    Object.keys(park_body).forEach(field => {
+        if(!allowedFields.includes(field)) extraFields.push(field);
+    });
+    
+    // Si hay campos extra, devolver 400
+    if(extraFields.length > 0) {
+        return response.status(400).send({
+            error: "Estructura JSON incorrecta",
+            extra_fields: extraFields
+        });
     }
     
     // Verificar que el parque existe
@@ -441,6 +479,56 @@ app.delete(BASE_API + "/national-parks", (request, response) => {
             response.status(200).send({ 
                 message: "Todos los parques han sido eliminados correctamente",
                 count: numRemoved
+            });
+        });
+    });
+});
+
+// DELETE para eliminar un parque específico por nombre y año
+app.delete(BASE_API + "/national-parks/:name/:declaration_date", (request, response) => {
+    console.log("New DELETE to /national-parks/:name/:declaration_date");
+    const parkName = request.params.name;
+    const year = parseInt(request.params.declaration_date);
+    
+    // Validar que el año es un número válido
+    if (isNaN(year)) {
+        return response.status(400).send({
+            error: "Año inválido",
+            message: "El segundo parámetro debe ser un número válido"
+        });
+    }
+    
+    // Buscar el parque antes de eliminarlo
+    db.findOne({ 
+        national_park: parkName,
+        declaration_date: year
+    }, (err, park) => {
+        if (err) {
+            return response.status(500).send({ error: "Error al consultar la base de datos" });
+        }
+        
+        if (!park) {
+            return response.status(404).send({ 
+                error: "Parque no encontrado", 
+                message: `No existe un parque con el nombre '${parkName}' declarado en ${year}` 
+            });
+        }
+        
+        // Eliminar el parque
+        db.remove({ 
+            national_park: parkName,
+            declaration_date: year 
+        }, {}, (err, numRemoved) => {
+            if (err) {
+                return response.status(500).send({ error: "Error al eliminar el parque" });
+            }
+            
+            // Transformar el documento para eliminar el campo _id
+            const { _id, ...rest } = park;
+            
+            response.status(200).send({
+                message: "Parque eliminado correctamente", 
+                data: rest
             });
         });
     });
