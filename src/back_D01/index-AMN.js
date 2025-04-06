@@ -227,6 +227,53 @@ export function loadBackend(app) {
         });
     });
 
+    // DELETE por parámetro único (año o comunidad autónoma)
+    app.delete(BASE_API + "/forest-fires/:param", (req, res) => {
+        console.log("DELETE a /forest-fires/:param");
+
+        const param = req.params.param.toLowerCase();
+
+        db.find({}, (err, data) => {
+            if (err) {
+                return res.status(500).json({ error: "Error accediendo a la base de datos" });
+            }
+
+            if (data.length === 0) {
+                return res.status(404).json({ 
+                    error: "No hay datos disponibles para eliminar" 
+                });
+            }
+
+            let deleteQuery;
+
+            if (!isNaN(param)) {
+                // Borrar por año
+                deleteQuery = { year: parseInt(param) };
+            } else {
+                // Borrar por comunidad
+                deleteQuery = { autonomous_community: param };
+            }
+
+            db.remove(deleteQuery, { multi: true }, (err, numRemoved) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error eliminando los datos" });
+                }
+
+                if (numRemoved === 0) {
+                    return res.status(404).json({
+                        error: "No se encontraron registros para eliminar",
+                        message: `No hay registros que coincidan con: ${param}`
+                    });
+                }
+
+                res.status(200).json({ 
+                    message: `${numRemoved} registro(s) eliminado(s) con éxito para el parámetro '${param}'`
+                });
+            });
+        });
+    });
+
+
     // DELETE por año y comunidad
     app.delete(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
         console.log(`DELETE request received at /forest-fires/${req.params.year}/${req.params.autonomous_community}`);
