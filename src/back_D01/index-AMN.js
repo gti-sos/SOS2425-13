@@ -105,6 +105,48 @@ export function loadBackend(app) {
             });
     });
 
+    // GET por parámetro único (año o comunidad autónoma)
+    app.get(BASE_API + "/forest-fires/:param", (req, res) => {
+        console.log("GET a /forest-fires/:param");
+    
+        const param = req.params.param.toLowerCase();
+    
+        db.find({}, (err, data) => {
+            if (err) {
+                return res.status(500).json({ error: "Error accediendo a la base de datos" });
+            }
+    
+                if (data.length === 0) {
+                    return res.status(404).json({
+                    error: "No hay datos disponibles",
+                    message: "Realice un GET a /forest-fires/loadInitialData para cargar datos"
+                });
+            }
+    
+            let filteredData;
+    
+            if (!isNaN(param)) {
+                // Buscar por año
+                filteredData = data.filter(entry => entry.year === parseInt(param));
+            } else {
+                // Buscar por comunidad
+                filteredData = data.filter(entry => entry.autonomous_community.toLowerCase() === param);
+            }
+    
+            if (filteredData.length === 0) {
+                return res.status(404).json({
+                    error: "No se encontraron registros",
+                    message: `No hay registros para el parámetro: ${param}`
+                });
+            }
+    
+            // Limpiar _id y responder
+            const cleanData = filteredData.map(({ _id, ...rest }) => rest);
+            res.status(200).json(cleanData);
+        });
+    });
+    
+
     // GET por año y comunidad
     app.get(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
         console.log("Received GET request to /forest-fires/:year/:autonomous_community");
