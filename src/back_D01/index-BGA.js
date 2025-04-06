@@ -54,7 +54,7 @@ const datosInicialesB = [
 
 function loadBackendB(app) {
     // Load Initial Data
-    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
+    app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         db.count({}, (err, count) => {
             if (err) return res.status(500).send({ error: "Error al acceder a la base de datos" });
             if (count > 0) return res.status(405).send({ message: "Ya existen datos. No se sobreescriben." });
