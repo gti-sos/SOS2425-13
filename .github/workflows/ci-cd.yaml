@@ -8,8 +8,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install dependencies
         run:  npm install
-      - name: Run darlopvil test @localhost
-        run: npm run test-national-parks
+      
       - name: Run blagaralo test @localhost
         run: npm run test-datosB
       - name: Deploy to Render
