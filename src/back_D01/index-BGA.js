@@ -53,6 +53,13 @@ const datosInicialesB = [
 ];
 
 function loadBackend(app) {
+
+      // Docs
+      app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
+        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUC3V9");
+    });
+
+    
     // Load Initial Data
     app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
         db.count({}, (err, count) => {
@@ -218,10 +225,7 @@ function loadBackend(app) {
         });
     });
 
-    // Docs
-    app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
-        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUC3V9");
-    });
+  
 }
 
 export { loadBackend };
