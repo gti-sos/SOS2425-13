@@ -34,7 +34,10 @@ const datosIniciales = [
 
 function loadBackend(app) {
 
-
+    app.get(BASE_API + "/national-parks/docs", (request, response) => {
+        response.redirect("https://documenter.getpostman.com/view/14944672/2sB2cUBNyt");
+    
+    });
    
 
 //loadInitialData
@@ -406,10 +409,7 @@ app.delete(BASE_API + "/national-parks/:name", (request, response) => {
     });
 });
 
-app.get(BASE_API + "/national-parks/docs", (request, response) => {
-    response.redirect("https://documenter.getpostman.com/view/14944672/2sB2cUBNyt");
 
-});
 
 }
 
