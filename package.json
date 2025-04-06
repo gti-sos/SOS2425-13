@@ -16,10 +16,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "test-datosB": "newman run test/back/blanca/blagaralo.postman_collection.json --environment test/back/blanca/online.postman_environment.json",
     "test-darlopvil-local": "npx newman run ./test/back/dario/darlopvil-tests.json -e ./test/back/dario/local-env.json",
-    "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local"
+    "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
+    "test": "npm run test-datosB"
   },
   "keywords": [],
   "dependencies": {
