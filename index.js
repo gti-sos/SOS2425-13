@@ -7,8 +7,9 @@ app.use(express.json());
 
 
 // ---- PARTE BLANCA (modularizada correctamente) ----
-import {loadBackendB} from "./src/back_D01/index-BGA.js";
+import { loadBackend as loadBackendB } from "./src/back_D01/index-BGA.js";
 loadBackendB(app);
+
 
 
 // ---- PARTE DARÍO (modularizada correctamente) ----
