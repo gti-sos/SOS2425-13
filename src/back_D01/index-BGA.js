@@ -56,7 +56,7 @@ function loadBackend(app) {
 
       // Docs
       app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
-        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cUC3V9");
+        res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
 
     
@@ -75,26 +75,72 @@ function loadBackend(app) {
     
 
     // GET con filtros (from, to y otros campos)
-    app.get(BASE_API + "/water-supply-improvements", (req, res) => {
-        let query = {};
-        const from = req.query.from ? parseInt(req.query.from) : null;
-        const to = req.query.to ? parseInt(req.query.to) : null;
-        if (!isNaN(from)) query.year = { ...query.year, $gte: from };
-        if (!isNaN(to)) query.year = { ...query.year, $lte: to };
-        const { from: _f, to: _t, ...otherParams } = req.query;
-        for (const [key, value] of Object.entries(otherParams)) {
-            const num = parseInt(value);
-            query[key] = isNaN(num) ? value.toLowerCase() : num;
+    ///GET a /water-supply-improvements con filtros, rangos de años y paginación
+app.get(BASE_API + "/water-supply-improvements", (req, res) => {
+    console.log("New GET to /water-supply-improvements");
+
+    let query = {};
+
+    // Filtros por año
+    const from = req.query.from ? parseInt(req.query.from) : null;
+    const to = req.query.to ? parseInt(req.query.to) : null;
+
+    if (from !== null && !isNaN(from)) {
+        query.year = query.year || {};
+        query.year.$gte = from;
+    }
+
+    if (to !== null && !isNaN(to)) {
+        query.year = query.year || {};
+        query.year.$lte = to;
+    }
+
+    // Paginación
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+
+    // Otros parámetros
+    const { from: _f, to: _t, limit: _l, offset: _o, ...otherParams } = req.query;
+
+    for (const [key, value] of Object.entries(otherParams)) {
+        const numValue = parseInt(value);
+        if (!isNaN(numValue) && String(numValue) === String(value)) {
+            query[key] = numValue;
+        } else {
+            query[key] = value.toLowerCase?.() || value;
         }
-        db.find(query, (err, docs) => {
-            if (err) return res.status(500).send({ error: "Error en la consulta" });
-            if (docs.length === 0) {
+    }
+
+    let dbQuery = db.find(query);
+
+    if (offset !== null && !isNaN(offset)) {
+        dbQuery = dbQuery.skip(offset);
+    }
+
+    if (limit !== null && !isNaN(limit)) {
+        dbQuery = dbQuery.limit(limit);
+    }
+
+    dbQuery.exec((err, docs) => {
+        if (err) {
+            return res.status(500).send({ error: "Error al consultar la base de datos" });
+        }
+
+        const hasQueryParams = Object.keys(req.query)
+            .filter(key => !['limit', 'offset'].includes(key)).length > 0;
+
+        if (docs.length === 0 && !hasQueryParams) {
             return res.status(404).send({
-                error: "No se encontraron datos",
-                message: "Utiliza otros filtros o carga datos iniciales",
+                error: "No hay datos que mostrar",
+                message: "Utiliza GET /api/v1/water-supply-improvements/loadInitialData para cargar datos iniciales",
                 data: []
             });
         }
+<<<<<<< HEAD
+
+        const transformedDocs = docs.map(({ _id, ...rest }) => rest);
+        return res.status(200).send(transformedDocs);
+=======
         const transformedDocs = docs.map(doc => {
             const { _id, ...rest } = doc;
             return rest;
@@ -103,7 +149,10 @@ function loadBackend(app) {
         // Siempre enviar un array (vacío si no hay resultados)
         return response.status(200).send(transformedDocs);
         });
+>>>>>>> 6392b54e8c462037d4fcfb658d9cee4ffd9735ea
     });
+});
+
 
 
     // GET por parámetro (año o comunidad)
