@@ -52,7 +52,7 @@
 			"response": []
 		},
 		{
-			"name": "national-parks/loadInitialData",
+			"name": "national-parks/loadInitialData Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -95,47 +95,7 @@
 			"response": []
 		},
 		{
-			"name": "national-parks/ after loaded InitialData",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"pm.test(\"Array size is 10\", function () {\r",
-							"    pm.expect(pm.response.json()).to.have.lengthOf(10);\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks",
-					"host": [
-						"{{Base_URL}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"national-parks"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "national-parks",
+			"name": "national-parks Copy",
 			"event": [
 				{
 					"listen": "test",
@@ -209,6 +169,46 @@
 						"v1",
 						"national-parks",
 						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/ after loaded InitialData Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Array size is 10\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.lengthOf(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
 					]
 				}
 			},
@@ -1679,6 +1679,126 @@
 						"national-parks",
 						"Teide",
 						"abc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/loadInitialData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Ensure the length of the data returned is 10\r",
+							"pm.test(\"Data length is 10\", function () {\r",
+							"    pm.expect(pm.response.json().data.length).to.equal(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/loadInitialData",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/ after loaded InitialData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Array size is 10\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.lengthOf(10);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
 					]
 				}
 			},
