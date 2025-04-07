@@ -95,8 +95,13 @@ function loadBackend(app) {
                 data: []
             });
         }
-            const transformed = docs.map(({ _id, ...rest }) => rest);
-            return res.status(200).send(transformed);
+        const transformedDocs = docs.map(doc => {
+            const { _id, ...rest } = doc;
+            return rest;
+        });
+        
+        // Siempre enviar un array (vacío si no hay resultados)
+        return response.status(200).send(transformedDocs);
         });
     });
 
