@@ -136,11 +136,6 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
                 data: []
             });
         }
-<<<<<<< HEAD
-
-        const transformedDocs = docs.map(({ _id, ...rest }) => rest);
-        return res.status(200).send(transformedDocs);
-=======
         const transformedDocs = docs.map(doc => {
             const { _id, ...rest } = doc;
             return rest;
@@ -149,9 +144,8 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         // Siempre enviar un array (vacío si no hay resultados)
         return response.status(200).send(transformedDocs);
         });
->>>>>>> 6392b54e8c462037d4fcfb658d9cee4ffd9735ea
     });
-});
+
 
 
 
