@@ -142,7 +142,7 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         });
         
         // Siempre enviar un array (vacío si no hay resultados)
-        return response.status(200).send(transformedDocs);
+        return res.status(200).send(transformedDocs);
         });
     });
 
