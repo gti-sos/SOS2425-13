@@ -312,10 +312,6 @@ export function loadBackend(app) {
         });
     });
 
-    // Documentación
-    app.get(BASE_API + "/forest-fires/docs", (req, res) => {
-        res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
-    });
 }
 
 
