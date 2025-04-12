@@ -43,6 +43,9 @@ const datosAlvaro = [
 ];
 
 export function loadBackend(app) {
+    app.get(BASE_API + "/forest-fires/docs", (req, res) => {
+        res.redirect("https://documenter.getpostman.com/view/42116184/2sB2cUBNgF");
+    });
 
     // Cargar datos iniciales
     app.get(BASE_API + "/forest-fires/loadInitialData", (req, res) => {
