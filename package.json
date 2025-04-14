@@ -28,7 +28,8 @@
     "test-darlopvil-local": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
     "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
     "test-water-supply-improvements": "start-server-and-test start http://localhost:16078 test-datosBGA",
-    "test": "npm run test-DLV  && npm run test-BGA"
+    "test": "npm run test-DLV  && npm run test-BGA",
+    "build": "cd src/GUI_D02 && npm run build"
   },
   "keywords": [],
   "dependencies": {

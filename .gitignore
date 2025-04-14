@@ -129,5 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-
-D:/Universidad/3/SOS/sos2425/SOS2425-13/src/GUI_D02/node_modules
+#node_modules frontend
+src\GUI_D02\node_modules
