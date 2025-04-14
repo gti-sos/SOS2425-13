@@ -1,39 +1,16 @@
-{
-  "name": "sos2425-13",
-  "version": "1.0.0",
-  "description": "modulo del grupo 13 de SOS2425",
-  "homepage": "https://github.com/gti-sos/SOS2425-13#readme",
-  "bugs": {
-    "url": "https://github.com/gti-sos/SOS2425-13/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gti-sos/SOS2425-13.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
+"scripts": {
     "build:gui": "cd src/GUI_D02 && npm install && npm run build",
     "start": "node index.js",
     "test-local-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-online-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/online.postman_environment.json",
+    "test-local-DLV": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
+    "test-online-DLV": "npx newman run test/back/darlopvil-tests.json --environment test/back/online.postman_environment.json",
     "test-local-BGA-L": "start-server-and-test start http://localhost:16078 test-local-BGA",
     "test-BGA": "npm run test-local-BGA-L",
+    "test-local-DLV-L": "start-server-and-test start http://localhost:16078 test-local-DLV",
+    "test-DLV": "npm run test-local-DLV-L",
     "test-datosBGA": "newman run test/back/blagaralo.postman_collection.json --environment test/back/online.postman_environment.json",
-    
-    
+    "test-darlopvil-local": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
+    "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
     "test-water-supply-improvements": "start-server-and-test start http://localhost:16078 test-datosBGA",
-    "test": " npm run test-BGA"
-  },
-  "keywords": [],
-  "dependencies": {
-    "cool-ascii-faces": "^1.3.4",
-    "express": "^4.21.2",
-    "nedb": "^1.8.0"
-  },
-  "devDependencies": {
-    "start-server-and-test": "^2.0.11"
-  }
-}
+    "test": "npm run test-DLV  && npm run test-BGA"
