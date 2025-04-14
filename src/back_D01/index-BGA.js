@@ -125,25 +125,37 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         if (err) {
             return res.status(500).send({ error: "Error al consultar la base de datos" });
         }
-
+    
+        // Verificar si no hay datos y se usaron filtros de fecha
+        const hasDateFilters = from !== null || to !== null;
+        if (docs.length === 0 && hasDateFilters) {
+            return res.status(404).send({
+                error: "No se encontraron datos para el rango de fechas especificado",
+                message: "Asegúrate de que las fechas estén dentro del rango de los datos disponibles",
+                data: []
+            });
+        }
+    
+        // Verificar si no hay datos y no se usaron filtros
         const hasQueryParams = Object.keys(req.query)
             .filter(key => !['limit', 'offset'].includes(key)).length > 0;
-
-        if (docs.length === 0 && !hasQueryParams) {
+        if (docs.length === 0 && !hasQueryParams && !hasDateFilters) {
             return res.status(404).send({
                 error: "No hay datos que mostrar",
                 message: "Utiliza GET /api/v1/water-supply-improvements/loadInitialData para cargar datos iniciales",
                 data: []
             });
         }
+    
+        // Transformar los documentos eliminando el campo `_id`
         const transformedDocs = docs.map(doc => {
             const { _id, ...rest } = doc;
             return rest;
         });
-        
+    
         // Siempre enviar un array (vacío si no hay resultados)
         return res.status(200).send(transformedDocs);
-        });
+    });
     });
 
 
@@ -160,7 +172,7 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
 
         db.find(search, (err, docs) => {
             if (err) return res.status(500).send({ error: "Error en la búsqueda" });
-            if (docs.length === 0) return res.status(404).send({ error: "Recurso no encontrado" });
+            if (docs.length === 0) return res.status(404).send({ error: "Recurso no encontrado", message: "No se encontraron resultados para los parámetros proporcionados" });
             const transformed = docs.map(({ _id, ...rest }) => rest);
             return res.status(200).send(transformed);
         });
