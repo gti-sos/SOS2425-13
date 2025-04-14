@@ -8,6 +8,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Install dependencies
         run:  npm install
+      - name: Build Frontend
+        run: |
+          cd src/GUI_D02
+          npm install
+          npm run build
+          cd ../../
       - name: Run test
         run: npm test
       - name: Deploy to Render
