@@ -7,7 +7,7 @@ import {handler} from './src/front/build/handler.js';
 
 //app.use("/", express.static("public"));
 app.use(express.json());
-app.use(handler);
+
 
 
 // ---- PARTE BLANCA (modularizada correctamente) ----
@@ -30,4 +30,4 @@ loadBackendA(app);
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
 });
-
+app.use(handler);
