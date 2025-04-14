@@ -15,8 +15,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "build:gui": "cd src/GUI_D02 && npm install && npm run build",
     "start": "node index.js",
-    "build": "cd src/GUI_D02 && npm install && npm run build",
     "test-local-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-online-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/online.postman_environment.json",
     "test-local-DLV": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
