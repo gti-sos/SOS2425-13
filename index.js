@@ -30,4 +30,9 @@ app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
 });
 
-app.use(handler);
+app.use(express.static(join(__dirname, "src/front/build")));
+ 
+ // SPA fallback (sirve index.html para cualquier ruta no API)
+ app.get("*", (req, res) => {
+   res.sendFile(join(__dirname, "src/front/build/index.html"));
+ });
