@@ -2,7 +2,7 @@ import express from "express";
 const app = express();
 const PORT = process.env.PORT || 16078;
 
-import {handler} from "./src/front/build/handler.js";
+import {handler} from './src/front/build/handler.js';
 
 
 //app.use("/", express.static("public"));
@@ -29,10 +29,4 @@ loadBackendA(app);
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
 });
-
-app.use(express.static(join(__dirname, "src/front/build")));
- 
- // SPA fallback (sirve index.html para cualquier ruta no API)
- app.get("*", (req, res) => {
-   res.sendFile(join(__dirname, "src/front/build/index.html"));
- });
+app.use(handler);
