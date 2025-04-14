@@ -8,45 +8,6 @@
 	},
 	"item": [
 		{
-			"name": "loadInitialData",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"✔ Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"pm.test(\"✔ Data was loaded\", function () {",
-							"    pm.expect(pm.response.json().data.length).to.be.above(0);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Base_URL}}/api/v1/water-supply-improvements/loadInitialData",
-					"host": [
-						"{{Base_URL}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"water-supply-improvements",
-						"loadInitialData"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "water-supply-improvements",
 			"event": [
 				{
@@ -86,6 +47,46 @@
 			},
 			"response": []
 		},
+		{
+			"name": "loadInitialData",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"✔ Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"✔ Data was loaded\", function () {",
+							"    pm.expect(pm.response.json().data.length).to.be.above(0);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/water-supply-improvements/loadInitialData",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"water-supply-improvements",
+						"loadInitialData"
+					]
+				}
+			},
+			"response": []
+		},
+		
 		{
 			"name": "Dos parametros",
 			"event": [

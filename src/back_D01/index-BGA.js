@@ -147,13 +147,12 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
             });
         }
     
-        // Transformar los documentos eliminando el campo `_id`
+        // Si hay datos, devolverlos
         const transformedDocs = docs.map(doc => {
             const { _id, ...rest } = doc;
             return rest;
         });
     
-        // Siempre enviar un array (vacío si no hay resultados)
         return res.status(200).send(transformedDocs);
     });
     });
