@@ -766,7 +766,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"✔ La respuesta tiene propiedad 'error' si es JSON\", function () {",
 							"    try {",
@@ -776,7 +775,9 @@
 							"        console.warn(\"La respuesta no es JSON. Test omitido.\");",
 							"    }",
 							"});"
-						]
+						],
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -796,7 +797,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/water-supply-improvements/salteras",
+					"raw": "{{Base_URL}}/api/v1/water-supply-improvements/2019/salteras",
 					"host": [
 						"{{Base_URL}}"
 					],
@@ -804,6 +805,7 @@
 						"api",
 						"v1",
 						"water-supply-improvements",
+						"2019",
 						"salteras"
 					]
 				}

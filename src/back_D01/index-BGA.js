@@ -201,37 +201,56 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     });
 
     // PUT
-    app.put(BASE_API + "/water-supply-improvements", (req, res) => {
-        return res.status(405).send({ error: "No se permite PUT a un conjunto de recursos" });
-    });
-
-    app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
-        const year = parseInt(req.params.year);
-        const community = req.params.autonomous_community.toLowerCase();
-        if (isNaN(year)) return res.status(400).send({ error: "Año inválido. Debe ser un número." });
-        const update = req.body;
-
-        if (!update || Object.keys(update).length === 0) return res.status(400).send({ error: "Petición mal formada: No hay datos en el cuerpo" });
-
-        db.findOne({ year, autonomous_community: community }, (err, existing) => {
-            if (err) return res.status(500).send({ error: "Error en la búsqueda" });
-            if (!existing) return res.status(404).send({ error: "Recurso no encontrado" });
-
-            if ((update.year && update.year !== year) || (update.autonomous_community && update.autonomous_community.toLowerCase() !== community)) {
-                db.findOne({ year: update.year, autonomous_community: update.autonomous_community?.toLowerCase() }, (err, dup) => {
-                    if (dup) return res.status(409).send({ error: "Conflicto con recurso existente" });
-                    doUpdate();
-                });
-            } else doUpdate();
-
-            function doUpdate() {
-                db.update({ year, autonomous_community: community }, { $set: update }, {}, (err) => {
-                    if (err) return res.status(500).send({ error: "Error al actualizar" });
-                    res.sendStatus(200);
-                });
-            }
+// PUT a un conjunto de recursos: no permitido
+app.put(BASE_API + "/water-supply-improvements", (req, res) => {
+    return res.status(405).send({ error: "No se permite PUT a un conjunto de recursos" });
+  });
+  
+  // PUT para actualizar un recurso específico identificado por año y comunidad autónoma
+  app.put(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
+    const year = parseInt(req.params.year);
+    const community = req.params.autonomous_community.toLowerCase();
+  
+    if (isNaN(year)) {
+      return res.status(400).send({ error: "Año inválido. Debe ser un número." });
+    }
+  
+    const update = req.body;
+    if (!update || Object.keys(update).length === 0) {
+      return res.status(400).send({ error: "Petición mal formada: No hay datos en el cuerpo" });
+    }
+  
+    // Buscar primero el recurso a actualizar
+    db.findOne({ year, autonomous_community: community }, (err, existing) => {
+      if (err) return res.status(500).send({ error: "Error en la búsqueda" });
+      if (!existing) return res.status(404).send({ error: "Recurso no encontrado" });
+  
+      // Si se intenta modificar 'year' o 'autonomous_community' se debe verificar que no cree duplicados
+      if ((update.year && update.year !== year) || 
+          (update.autonomous_community && update.autonomous_community.toLowerCase() !== community)) {
+        db.findOne({
+          year: update.year,
+          autonomous_community: update.autonomous_community ? update.autonomous_community.toLowerCase() : community
+        }, (err, dup) => {
+          if (err) return res.status(500).send({ error: "Error en la búsqueda de duplicados" });
+          if (dup) return res.status(409).send({ error: "Conflicto con recurso existente" });
+          doUpdate();
         });
+      } else {
+        doUpdate();
+      }
+  
+      function doUpdate() {
+        // Se realiza la actualización: se utiliza el operador $set para modificar solo los campos enviados
+        db.update({ year, autonomous_community: community }, { $set: update }, {}, (err, numUpdated) => {
+          if (err) return res.status(500).send({ error: "Error al actualizar" });
+          if (numUpdated === 0) return res.status(404).send({ error: "Recurso no encontrado" });
+          return res.sendStatus(200);
+        });
+      }
     });
+  });
+  
 
     // DELETE general
     app.delete(BASE_API + "/water-supply-improvements", (req, res) => {
