@@ -1,8 +1,9 @@
 import express from "express";
+import {handler} from './src/front/build/handler.js';
 const app = express();
 const PORT = process.env.PORT || 16078;
 
-import {handler} from './src/front/build/handler.js';
+
 
 
 //app.use("/", express.static("public"));
@@ -27,10 +28,11 @@ import { loadBackend as loadBackendA } from "./src/back_D01/index-AMN.js";
 loadBackendA(app);
 
 
+app.use(handler);
+
+
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto :${PORT}`);
 });
 
 
-
-app.use(handler);
