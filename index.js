@@ -1,5 +1,5 @@
 import express from "express";
-import {handler} from '../front/build/handler.js';
+import {handler} from './src/front/build/handler.js';
 const app = express();
 const PORT = process.env.PORT || 16078;
 
