@@ -15,7 +15,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    
+    "build": "cd src/front && npm run build",
     "start": "node index.js",
     "test-local-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-online-BGA": "npx newman run test/back/blagaralo.postman_collection.json --environment test/back/online.postman_environment.json",
@@ -29,8 +29,8 @@
     "test-darlopvil-local": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
     "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
     "test-water-supply-improvements": "start-server-and-test start http://localhost:16078 test-datosBGA",
-    "test": "npm run test-DLV  && npm run test-BGA",
-    "build": "cd src/front && npm run build"
+    "test": "npm run test-DLV  && npm run test-BGA"
+    
   },
   "keywords": [],
   "dependencies": {
