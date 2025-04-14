@@ -1,0 +1,1633 @@
+{
+	"info": {
+		"_postman_id": "734e29c8-c1ec-438b-ab7f-33968ce0d043",
+		"name": "API for national parks in Spain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14944672",
+		"_collection_link": "https://sos2425-13.postman.co/workspace/SOS2425-13-~b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/14944672-734e29c8-c1ec-438b-ab7f-33968ce0d043?action=share&source=collection_link&creator=14944672"
+	},
+	"item": [
+		{
+			"name": "UTILS",
+			"item": [
+				
+				{
+					"name": "loadInitialData",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure the length of the data returned is 10\r",
+									"pm.test(\"Data length is 10\", function () {\r",
+									"    pm.expect(pm.response.json().data.length).to.equal(10);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/loadInitialData",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"loadInitialData"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Tests útiles for debug purposes"
+		},
+		{
+			"name": "TABLA VERDE",
+			"item": [
+				{
+					"name": "national-parks (400 sin body)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks (400 bad JSON - faltan campos)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"national_park\": \"ParqueNuevo\", \"declaration_date\": 2023, \"autonomous_community\": \"Extremadura\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks (400 bad JSON - sobran campos)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"national_park\": \"ParqueNuevo\", \"declaration_date\": 2023, \"autonomous_community\": \"Extremadura\", \"initial_area\": 5000, \"current_area\": 5000, \"campo_extra\": \"valor\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks (409 parque repetido)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {\r",
+									"    pm.response.to.have.status(409);\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"national_park\": \"Teide\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (405 prohibido)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 405\", function () {\r",
+									"    pm.response.to.have.status(405);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"national_park\": \"Test\", \r\n  \"declaration_date\": 1954, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Cabañeros (404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Cabañeros2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks (405)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 405\", function () {\r",
+									"    pm.response.to.have.status(405);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Cabañeros (404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Error message indicates park not found\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"Parque no encontrado. No puedo actualizarlo\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " { \"national_park\": \"Cabañeros\", \"declaration_date\": 1995, \"autonomous_community\": \"Castilla-La Mancha\", \"initial_area\": 3984, \"current_area\": 3984 }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Cabañeros2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (body vacío 400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Request body is an empty object/array\", function () {\r",
+									"    const requestBody = pm.request.body.raw;\r",
+									"    const parsedBody = JSON.parse(requestBody || \"null\");\r",
+									"    \r",
+									"    // Verifica si es un objeto o array vacío\r",
+									"    const isEmpty = \r",
+									"        (Array.isArray(parsedBody) && parsedBody.length === 0) ||\r",
+									"        (parsedBody !== null && typeof parsedBody === 'object' && Object.keys(parsedBody).length === 0);\r",
+									"    \r",
+									"    pm.expect(isEmpty).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " { }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (400 bad JSON)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"declaration_date\": 1960, \"campo_extra\": \"valor\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (error 409, Garajonay exists!)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {\r",
+									"    pm.response.to.have.status(409);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"national_park\": \"Garajonay\",\r\n  \"autonomous_community\": \"Canarias\",\r\n  \"declaration_date\": 1974,\r\n  \"initial_area\": 5107,\r\n  \"current_area\": 5107\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Sierra Nevada (404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Sierra Nevada",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Sierra Nevada"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Checking all status codes from the infamous \"Green Table\""
+		},
+		{
+			"name": "TABLA AZUL",
+			"item": [
+				{
+					"name": "national-parks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verify the status code is 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body has 10 items\", function () {\r",
+									"    pm.expect(pm.response.json()).to.have.lengthOf(10);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains a single data item\", function () {\r",
+									"    pm.expect(Object.keys(pm.response.json())).to.have.lengthOf(5);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks (OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Ensure the response status code is 201\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Ensure the request body is not empty\r",
+									"pm.test(\"Request body is not empty\", function () {\r",
+									"    pm.expect(request.data).not.eql(null);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"national_park\": \"Garajonay2\", \r\n  \"declaration_date\": 1982, \r\n  \"autonomous_community\": \"Canarias\", \r\n  \"initial_area\": 13571, \r\n  \"current_area\": 18990\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Teide (OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verify the status code is 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verify that the request body contains data\r",
+									"pm.test(\"Request body contains data\", function () {\r",
+									"    pm.expect(pm.request.body).to.not.be.empty;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " { \"national_park\": \"Teide\", \"declaration_date\": 1954, \"autonomous_community\": \"Canarias\", \"initial_area\": 3984, \"current_area\": 3984 }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Teide"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "national-parks/Garajonay2 (OK)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for status code 200 OK\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{Base_URL}}/api/v1/national-parks/Garajonay2",
+							"host": [
+								"{{Base_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"national-parks",
+								"Garajonay2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "All scenarios from the \"Tabla Azul\":  \n\\->GET /national-parks/  \n\\->GET /national-parks/Teide  \n\\->POST /national-parks/Garajonay2  \n\\->PUT /national-parks/Teide  \n\\->DELETE /national-parks/Garajonay2  \n  \n(No se incluye el DELETE /national-parks/ porque rompe la Idempotencia)"
+		},
+		{
+			"name": "?autonomous_community=CC.AA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"/*pm.test(\"Response body has 3 elements\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.lengthOf(3);\r",
+							"});\r",
+							"*/"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?autonomous_community=Baleares",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "autonomous_community",
+							"value": "Baleares"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?current_area=ÁREA ACTUAL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?current_area=15608",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "current_area",
+							"value": "15608"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?initial_area=ÁREA INICIAL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?initial_area=3984",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "initial_area",
+							"value": "3984"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?national_park=NOMBRE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?national_park=Teide",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "national_park",
+							"value": "Teide"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?declaration_date=AÑO DE DECLARACIÓN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?declaration_date=1995",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "declaration_date",
+							"value": "1995"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/CC.AA.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parqueConcreto/Fecha",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias/1981",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias",
+						"1981"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/CC.AA./Fecha",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias/1954",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias",
+						"1954"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide/1999",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide",
+						"1999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide/1999 (400 - BAD JSON)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"dato\": \"valor\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide",
+						"1999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/CC.AA.?from=1980&to=2000",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"// Verify that the response contains 3 objects in the body\r",
+							"pm.test(\"Verify the response contains 2 objects\", function () {\r",
+							"    pm.expect(pm.response.json()).to.be.an('array').that.has.lengthOf(2);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias?from=1980&to=2000",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Canarias"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1980"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks?from=1950&to=1980",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?from=1950&to=1980",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1950"
+						},
+						{
+							"key": "to",
+							"value": "1980"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parques por periodo (no hay)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"El body de la response debe devolver un array vacío\", function () {\r",
+							"    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?from=2000&to=2010",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2000"
+						},
+						{
+							"key": "to",
+							"value": "2010"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PAGINACIÓN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"La respuesta contiene 3 datos\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array').that.has.lengthOf(3);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks?limit=3&offset=4",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide/1999",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide",
+						"1999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "national-parks/Teide/abc (400 - BAD JSON)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 OK\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/abc",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						"Teide",
+						"abc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[IDEMPOTENCIA] national-parks/Teide",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " { \"national_park\": \"Teide\", \"declaration_date\": 1954, \"autonomous_community\": \"Canarias\", \"initial_area\": 13571, \"current_area\": 18990 }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Base_URL}}/api/v1/national-parks/",
+					"host": [
+						"{{Base_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"national-parks",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
