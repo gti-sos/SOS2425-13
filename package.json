@@ -29,7 +29,7 @@
     "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
     "test-water-supply-improvements": "start-server-and-test start http://localhost:16078 test-datosBGA",
     "test": "npm run test-DLV  && npm run test-BGA",
-    "build": "cd src/GUI_D02 && npm run build"
+    "build": "cd src/GUI_D02 && npm install && npm run build"
   },
   "keywords": [],
   "dependencies": {
