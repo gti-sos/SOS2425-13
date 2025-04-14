@@ -1,0 +1,12 @@
+<main>
+    <a href="https://github.com/gti-sos/SOS2223-13" style="text-decoration: none;">Realizado por SOS2223-13 </a>
+</main>
+<style>
+    main{
+        margin-bottom: 30px;
+    }
+    a{
+        color:rgb(2, 0, 8);
+        margin-left: 40px;
+    }
+</style>

@@ -76,7 +76,7 @@ function loadBackend(app) {
 
     // GET con filtros (from, to y otros campos)
     ///GET a /water-supply-improvements con filtros, rangos de años y paginación
-app.get(BASE_API + "/water-supply-improvements", (req, res) => {
+    app.get(BASE_API + "/water-supply-improvements", (req, res) => {
     console.log("New GET to /water-supply-improvements");
 
     let query = {};
@@ -127,7 +127,7 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         }
     
         // Verificar si no hay datos y se usaron filtros de fecha
-        const hasDateFilters = from !== null || to !== null;
+        const hasDateFilters = req.query.from || req.query.to;
         if (docs.length === 0 && hasDateFilters) {
             return res.status(404).send({
                 error: "No se encontraron datos para el rango de fechas especificado",
@@ -136,10 +136,10 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
             });
         }
     
-        // Verificar si no hay datos y no se usaron filtros
+        // Verificar si no hay datos y no se usaron parámetros de consulta (excepto limit y offset)
         const hasQueryParams = Object.keys(req.query)
             .filter(key => !['limit', 'offset'].includes(key)).length > 0;
-        if (docs.length === 0 && !hasQueryParams && !hasDateFilters) {
+        if (docs.length === 0 && !hasQueryParams) {
             return res.status(404).send({
                 error: "No hay datos que mostrar",
                 message: "Utiliza GET /api/v1/water-supply-improvements/loadInitialData para cargar datos iniciales",
@@ -147,15 +147,16 @@ app.get(BASE_API + "/water-supply-improvements", (req, res) => {
             });
         }
     
-        // Si hay datos, devolverlos
+        // Si hay datos, transformarlos para eliminar el campo _id
         const transformedDocs = docs.map(doc => {
             const { _id, ...rest } = doc;
             return rest;
         });
     
+        // Devolver los datos transformados
         return res.status(200).send(transformedDocs);
     });
-    });
+});
 
 
 
