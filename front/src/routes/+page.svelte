@@ -12,7 +12,7 @@
             <a href="https://github.com/blancagrclns"> Blanca García Alonso (water-supply-improvements)</a>
         </li>
         <li>
-            <a href="https://github.com/miembro2">Darío Lopez Villegas (Recurso 2)</a>
+            <a href="https://github.com/darlopvil">Darío López Villegas (national-parks)</a>
         </li>
         <li>
             <a href="https://github.com/alvmornav">Alvaro Morillo Navajas (forest-fires)</a>
@@ -28,7 +28,7 @@
             <a href="https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy">Documentación API Blanca García Alonso</a>
         </li>
         <li>
-            <a href="https://documenter.getpostman.com/view/YYYY">Documentación API Miembro 2</a>
+            <a href="https://documenter.getpostman.com/view/14944672/2sB2cUBNyt">Documentación API Darío López Villegas</a>
         </li>
         <li>
             <a href="https://documenter.getpostman.com/view/42116184/2sB2cUBNgF">Documentación API Alvaro Morillo Navajas</a>
@@ -41,7 +41,7 @@
             <a href="http://sos2425-13.onrender.com/api/v1/water-supply-improvements">API Blanca García Alonso</a>
         </li>
         <li>
-            <a href="http://sos2425-XX.onrender.com/api/v1/resource2">API Miembro 2</a>
+            <a href="http://sos2425-13.onrender.com/api/v1/national-parks">API Darío López Villegas</a>
         </li>
         <li>
             <a href="http://sos2425-13.onrender.com/api/v1/forest-fires">API Alvaro Morillo Navajas</a>
@@ -54,7 +54,7 @@
             <a href="http://sos2425-XX.onrender.com/frontend-water-supply-improvements">FrontEnd Blanca García Alonso</a>
         </li>
         <li>
-            <a href="http://sos2425-XX.onrender.com/frontend-miembro2">FrontEnd Miembro 2</a>
+            <a href="http://sos2425-13.onrender.com/frontend-national-parks">FrontEnd Darío López Villegas</a>
         </li>
         <li>
             <a href="http://sos2425-13.onrender.com/frontend-forest-fires">FrontEnd Alvaro Morillo Navajas</a>

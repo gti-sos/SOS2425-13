@@ -1,5 +1,5 @@
 <main>
-    <a href="https://github.com/gti-sos/SOS2223-13" style="text-decoration: none;">Realizado por SOS2223-13 </a>
+    <a href="https://github.com/gti-sos/SOS2425-13" style="text-decoration: none;">Realizado por SOS2425-13 </a>
 </main>
 <style>
     main{
