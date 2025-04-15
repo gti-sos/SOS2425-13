@@ -10,13 +10,13 @@ jobs:
         run:  npm install
 
       - name: Install frontend dependencies
-        run: cd src/front && npm install
+        run: cd front && npm install
 
       - name: Build frontend
-        run: cd src/front && npm run build
+        run: cd ront && npm run build
         
       - name: Check handler.js exists
-        run: test -f src/front/build/handler.js
+        run: test -f front/build/handler.js
 
       - name: Run test
         run: npm test
