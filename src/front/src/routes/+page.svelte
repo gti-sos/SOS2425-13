@@ -15,7 +15,7 @@
             <a href="https://github.com/miembro2">Darío Lopez Villegas (Recurso 2)</a>
         </li>
         <li>
-            <a href="https://github.com/miembro3">Miembro 3 (Recurso 3)</a>
+            <a href="https://github.com/alvmornav">Alvaro Morillo Navajas (forest-fires)</a>
         </li>
     </ul>
     <h2>Repositorio</h2>
@@ -31,7 +31,7 @@
             <a href="https://documenter.getpostman.com/view/YYYY">Documentación API Miembro 2</a>
         </li>
         <li>
-            <a href="https://documenter.getpostman.com/view/ZZZZ">Documentación API Miembro 3</a>
+            <a href="https://documenter.getpostman.com/view/42116184/2sB2cUBNgF">Documentación API Alvaro Morillo Navajas</a>
         </li>
     </ul>
     <br>
@@ -44,7 +44,7 @@
             <a href="http://sos2425-XX.onrender.com/api/v1/resource2">API Miembro 2</a>
         </li>
         <li>
-            <a href="http://sos2425-XX.onrender.com/api/v1/resource3">API Miembro 3</a>
+            <a href="http://sos2425-13.onrender.com/api/v1/forest-fires">API Alvaro Morillo Navajas</a>
         </li>
     </ul>
     <br>
@@ -57,7 +57,7 @@
             <a href="http://sos2425-XX.onrender.com/frontend-miembro2">FrontEnd Miembro 2</a>
         </li>
         <li>
-            <a href="http://sos2425-XX.onrender.com/frontend-miembro3">FrontEnd Miembro 3</a>
+            <a href="http://sos2425-13.onrender.com/frontend-forest-fires">FrontEnd Alvaro Morillo Navajas</a>
         </li>
     </ul>
 </main>
