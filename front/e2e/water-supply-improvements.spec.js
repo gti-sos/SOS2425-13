@@ -1,10 +1,14 @@
 //@ts-check
 import { test, expect } from '@playwright/test';
 
+
 // 🌍 URL base dinámica
-const baseURL = process.env.BASE_URL || 'http://localhost:5173';
+
+
+
 
 // RUTA completa del recurso
+const baseURL = 'https://sos2425-13.onrender.com/'
 const PATH = '/water-supply-improvements';
 const URL = `${baseURL}${PATH}`;
 

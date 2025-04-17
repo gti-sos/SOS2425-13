@@ -1,29 +1,57 @@
-name: CI /CD
+name: CI/CD
+
 on: [push, pull_request]
+
 jobs:
   ci-cd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install dependencies
-        run:  npm install
+
+      - name: Install backend dependencies
+        run: npm install
 
       - name: Install frontend dependencies
         run: cd front && npm install
 
       - name: Build frontend
         run: cd front && npm run build
-        
+
       - name: Check handler.js exists
         run: test -f front/build/handler.js
 
-      - name: Run test
+      - name: Run backend tests
         run: npm test
+
       - name: Deploy to Render
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
           api-key: ${{ secrets.MY_RENDER_API_KEY }}
-       
-  
+
+  playwright-tests:
+    runs-on: ubuntu-latest
+    needs: ci-cd
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies (front)
+        working-directory: front
+        run: npm install
+
+      - name: Install Playwright and browsers
+        working-directory: front
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests in Render
+        working-directory: front
+        env:
+          BASE_URL: https://sos2425-13.onrender.com
+        run: npm run test:e2e
