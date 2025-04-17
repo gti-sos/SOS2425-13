@@ -17,9 +17,12 @@
     let tipoMensaje = "primary";
     let limit = 10;
     let offset = 0;
-    let API = dev
-      ? "http://localhost:16078/api/v1/water-supply-improvements"
-      : "/api/v1/water-supply-improvements";
+    const BASE_URL = dev
+  ? "http://localhost:16078"
+  : "https://sos2425-13.onrender.com"; // ← Aquí va tu URL de Render
+
+    const API = `${BASE_URL}/api/v1/water-supply-improvements`;
+
     let query = `?limit=${limit}&offset=${offset}`;
   
     // Formulario de creación
