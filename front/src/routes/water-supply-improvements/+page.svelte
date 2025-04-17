@@ -52,7 +52,7 @@
         if (!res.ok) throw new Error();
         Datos = await res.json();
       } catch {
-        mensaje = "Error al obtener los datos.";
+        mensaje = "No existen datos, cargue los iniciales";
         tipoMensaje = "danger";
       }
     }
@@ -70,7 +70,7 @@
         mostrarMensaje("Datos iniciales cargados correctamente", "success");
         obtenerDatos();
       } catch {
-        mostrarMensaje("No se pudieron cargar los datos iniciales.", "danger");
+        mostrarMensaje("Ya existen datos.", "danger");
       }
     }
   
