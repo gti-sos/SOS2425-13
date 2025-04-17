@@ -16,7 +16,8 @@
   
     const API = dev
       ? "http://localhost:16078/api/v1/water-supply-improvements"
-      : "/api/v1/water-supply-improvements";
+      
+      : "https://sos2425-13.onrender.com/api/v1/water-supply-improvements";
   
     onMount(async () => {
       year = $page.params.year;
