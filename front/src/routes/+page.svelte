@@ -51,7 +51,7 @@
     <h2>FrontEnd</h2>
     <ul>
         <li>
-            <a href="http://sos2425-13.onrender.com/water-supply-improvements">FrontEnd Blanca García Alonso</a>
+            <a href="http://sos2425-13.onrender.com/front-water-supply-improvements">FrontEnd Blanca García Alonso</a>
         </li>
         <li>
             <a href="http://sos2425-13.onrender.com/front-national-parks">FrontEnd Darío López Villegas</a>
