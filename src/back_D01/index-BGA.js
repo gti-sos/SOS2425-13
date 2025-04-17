@@ -59,6 +59,8 @@ function loadBackend(app) {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
 
+  
+
     
      // Load Initial Data
      app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
@@ -277,23 +279,28 @@ app.put(BASE_API + "/water-supply-improvements", (req, res) => {
     });
 
     // DELETE por año y comunidad
-    app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
-        const year = parseInt(req.params.year);
-        if (isNaN(year)) return res.status(400).send({ error: "Año inválido" });
-        const community = req.params.autonomous_community.toLowerCase();
-        db.findOne({ year, autonomous_community: community }, (err, doc) => {
+app.delete(BASE_API + "/water-supply-improvements/:year/:autonomous_community", (req, res) => {
+    const year = parseInt(req.params.year);
+    if (isNaN(year)) return res.status(400).send({ error: "Año inválido" });
+
+    const community = req.params.autonomous_community.toLowerCase();
+    
+    // Buscar si el recurso existe
+    db.findOne({ year, autonomous_community: community }, (err, doc) => {
         if (err) return res.status(500).send({ error: "Error al buscar el recurso antes de eliminarlo" });
         if (!doc) return res.status(404).send({ error: "Recurso no encontrado" });
 
-        db.remove({ year, autonomous_community: community }, {}, (err) => {
-                if (err) return res.status(500).send({ error: "Error al eliminar" });
-                const { _id, ...rest } = doc;
-                res.status(200).send({ message: "Recurso eliminado correctamente", data: rest });
-            });
+        // Eliminar el recurso
+        db.remove({ year, autonomous_community: community }, {}, (err, numRemoved) => {
+            if (err) return res.status(500).send({ error: "Error al eliminar" });
             if (numRemoved === 0) return res.status(404).send({ error: "Recurso no encontrado" });
-            res.status(200).send({ message: "Recurso eliminado correctamente" });
+
+            // Retornar los datos eliminados
+            const { _id, ...rest } = doc;
+            res.status(200).send({ message: "Recurso eliminado correctamente", data: rest });
         });
     });
+});
 
     // DELETE por año
     app.delete(BASE_API + "/water-supply-improvements/:year", (req, res) => {

@@ -1,13 +1,16 @@
 import express from "express";
 import {handler} from './front/build/handler.js';
+import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 16078;
 
 
 
 
+
 //app.use("/", express.static("public"));
 app.use(express.json());
+app.use(cors());
 
 
 
