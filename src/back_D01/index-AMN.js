@@ -299,6 +299,12 @@ export function loadBackend(app) {
         });
     });
 
+    // Ruta DELETE inválida (malformada) → error 400
+    app.delete(BASE_API + "/forest-fires/*", (req, res) => {
+        return res.status(400).json({ 
+            error: "Formato de URL incorrecto. Usa /forest-fires/:year/:autonomous_community o /:param" 
+        });
+    });
 
     // DELETE por año y comunidad
     app.delete(BASE_API + "/forest-fires/:year/:autonomous_community", (req, res) => {
