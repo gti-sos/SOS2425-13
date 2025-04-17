@@ -21,7 +21,7 @@
   ? "http://localhost:16078"
   : "https://sos2425-13.onrender.com"; // ← Aquí va tu URL de Render
 
-    const API = `${BASE_URL}/api/v1/water-supply-improvements`;
+    const API = `${BASE_URL}/api/v1/front-water-supply-improvements`;
 
     let query = `?limit=${limit}&offset=${offset}`;
   
