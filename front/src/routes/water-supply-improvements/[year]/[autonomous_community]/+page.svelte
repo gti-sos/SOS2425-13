@@ -155,7 +155,7 @@
         {isLoading ? "Actualizando..." : "Actualizar"}
       </button>
       <button type="button" class="btn btn-danger" on:click={deleteData}>
-        Eliminar
+        {isLoading ? "Eliminando..." : "Eliminar"}
       </button>
     </form>
   
