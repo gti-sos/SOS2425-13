@@ -57,7 +57,7 @@
             <a href="http://sos2425-13.onrender.com/front-national-parks">FrontEnd Darío López Villegas</a>
         </li>
         <li>
-            <a href="http://sos2425-13.onrender.com/front-forest-fires">FrontEnd Alvaro Morillo Navajas</a>
+            <a href="http://sos2425-13.onrender.com/forest-fires">FrontEnd Alvaro Morillo Navajas</a>
         </li>
     </ul>
 </main>
