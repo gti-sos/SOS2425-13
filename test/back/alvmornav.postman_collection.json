@@ -9,60 +9,6 @@
 	},
 	"item": [
 		{
-			"name": "GET /forest-fires",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Response is an array\", function () {",
-							"    const jsonData = pm.response.json();",
-							"    pm.expect(jsonData).to.be.an('array');",
-							"});",
-							"",
-							"pm.test(\"Each item has required fields\", function () {",
-							"    const jsonData = pm.response.json();",
-							"    if (jsonData.length > 0) {",
-							"        jsonData.forEach(item => {",
-							"            pm.expect(item).to.have.property(\"year\");",
-							"            pm.expect(item).to.have.property(\"autonomous_community\");",
-							"            pm.expect(item).to.have.property(\"number_of_accidents\");",
-							"            pm.expect(item).to.have.property(\"percentage_of_large_fires\");",
-							"        });",
-							"    }",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:16078/api/v1/forest-fires",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "16078",
-					"path": [
-						"api",
-						"v1",
-						"forest-fires"
-					]
-				},
-				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
-			},
-			"response": []
-		},
-		{
 			"name": "GET /forest-fires/loadInitialData",
 			"event": [
 				{
@@ -157,6 +103,60 @@
 						"loadAlvaroData"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /forest-fires",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Each item has required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        jsonData.forEach(item => {",
+							"            pm.expect(item).to.have.property(\"year\");",
+							"            pm.expect(item).to.have.property(\"autonomous_community\");",
+							"            pm.expect(item).to.have.property(\"number_of_accidents\");",
+							"            pm.expect(item).to.have.property(\"percentage_of_large_fires\");",
+							"        });",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:16078/api/v1/forest-fires",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "16078",
+					"path": [
+						"api",
+						"v1",
+						"forest-fires"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
 			},
 			"response": []
 		},
@@ -278,21 +278,33 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"// Parámetro esperado en la URL (cambia si pruebas otra comunidad)\r",
+							"const communityParam = \"andalucia\";\r",
+							"\r",
+							"// Función para normalizar texto (quita tildes, mayúsculas y espacios)\r",
+							"function normalize(str) {\r",
+							"    return str.normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\").trim().toLowerCase();\r",
+							"}\r",
+							"\r",
 							"pm.test(\"Código de estado es 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
 							"pm.test(\"La respuesta es un array\", function () {\r",
-							"    const data = pm.response.json();\r",
-							"    pm.expect(data).to.be.an('array');\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Todos los elementos tienen la comunidad 'andalucia'\", function () {\r",
-							"    const data = pm.response.json();\r",
-							"    data.forEach(item => {\r",
-							"        pm.expect(item.autonomous_community.toLowerCase()).to.eql(\"andalucia\");\r",
+							"pm.test(`Todos los registros son de la comunidad '${communityParam}'`, function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const expected = normalize(communityParam);\r",
+							"\r",
+							"    jsonData.forEach((item, index) => {\r",
+							"        const actual = normalize(item.autonomous_community || \"\");\r",
+							"        console.log(`Ítem ${index}:`, actual);\r",
+							"        pm.expect(actual).to.eql(expected);\r",
 							"    });\r",
-							""
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -691,7 +703,7 @@
 							"\r",
 							"pm.test(\"Mensaje de error adecuado\", function () {\r",
 							"    const res = pm.response.json();\r",
-							"    pm.expect(res.error).to.include(\"Método PUT no permitido en este endpoint\");\r",
+							"    pm.expect(res.error).to.include(\"PUT no permitido en el recurso base\");\r",
 							"});\r",
 							""
 						],
@@ -779,6 +791,141 @@
 			"response": []
 		},
 		{
+			"name": "DELETE /forest-fires/2010 BORRAR DATO POR AÑO ERROR 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Eliminar datos por año o devolver 404 si no hay\", function () {\r",
+							"    const status = pm.response.code;\r",
+							"    const json = pm.response.json();\r",
+							"\r",
+							"    if (status === 200) {\r",
+							"        pm.expect(status).to.eql(200);\r",
+							"        pm.expect(json.message).to.include(\"eliminado\");\r",
+							"    } else if (status === 404) {\r",
+							"        pm.expect(status).to.eql(404);\r",
+							"        pm.expect(json.message).to.include(\"No hay registros que coincidan\");\r",
+							"    } else {\r",
+							"        pm.expect.fail(`Código inesperado: ${status}`);\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:16078/api/v1/forest-fires/2010",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "16078",
+					"path": [
+						"api",
+						"v1",
+						"forest-fires",
+						"2010"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /forest-fires/hola ERROR 400 DEMASIADOS PARAMETROS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"DELETE /forest-fires/2024/andalucia/hola - 400 Bad Request\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.error).to.include(\"Demasiados parámetros\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:16078/api/v1/forest-fires/2024/andalucia/hola",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "16078",
+					"path": [
+						"api",
+						"v1",
+						"forest-fires",
+						"2024",
+						"andalucia",
+						"hola"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /forest-fires/2024 BORRAR DATO POR AÑO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"DELETE /forest-fires/2024 - 200 o 404\", function () {\r",
+							"    const status = pm.response.code;\r",
+							"    const jsonData = pm.response.json();\r",
+							"\r",
+							"    if (status === 200) {\r",
+							"        pm.expect(jsonData.message).to.include(\"registro(s) eliminado(s)\");\r",
+							"    } else if (status === 404) {\r",
+							"        pm.expect(jsonData.error).to.include(\"No se encontraron registros\");\r",
+							"    } else {\r",
+							"        pm.expect.fail(`Código inesperado: ${status}`);\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:16078/api/v1/forest-fires/2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "16078",
+					"path": [
+						"api",
+						"v1",
+						"forest-fires",
+						"2024"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Borrar datos",
 			"event": [
 				{
@@ -791,7 +938,11 @@
 							"",
 							"pm.test(\"Mensaje correcto de eliminación\", function () {",
 							"    const jsonData = pm.response.json();",
-							"    pm.expect(jsonData.message).to.include(\"Datos eliminados correctamente\");",
+							"    const match = jsonData.message.match(/Eliminados (\\d+) registros/);",
+							"",
+							"    pm.expect(match).to.not.be.null;",
+							"    const count = parseInt(match[1]);",
+							"    pm.expect(count).to.be.greaterThan(0); // O el número que esperas",
 							"});",
 							""
 						],
@@ -838,13 +989,12 @@
 						"exec": [
 							"pm.test(\"Elimina todos los datos o devuelve 404 si no hay datos\", function () {\r",
 							"    const status = pm.response.code;\r",
+							"    const jsonData = pm.response.json();\r",
 							"\r",
 							"    if (status === 200) {\r",
-							"        pm.expect(status).to.eql(200);\r",
-							"        pm.expect(pm.response.json().deleted).to.be.above(0);\r",
+							"        pm.expect(jsonData.message).to.include(\"Eliminados\");\r",
 							"    } else if (status === 404) {\r",
-							"        pm.expect(status).to.eql(404);\r",
-							"        pm.expect(pm.response.json().message).to.eql(\"No hay datos disponibles para eliminar.\");\r",
+							"        pm.expect(jsonData.error).to.include(\"No hay datos que eliminar\");\r",
 							"    } else {\r",
 							"        pm.expect.fail(`Código de estado inesperado: ${status}`);\r",
 							"    }\r",
@@ -870,143 +1020,6 @@
 						"api",
 						"v1",
 						"forest-fires"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE /forest-fires/2010 BORRAR DATO POR AÑO ERROR 404",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Eliminar datos por año o devolver 404 si no hay\", function () {\r",
-							"    const status = pm.response.code;\r",
-							"\r",
-							"    if (status === 200) {\r",
-							"        pm.expect(status).to.eql(200);\r",
-							"        pm.expect(pm.response.json().deleted).to.be.above(0);\r",
-							"    } else if (status === 404) {\r",
-							"        pm.expect(status).to.eql(404);\r",
-							"        pm.expect(pm.response.json().message).to.include(\"No se encontraron registros para eliminar\");\r",
-							"    } else {\r",
-							"        pm.expect.fail(`Código inesperado: ${status}`);\r",
-							"    }\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:16078/api/v1/forest-fires/2010",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "16078",
-					"path": [
-						"api",
-						"v1",
-						"forest-fires",
-						"2010"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE /forest-fires/2024 BORRAR DATO POR AÑO",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"DELETE /forest-fires/2024 - 200 o 404\", function () {\r",
-							"    const status = pm.response.code;\r",
-							"\r",
-							"    if (status === 200) {\r",
-							"        pm.expect(status).to.eql(200);\r",
-							"        const jsonData = pm.response.json();\r",
-							"        pm.expect(jsonData.message).to.include(\"Dato eliminado correctamente\");\r",
-							"        pm.expect(jsonData.deleted).to.be.above(0);\r",
-							"    } else if (status === 404) {\r",
-							"        pm.expect(status).to.eql(404);\r",
-							"        pm.expect(pm.response.json().message).to.include(\"No se encontraron registros para eliminar\");\r",
-							"    } else {\r",
-							"        pm.expect.fail(`Código inesperado: ${status}`);\r",
-							"    }\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:16078/api/v1/forest-fires/2024",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "16078",
-					"path": [
-						"api",
-						"v1",
-						"forest-fires",
-						"2024"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DELETE /forest-fires/hola ERROR 400 DEMASIADOS PARAEMTROS",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"DELETE /forest-fires/2024/andalucia/hola - 400 Bad Request\", function () {\r",
-							"    pm.response.to.have.status(400);\r",
-							"    const jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.message).to.include(\"parámetro\");\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:16078/api/v1/forest-fires/2024/andalucia/hola",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "16078",
-					"path": [
-						"api",
-						"v1",
-						"forest-fires",
-						"2024",
-						"andalucia",
-						"hola"
 					]
 				}
 			},
