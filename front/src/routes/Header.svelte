@@ -6,9 +6,6 @@
      <nav>
          <div class="container">            
              <a  id="inicio" href="/">Inicio</a>
- 
- 
- 
          </div>
      </nav>
  </main>
