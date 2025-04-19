@@ -33,7 +33,7 @@ const datosIniciales = [
     { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
     { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
     { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
-    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Castilla y León", initial_area: 33960, current_area: 33960 },
     { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
 ];
 
@@ -213,7 +213,7 @@ app.get(BASE_API + "/national-parks/:param", (request, response) => {
         const toYear = request.query.to ? parseInt(request.query.to) : null;
 
         // Construir consulta para filtrar por comunidad y posiblemente por años
-        let query = { autonomous_community: param };
+        let query = { autonomous_community: { $regex: new RegExp(param, "i") } };
 
         if (fromYear !== null && !isNaN(fromYear)) {
             query.declaration_date = query.declaration_date || {};
@@ -265,7 +265,7 @@ app.get(BASE_API + "/national-parks/:autonomous_community/:declaration_date", (r
     
     // Consultar la base de datos
     db.find({ 
-        autonomous_community: community,
+        autonomous_community: { $regex: new RegExp(community, "i") },
         declaration_date: year
     }, (err, parks) => {
         if (err) {
