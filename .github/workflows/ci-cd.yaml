@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies (front)
+      - name: Install frontend dependencies
         working-directory: front
         run: npm install
 
@@ -50,7 +50,10 @@ jobs:
         working-directory: front
         run: npx playwright install --with-deps
 
-      - name: Run Playwright E2E tests in Render
+      - name: Esperar a que Render arranque
+        run: sleep 20
+
+      - name: Ejecutar tests E2E en Render
         working-directory: front
         env:
           BASE_URL: https://sos2425-13.onrender.com
