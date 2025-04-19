@@ -79,7 +79,7 @@
 	//Actualizar un parque nacional
 	async function updateNationalPark() {
     mensaje = '';
-    // Construye el objeto solo con los campos editables
+    // Construir el objeto solo con los campos editables
     const updatedFields = {
         declaration_date: national_park.declaration_date,
         autonomous_community: national_park.autonomous_community,
@@ -118,7 +118,7 @@
 
         if (res.ok) {
             mostrarMensaje("Parque Nacional eliminado correctamente", "success");
-            // Espera a que el usuario vea el mensaje antes de redirigir
+            // Esperar a que el usuario vea el mensaje antes de redirigir
             setTimeout(() => {
                 goto('/national-parks');
             }, 1500);
@@ -158,7 +158,7 @@ onMount(async () => {
     {/if}
 </h2>
 
-<!-- Añade este bloque para mostrar mensajes -->
+<!-- Añadir este bloque para mostrar mensajes -->
 {#if mensaje}
     <Alert 
         color={tipoMensaje === 'success' ? 'success' : 
