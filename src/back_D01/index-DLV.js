@@ -29,6 +29,12 @@ const datosIniciales = [
     { national_park: "Ordesa y Monte Perdido", declaration_date: 1916, autonomous_community: "Aragón", initial_area: 2100, current_area: 15608 },
     { national_park: "Aiguas Tortas y Lago de San Mauricio", declaration_date: 1955, autonomous_community: "Cataluña", initial_area: 10230, current_area: 14119 },
     { national_park: "Archipiélago de Cabrera", declaration_date: 1991, autonomous_community: "Baleares", initial_area: 10021, current_area: 10021 },
+    { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
+    { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
+    { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
+    { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
+    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
+    { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
 ];
 
 
@@ -98,12 +104,40 @@ app.get(BASE_API + "/national-parks", (request, response) => {
         query.declaration_date.$lte = toYear;
     }
     
+    // Procesar parámetros de áreas como rangos
+    const initialAreaMin = request.query.initial_area_min ? parseInt(request.query.initial_area_min) : null;
+    const initialAreaMax = request.query.initial_area_max ? parseInt(request.query.initial_area_max) : null;
+    const currentAreaMin = request.query.current_area_min ? parseInt(request.query.current_area_min) : null;
+    const currentAreaMax = request.query.current_area_max ? parseInt(request.query.current_area_max) : null;
+    
+    if (initialAreaMin !== null && !isNaN(initialAreaMin)) {
+        query.initial_area = query.initial_area || {};
+        query.initial_area.$gte = initialAreaMin;
+    }
+    
+    if (initialAreaMax !== null && !isNaN(initialAreaMax)) {
+        query.initial_area = query.initial_area || {};
+        query.initial_area.$lte = initialAreaMax;
+    }
+    
+    if (currentAreaMin !== null && !isNaN(currentAreaMin)) {
+        query.current_area = query.current_area || {};
+        query.current_area.$gte = currentAreaMin;
+    }
+    
+    if (currentAreaMax !== null && !isNaN(currentAreaMax)) {
+        query.current_area = query.current_area || {};
+        query.current_area.$lte = currentAreaMax;
+    }
+    
     // Extraer parámetros de paginación
     const limit = request.query.limit ? parseInt(request.query.limit) : null;
     const offset = request.query.offset ? parseInt(request.query.offset) : 0;
     
     // Procesar el resto de parámetros de consulta (excluyendo parámetros especiales)
-    const { from, to, limit: limitParam, offset: offsetParam, ...otherParams } = request.query;
+    const { from, to, limit: limitParam, offset: offsetParam, 
+           initial_area_min, initial_area_max, current_area_min, current_area_max, 
+           ...otherParams } = request.query;
     
     for (const [key, value] of Object.entries(otherParams)) {
         // Convertir valores numéricos
