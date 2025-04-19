@@ -22,6 +22,11 @@
     "test-local-DLV": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
     "test-online-DLV": "npx newman run ./test/back/darlopvil-tests.json --environment test/back/online.postman_environment.json",
     "test-local-BGA-L": "start-server-and-test start http://localhost:16078 test-local-BGA",
+    "test-local-AMN": "npx newman run ./test/back/alvmornav.postman_collection.json -e ./test/back/local.postman_environment.json",
+    "test-online-AMN": "npx newman run ./test/back/alvmornav.postman_collection.json -e ./test/back/online.postman_environment.json",
+    "test-local-AMN-L": "start-server-and-test start http://localhost:16078 test-local-AMN",
+
+
     "test-BGA": "npm run test-local-BGA-L",
     "test-local-DLV-L": "start-server-and-test start http://localhost:16078 test-local-DLV",
     "test-DLV": "npm run test-local-DLV-L",
@@ -29,8 +34,14 @@
     "test-darlopvil-local": "npx newman run ./test/back/darlopvil-tests.json -e ./test/back/local.postman_environment.json",
     "test-national-parks": "start-server-and-test start http://localhost:16078 test-darlopvil-local",
     "test-water-supply-improvements": "start-server-and-test start http://localhost:16078 test-datosBGA",
-    "test": "npm run test-DLV  && npm run test-BGA",
+
+    "test-AMN": "npm run test-local-AMN-L",
+    "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
+    "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
+
+    "test": "npm run test-DLV  && npm run test-BGA && npm run test-AMN",
     "test:e2e": "npm --prefix front run test:e2e"
+
   },
   "keywords": [],
   "dependencies": {
