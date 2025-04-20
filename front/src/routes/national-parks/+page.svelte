@@ -1442,23 +1442,22 @@
 
 <!-- Modal para confirmar eliminación de todos los parques -->
 <Modal isOpen={deleteAllModalOpen} toggle={() => (deleteAllModalOpen = !deleteAllModalOpen)}>
-	<ModalHeader toggle={() => (deleteAllModalOpen = !deleteAllModalOpen)}>
-		Confirmar eliminación masiva
-	</ModalHeader>
-	<ModalBody>
-		¿Estás seguro que deseas eliminar el parque nacional "<strong>{parkToDelete}</strong>"? Esta
-		acción no se puede deshacer.
-	</ModalBody>
-	<ModalFooter>
-		<Button color="secondary" on:click={() => (deleteAllModalOpen = false)}>Cancelar</Button>
-		<Button
-			color="danger"
-			on:click={() => {
-				deleteAllModalOpen = false;
-				deleteAllNationalParks();
-			}}
-		>
-			Eliminar todos
-		</Button>
-	</ModalFooter>
+    <ModalHeader toggle={() => (deleteAllModalOpen = !deleteAllModalOpen)}>
+        Confirmar eliminación masiva
+    </ModalHeader>
+    <ModalBody>
+        ¿Estás seguro que deseas eliminar TODOS los parques nacionales? Esta acción no se puede deshacer.
+    </ModalBody>
+    <ModalFooter>
+        <Button color="secondary" on:click={() => (deleteAllModalOpen = false)}>Cancelar</Button>
+        <Button
+            color="danger"
+            on:click={() => {
+                deleteAllModalOpen = false;
+                deleteAllNationalParks();
+            }}
+        >
+            Eliminar todos
+        </Button>
+    </ModalFooter>
 </Modal>

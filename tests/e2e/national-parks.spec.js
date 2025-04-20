@@ -75,80 +75,95 @@ test('Formulario de crear parque aparece al hacer clic en botón', async ({ page
 test('Botones de crear y limpiar en el formulario de crear parque', async ({ page }) => {
   await page.goto('localhost:5173/national-parks');
   
-  // Usar el mismo selector exacto que en la prueba anterior
+  // Esperar a que la página cargue completamente
+  await page.waitForLoadState('networkidle');
+  
+  // Examinar el HTML visible para debugging
+  console.log('Haciendo clic en el botón Crear Parque');
+  
+  // Usar un selector exacto con los espacios correctos del botón
   await page.getByRole('button', { name: ' ➕  Crear Parque' }).click();
   
-  // Añadir un pequeño tiempo de espera para asegurar que el formulario se ha cargado completamente
-  await page.waitForTimeout(1000);
-
-  // Verificar los botones con un timeout más amplio y usando selectores más flexibles
-  await expect(page.getByRole('button', { name: /Crear/i })).toBeVisible({ timeout: 10000 });
+  // Esperar a que cualquier parte del formulario sea visible primero
+  await expect(page.locator('div:has(> h4:text("Crear Nuevo Parque Nacional"))')).toBeVisible({ 
+    timeout: 10000 
+  });
   
-  // Para el botón Limpiar, usar un selector más específico basado en el HTML real
-  // Opción 1: Usar una expresión regular para el nombre
-  await expect(page.getByRole('button', { name: /Limpiar/i })).toBeVisible({ timeout: 10000 });
-  
-  // Opción 2 (alternativa): Buscar por el HTML interno que incluye el ícono
-  // await expect(page.locator('button:has-text("Limpiar")')).toBeVisible({ timeout: 10000 });
-  
-  // Opción 3 (alternativa): Buscar por la acción del botón
-  // await expect(page.locator('button[on\\:click="clearCreateForm"]')).toBeVisible({ timeout: 10000 });
+  // Luego verificar los botones
+  await expect(page.getByRole('button', { name: 'Crear' })).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('button:has-text("Limpiar")')).toBeVisible({ timeout: 5000 });
 });
 
 // Test para verificar la funcionalidad de búsqueda rápida
 test('Formulario de búsqueda rápida aparece al hacer clic en botón', async ({ page }) => {
   await page.goto('localhost:5173/national-parks');
+  
+  // Esperar a que la página se cargue completamente
+  await page.waitForLoadState('networkidle');
 
-  // Usar un selector más flexible para el botón
-  const searchButton = page.getByRole('button', { name: /Búsqueda rápida/i });
-  await expect(searchButton).toBeVisible();
+  // Obtener el botón y verificar que existe
+  const searchButton = page.getByRole('button', { name: ' 🔥 Búsqueda rápida' });
+  await expect(searchButton).toBeVisible({ timeout: 5000 });
   
-  // Mostrar información de depuración
-  console.log('Haciendo clic en el botón de Búsqueda rápida');
-  
-  // Hacer clic y esperar más tiempo para que el formulario se muestre
+  // Hacer clic y esperar
   await searchButton.click();
   
-  console.log('Clic realizado, esperando que aparezca el formulario');
-  
-  // Aumentar el timeout y usar un selector más específico y robusto
+  // Primero verificar que el contenedor del formulario aparece
   await expect(
-    page.locator('input.form-control[placeholder="Comunidad Autónoma"]')
+    page.locator('div:has(> div:has-text("Búsqueda rápida:"))')
   ).toBeVisible({ timeout: 10000 });
+  
+  // Luego verificar los campos específicos con selectores más flexibles
+  await expect(
+    page.locator('input[placeholder*="Comunidad"]')
+  ).toBeVisible({ timeout: 5000 });
   
   await expect(
     page.locator('input[placeholder="Año"]')
-  ).toBeVisible({ timeout: 10000 });
+  ).toBeVisible({ timeout: 5000 });
 
   // Verificar botones del formulario
   await expect(page.getByRole('button', { name: 'Buscar por Comunidad y Año' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Limpiar' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('button', { name: 'Limpiar' })).toBeVisible();
 });
 
 // Test para verificar la funcionalidad de filtrado avanzado
 test('Formulario de filtrado avanzado aparece al hacer clic en botón', async ({ page }) => {
   await page.goto('localhost:5173/national-parks');
+  
+  // Esperar a que la página se cargue completamente
+  await page.waitForLoadState('networkidle');
 
-  // Hacer clic en el botón de filtrado
-  const createButton = page.getByRole('button', { name: ' 🔍 Filtrar parques' });
-  await createButton.click();
+  // Usar un selector más preciso y verificar que el botón esté visible
+  const filterButton = page.getByRole('button', { name: ' 🔍 Filtrar parques' });
+  await expect(filterButton).toBeVisible({ timeout: 5000 });
+  
+  // Hacer clic y esperar
+  await filterButton.click();
+  
+  // Primero verificar que aparece el contenedor del formulario
+  await expect(
+    page.locator('div:has(> h4:text("Filtrar Parques Nacionales"))')
+  ).toBeVisible({ timeout: 10000 });
+  
+  // Luego verificar el encabezado específico
+  await expect(
+    page.getByRole('heading', { name: 'Filtrar Parques Nacionales' })
+  ).toBeVisible({ timeout: 10000 });
 
-  // Verificar que aparece el encabezado
-  await expect(page.getByRole('heading', { name: 'Filtrar Parques Nacionales' })).toBeVisible();
-
-  // Verificar campos del formulario
-  await expect(page.locator('#searchName')).toBeVisible();
-  await expect(page.locator('#searchCommunity')).toBeVisible();
-  await expect(page.locator('#searchFrom')).toBeVisible();
-  await expect(page.locator('#searchTo')).toBeVisible();
-  await expect(page.locator('#searchInitAreaMin')).toBeVisible();
-  await expect(page.locator('#searchInitAreaMax')).toBeVisible();
-  await expect(page.locator('#searchCurrAreaMin')).toBeVisible();
-  await expect(page.locator('#searchCurrAreaMax')).toBeVisible();
+  // Verificar campos del formulario con timeouts explícitos
+  await expect(page.locator('#searchName')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchCommunity')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchFrom')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchTo')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchInitAreaMin')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchInitAreaMax')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchCurrAreaMin')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#searchCurrAreaMax')).toBeVisible({ timeout: 5000 });
 
   // Verificar botones
-  await expect(page.getByRole('button', { name: 'Buscar' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Limpiar' }).nth(1)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Buscar' })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole('button', { name: 'Limpiar' })).toBeVisible({ timeout: 5000 });
 });
 
 // Test para comprobar la paginación
@@ -258,49 +273,99 @@ test('Modal de confirmación al eliminar todos los parques', async ({ page }) =>
 });
 
 // Test para verificar el funcionamiento de creación de un parque
+/*
+1- Verificar primero que el parque se ha creado correctamente
+2- Cerrar manualmente el formulario haciendo clic en el botón "❌ Cancelar"
+3- Después verificar que el formulario ya no es visible
+*/
 test('Creación de un nuevo parque', async ({ page }) => {
   await page.goto('localhost:5173/national-parks');
 
-  // Abrir formulario de crear parque
-  await page.getByRole('button', { name: ' ➕  Crear Parque' }).click();
+  // Wait for page to be fully loaded before clicking
+  await page.waitForLoadState('networkidle');
 
-  // Rellenar el formulario
+  // Use a more precise selector for the button and ensure it's visible
+  const createButton = page.getByRole('button', { name: ' ➕  Crear Parque' });
+  await expect(createButton).toBeVisible({ timeout: 10000 });
+  
+  // Click and wait for navigation/rendering
+  await createButton.click();
+  
+  // Wait for the form header to appear, confirming the form is rendered
+  await expect(page.getByText('Crear Nuevo Parque Nacional')).toBeVisible({ timeout: 10000 });
+  
+  // Explicitly wait for each input field to be visible before interacting
+  await expect(page.locator('#parkName')).toBeVisible({ timeout: 10000 });
   await page.locator('#parkName').fill('Parque Test Playwright');
+  
+  await expect(page.locator('#declarationDate')).toBeVisible({ timeout: 10000 });
   await page.locator('#declarationDate').fill('2023');
+  
+  await expect(page.locator('#community')).toBeVisible({ timeout: 10000 });
   await page.locator('#community').fill('Test Community');
+  
+  await expect(page.locator('#initialArea')).toBeVisible({ timeout: 10000 });
   await page.locator('#initialArea').fill('10000');
+  
+  await expect(page.locator('#currentArea')).toBeVisible({ timeout: 10000 });
   await page.locator('#currentArea').fill('12000');
 
-  // Hacer clic en el botón Crear
-  await page.getByRole('button', { name: 'Crear' }).click();
-
-  // Verificar que aparece mensaje de éxito (podría ser necesario ajustar el selector)
-  await expect(page.getByText(/Parque nacional creado correctamente/i)).toBeVisible();
-
-  // Verificar que el nuevo parque aparece en la tabla
-  await expect(page.getByText('Parque Test Playwright')).toBeVisible();
+  // Ensure the submit button is visible before clicking
+  const submitButton = page.getByRole('button', { name: 'Crear' });
+  await expect(submitButton).toBeVisible({ timeout: 10000 });
+  
+  // Click submit button
+  await submitButton.click();
+  
+  // Verificar que el nuevo parque aparece en la tabla (confirmando que se creó correctamente)
+  await expect(page.getByText('Parque Test Playwright')).toBeVisible({ timeout: 15000 });
+  
+  // Esperar mensaje de éxito
+  await expect(page.getByText('Parque nacional creado correctamente')).toBeVisible({ timeout: 10000 });
+  
+  // Verificar que el formulario se ha cerrado automáticamente
+  await expect(page.locator('#parkName')).not.toBeVisible({ timeout: 10000 });
+  
+  // Verificar que el botón ha vuelto a su estado "Crear Parque"
+  await expect(page.getByRole('button', { name: ' ➕  Crear Parque' })).toBeVisible({ timeout: 10000 });
 });
 
 // Test para verificar la funcionalidad de cargar datos iniciales
 test('Cargar datos iniciales', async ({ page }) => {
   await page.goto('localhost:5173/national-parks');
+  
+  // Esperar a que la página se cargue completamente
+  await page.waitForLoadState('networkidle');
 
-  // Primero eliminar todos los datos
-  await page.getByRole('button', { name: '❌ Borrar todo' }).click();
-  await page.getByRole('button', { name: 'Eliminar todos' }).click();
+  // Verificar que el botón Borrar todo esté visible antes de hacer clic
+  const deleteAllButton = page.getByRole('button', { name: '❌ Borrar todo' });
+  await expect(deleteAllButton).toBeVisible({ timeout: 5000 });
+  
+  // Hacer clic y esperar a que aparezca el modal
+  await deleteAllButton.click();
+  
+  // Esperar a que aparezca el modal de confirmación
+  await expect(page.getByRole('heading', { name: 'Confirmar eliminación masiva' })).toBeVisible({ timeout: 10000 });
+  
+  // Buscar el botón dentro del modal usando un selector más flexible
+  const confirmButton = page.locator('button:has-text("Eliminar todos")');
+  await expect(confirmButton).toBeVisible({ timeout: 10000 });
+  
+  // Hacer clic en el botón
+  await confirmButton.click();
 
   // Esperar mensaje de confirmación
-  await expect(page.getByText(/Todos los parques nacionales han sido borrados/i)).toBeVisible();
+  await expect(page.getByText(/Todos los parques nacionales han sido borrados/i)).toBeVisible({ timeout: 10000 });
 
   // Cargar datos iniciales
   await page.getByRole('button', { name: '💾 Cargar datos iniciales' }).click();
 
   // Verificar mensaje de éxito
-  await expect(page.getByText(/Datos iniciales cargados correctamente/i)).toBeVisible();
+  await expect(page.getByText(/Datos iniciales cargados correctamente/i)).toBeVisible({ timeout: 10000 });
+  
   // Verificar que se muestran datos en la tabla
   const rowCount = await page.locator('table tbody tr').count();
   expect(rowCount).toBeGreaterThanOrEqual(1);
-
 });
 
 // Test para el cambio en elementos por página
@@ -314,27 +379,50 @@ test('Cambio en elementos por página', async ({ page }) => {
   await page.getByRole('button', { name: '5' }).click();
 
   // Seleccionar 10 elementos por página
+  await page.getByRole('button', { name: '10' }).click();
+  
+  // Esperar a que la tabla se actualice
+  await page.waitForTimeout(1000);
+  
   // Verificar que ahora se muestran hasta 10 elementos
   const rowCount = await page.locator('table tbody tr').count();
   expect(rowCount).toBeGreaterThanOrEqual(5);
   expect(rowCount).toBeLessThanOrEqual(10);
+});
 
+// Test para verificar la búsqueda rápida (ahora como test independiente)
+test('Búsqueda rápida por comunidad y año', async ({ page }) => {
+  await page.goto('localhost:5173/national-parks');
 
-  // Test para verificar la búsqueda rápida
-  test('Búsqueda rápida por comunidad y año', async ({ page }) => {
-    await page.goto('localhost:5173/national-parks');
+  // Esperar a que la página se cargue completamente
+  await page.waitForLoadState('networkidle');
 
-    // Abrir búsqueda rápida
-    await page.getByRole('button', { name: ' 🔥 Búsqueda rápida' }).click();
-
-    // Rellenar formulario
-    await page.getByPlaceholder('Comunidad Autónoma').fill('Andalucía');
-    await page.getByPlaceholder('Año').fill('1999');
-
-    // Hacer clic en buscar
-    await page.getByRole('button', { name: 'Buscar por Comunidad y Año' }).click();
-
-    // Verificar que se muestran resultados filtrados
-    await expect(page.getByText(/Se encontraron \d+ parques/)).toBeVisible();
+  // Asegurarse de que el botón esté completamente visible
+  const searchButton = page.getByRole('button', { name: ' 🔥 Búsqueda rápida' });
+  await expect(searchButton).toBeVisible({ timeout: 5000 });
+  
+  // Hacer clic y esperar
+  await searchButton.click();
+  
+  // Verificar primero que el contenedor del formulario aparece
+  await expect(page.locator('div:has(> div:has-text("Búsqueda rápida:"))')).toBeVisible({
+    timeout: 10000
   });
-})
+  
+  // Luego interactuar con los campos usando selectores más flexibles
+  const communityInput = page.locator('input[placeholder*="Comunidad"]');
+  await expect(communityInput).toBeVisible({ timeout: 5000 });
+  await communityInput.fill('Canarias');
+  
+  const yearInput = page.locator('input[placeholder="Año"]');
+  await expect(yearInput).toBeVisible({ timeout: 5000 });
+  await yearInput.fill('1954');
+
+  // Hacer clic en el botón de búsqueda
+  await page.getByRole('button', { name: 'Buscar por Comunidad y Año' }).click();
+
+  // Verificar el mensaje específico con formato "Se encontraron X parques en Y declarados en Z"
+  await expect(
+    page.getByText(/Se encontraron \d+ parques en Canarias declarados en 1954/)
+  ).toBeVisible({ timeout: 10000 });
+});
