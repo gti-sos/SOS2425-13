@@ -183,6 +183,8 @@
   <div style="color: red;">{error}</div>
 {/if}
 
+<p style="color: blue;">🧪 Prueba visual: este texto debe verse</p>
+
 <h2>➕ Añadir nuevo incendio forestal</h2>
 <form on:submit|preventDefault={crearIncendio}>
   <input placeholder="Año" type="number" bind:value={year} required />
