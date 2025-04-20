@@ -1,3 +1,8 @@
+<svelte:head>
+    <title>SOS2425-13</title>
+</svelte:head>
+
+
 <main>
     <h1><u>SOS2425-13</u></h1>
     <h2>Descripción del proyecto</h2>
