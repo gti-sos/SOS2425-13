@@ -84,7 +84,7 @@ test.describe('Crear incendio forestal', () => {
 
 test.describe('Listado de incendios forestales', () => {
 	const year = 2024;
-	const community = 'AndalucIa'; 
+	const autonomous_community = 'andalucIa'; 
 	const listUrl = '/forest-fires';
 
 	test('Carga correctamente la lista de incendios', async ({ page }) => {
