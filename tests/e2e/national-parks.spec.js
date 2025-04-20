@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test';
 
 // Título de la página
 test('Título correcto del recurso "national-parks"', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   await expect(page).toHaveTitle(/Parques Nacionales/);
 });
 
 // Test para el encabezado principal
 test('Encabezado principal correcto', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   const heading = page.getByRole('heading', { name: 'Parques Nacionales de España' });
   await expect(heading).toBeVisible();
   await expect(heading).toHaveText('Parques Nacionales de España');
@@ -17,7 +17,7 @@ test('Encabezado principal correcto', async ({ page }) => {
 
 // Test para los botones principales
 test('Botones principales visibles', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   await expect(page.getByRole('button', { name: '❌ Borrar todo' })).toBeVisible();
   await expect(page.getByRole('button', { name: '💾 Cargar datos iniciales' })).toBeVisible();
@@ -28,7 +28,7 @@ test('Botones principales visibles', async ({ page }) => {
 
 // Test para la tabla de parques
 test('Tabla de parques visible con encabezados correctos', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   // Verificar que la tabla existe
   const table = page.locator('table');
@@ -45,7 +45,7 @@ test('Tabla de parques visible con encabezados correctos', async ({ page }) => {
 
 // Test para verificar funcionalidad de crear parque
 test('Formulario de crear parque aparece al hacer clic en botón', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -73,7 +73,7 @@ test('Formulario de crear parque aparece al hacer clic en botón', async ({ page
 
 // Test para verificar botones del formulario de crear parque
 test('Botones de crear y limpiar en el formulario de crear parque', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página cargue completamente
   await page.waitForLoadState('networkidle');
@@ -96,7 +96,7 @@ test('Botones de crear y limpiar en el formulario de crear parque', async ({ pag
 
 // Test para verificar la funcionalidad de búsqueda rápida
 test('Formulario de búsqueda rápida aparece al hacer clic en botón', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -129,7 +129,7 @@ test('Formulario de búsqueda rápida aparece al hacer clic en botón', async ({
 
 // Test para verificar la funcionalidad de filtrado avanzado
 test('Formulario de filtrado avanzado aparece al hacer clic en botón', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -168,7 +168,7 @@ test('Formulario de filtrado avanzado aparece al hacer clic en botón', async ({
 
 // Test para comprobar la paginación
 test('Controles de paginación visibles y funcionales', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   // Verificar que los elementos de paginación están presentes
   await expect(page.getByText('Elementos por página:')).toBeVisible();
@@ -189,7 +189,7 @@ test('Controles de paginación visibles y funcionales', async ({ page }) => {
 
 // Test para verificar ordenación por columnas
 test('Ordenación de la tabla por columnas', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -230,7 +230,7 @@ test('Ordenación de la tabla por columnas', async ({ page }) => {
 
 // Test para verificar la navegación a detalles de un parque
 test('Navegación a detalles de un parque', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -265,7 +265,7 @@ test('Navegación a detalles de un parque', async ({ page }) => {
 
 // Test para el modal de confirmación de eliminación
 test('Modal de confirmación al eliminar un parque', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -308,7 +308,7 @@ test('Modal de confirmación al eliminar un parque', async ({ page }) => {
 
 // Test para el modal de confirmación de eliminación masiva
 test('Modal de confirmación al eliminar todos los parques', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -349,7 +349,7 @@ test('Modal de confirmación al eliminar todos los parques', async ({ page }) =>
 3- Después verificar que el formulario ya no es visible
 */
 test('Creación de un nuevo parque', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   // Wait for page to be fully loaded before clicking
   await page.waitForLoadState('networkidle');
@@ -402,7 +402,7 @@ test('Creación de un nuevo parque', async ({ page }) => {
 
 // Test para verificar la funcionalidad de cargar datos iniciales
 test('Cargar datos iniciales', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
   
   // Esperar a que la página se cargue completamente
   await page.waitForLoadState('networkidle');
@@ -443,7 +443,7 @@ test('Cargar datos iniciales', async ({ page }) => {
 
 // Test para el cambio en elementos por página
 test('Cambio en elementos por página', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   // Verificar elementos iniciales por página (por defecto 5)
   await expect(page.locator('table tbody tr')).toHaveCount(5);
@@ -465,7 +465,7 @@ test('Cambio en elementos por página', async ({ page }) => {
 
 // Test para verificar la búsqueda rápida (ahora como test independiente)
 test('Búsqueda rápida por comunidad y año', async ({ page }) => {
-  await page.goto('localhost:5173/national-parks');
+  await page.goto('/national-parks');
 
   // Verificar si ya hay datos en la tabla
   const initialRowCount = await page.locator('table tbody tr').count();

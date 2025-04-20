@@ -31,14 +31,25 @@ jobs:
       - name: Run backend tests
         run: npm test
 
-      - name: Run server for e2e tests
-        run: npm run start &
+        - name: Run server for e2e tests
+        run: |
+          npm run start &
+          # Esperar a que el servidor esté listo (ajusta el tiempo según sea necesario)
+          echo "Esperando que el servidor inicie..."
+          sleep 10
+          # Verificar que el servidor responde
+          npx wait-on http://localhost:5173 -t 30000
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      - name: Install Playwright dependencies
+        run: |
+          npx playwright install --with-deps
+          npm install -g wait-on
 
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          # Configura la URL base para los tests
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:5173
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
