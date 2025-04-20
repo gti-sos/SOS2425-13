@@ -39,18 +39,20 @@
 
 	//Variables para la paginación
 	let currentPage = 1;
-	let itemsPerPage = 5; 
+	let itemsPerPage = 5;
 	let totalItems = 0;
 	let totalPages = 0;
 	let isOpen = false; // Variable para controlar el estado del dropdown
 
+	// Variables para controlar el estado del filtrado (filtrado+paginación)
+	let isFiltered = false;
+	let filteredParks = [];
+	let filteredTotalItems = 0;
+	let filteredTotalPages = 0;
 
-    // Variables para controlar el estado del filtrado (filtrado+paginación)
-    let isFiltered = false;
-    let filteredParks = [];
-    let filteredTotalItems = 0;
-    let filteredTotalPages = 0;
-    
+	//Variables para arreglar la paginacion con filtrado
+	let allParks = []; // Todos los parques (nunca cambia después de cargarse)
+	let displayedParks = []; // Parques que se muestran actualmente (paginados)
 
 	/* -------------- ORDENACIÓN DE COLUMNAS -------------- */
 	let sortField = 'national_park'; // Campo por defecto para ordenar
@@ -114,141 +116,193 @@
 	}
 
 	// Función para realizar la búsqueda + paginación con filtrado
-	async function searchNationalParks() {
-		mensaje = '';
+async function searchNationalParks() {
+    mensaje = '';
 
-		// Si solo hay búsqueda por comunidad autónoma, usar el endpoint específico
-		if (
-			searchParams.autonomous_community &&
-			!searchParams.national_park &&
-			!searchParams.initial_area_min &&
-			!searchParams.initial_area_max &&
-			!searchParams.current_area_min &&
-			!searchParams.current_area_max
-		) {
-			// Si hay rango de años, usar la búsqueda general
-			// Si solo hay un año específico (from=to), usar endpoint específico
-			if (searchParams.from && searchParams.to && searchParams.from === searchParams.to) {
-				// Usar la búsqueda específica por comunidad y año
-				return await searchByCommunityAndYear();
-			} else if (searchParams.from || searchParams.to) {
-				// Usar el endpoint de comunidad con filtro de años
-				try {
-					// Usar la ruta específica para comunidad autónoma con posibles filtros de año
-					const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}`;
-
-					// Añadir parámetros de año si existen
-					let url = new URL(specificURL, window.location.origin);
-					if (searchParams.from) url.searchParams.append('from', searchParams.from);
-					if (searchParams.to) url.searchParams.append('to', searchParams.to);
-
-					console.log('Realizando búsqueda mejorada en URL:', url.toString());
-
-					const res = await fetch(url, { method: 'GET' });
-
-					if (res.ok) {
-						const data = await res.json();
-						national_parks = Array.isArray(data) ? data : [data];
-
-						if (data.length === 0) {
-							mostrarMensaje(
-								'No se encontraron parques que coincidan con los criterios de búsqueda.',
-								'warning'
-							);
-						} else {
-							mostrarMensaje(`Se encontraron ${data.length} parques.`, 'success');
-						}
-						return;
-					}
-				} catch (error) {
-					console.error('Error en búsqueda mejorada:', error);
-				}
-			} else {
-				// Solo comunidad sin filtros de año, usar el endpoint específico
-				try {
-					const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}`;
-					console.log('Realizando búsqueda por comunidad en URL:', specificURL);
-
-					const res = await fetch(specificURL, { method: 'GET' });
-
-					if (res.ok) {
-						const data = await res.json();
-						national_parks = Array.isArray(data) ? data : [data];
-
-						if (data.length === 0) {
-							mostrarMensaje(
-								'No se encontraron parques que coincidan con los criterios de búsqueda.',
-								'warning'
-							);
-						} else {
-							mostrarMensaje(`Se encontraron ${data.length} parques.`, 'success');
-						}
-						return;
-					}
-				} catch (error) {
-					console.error('Error en búsqueda por comunidad:', error);
-				}
-			}
-		}
-
-		// Si llegamos aquí, usamos la búsqueda general normal
-		// Construir la URL con los parámetros de búsqueda
-		let url = new URL(API, window.location.origin);
-
-		// Añadir parámetros no vacíos
-		if (searchParams.national_park)
-			url.searchParams.append('national_park', searchParams.national_park);
-		if (searchParams.autonomous_community)
-			url.searchParams.append('autonomous_community', searchParams.autonomous_community);
-		if (searchParams.from) url.searchParams.append('from', searchParams.from);
-		if (searchParams.to) url.searchParams.append('to', searchParams.to);
-
-		// Para áreas, usar lógica adicional en el backend
-		if (searchParams.initial_area_min)
-			url.searchParams.append('initial_area_min', searchParams.initial_area_min);
-		if (searchParams.initial_area_max)
-			url.searchParams.append('initial_area_max', searchParams.initial_area_max);
-		if (searchParams.current_area_min)
-			url.searchParams.append('current_area_min', searchParams.current_area_min);
-		if (searchParams.current_area_max)
-			url.searchParams.append('current_area_max', searchParams.current_area_max);
-
+    // Si solo hay búsqueda por comunidad autónoma, usar el endpoint específico
+    if (
+        searchParams.autonomous_community &&
+        !searchParams.national_park &&
+        !searchParams.initial_area_min &&
+        !searchParams.initial_area_max &&
+        !searchParams.current_area_min &&
+        !searchParams.current_area_max
+    ) {
+        // Si hay rango de años, usar la búsqueda general
+        // Si solo hay un año específico (from=to), usar endpoint específico
+        if (searchParams.from && searchParams.to && searchParams.from === searchParams.to) {
+            // Usar la búsqueda específica por comunidad y año
+            return await searchByCommunityAndYear();
+        } else if (searchParams.from || searchParams.to) {
+            // Usar el endpoint de comunidad con filtro de años
             try {
-            const res = await fetch(url, { method: 'GET' });
+                // Usar la ruta específica para comunidad autónoma con posibles filtros de año
+                const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}`;
+
+                // Añadir parámetros de año si existen
+                let url = new URL(specificURL, window.location.origin);
+                if (searchParams.from) url.searchParams.append('from', searchParams.from);
+                if (searchParams.to) url.searchParams.append('to', searchParams.to);
+
+                console.log('Realizando búsqueda mejorada en URL:', url.toString());
+
+                const res = await fetch(url, { method: 'GET' });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Guardar todos los resultados filtrados
+                    filteredParks = Array.isArray(data) ? data : [data];
+                    filteredTotalItems = filteredParks.length;
+                    filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+                    isFiltered = true;
+                    
+                    // Aplicar paginación local
+                    currentPage = 1;
+                    applyPagination();
+
+                    if (filteredParks.length === 0) {
+                        mostrarMensaje(
+                            'No se encontraron parques que coincidan con los criterios de búsqueda.',
+                            'warning'
+                        );
+                    } else {
+                        mostrarMensaje(`Se encontraron ${filteredParks.length} parques.`, 'success');
+                    }
+                    return;
+                } else {
+                    handleApiError(res, 'búsqueda mejorada');
+                    return;
+                }
+            } catch (error) {
+                console.error('Error en búsqueda mejorada:', error);
+                mostrarMensaje('Error de conexión al realizar la búsqueda mejorada.', 'error');
+                return;
+            }
+        } else {
+            // Solo comunidad sin filtros de año, usar el endpoint específico
+            try {
+                const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}`;
+                console.log('Realizando búsqueda por comunidad en URL:', specificURL);
+
+                const res = await fetch(specificURL, { method: 'GET' });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Guardar todos los resultados filtrados
+                    filteredParks = Array.isArray(data) ? data : [data];
+                    filteredTotalItems = filteredParks.length;
+                    filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+                    isFiltered = true;
+                    
+                    // Aplicar paginación local
+                    currentPage = 1;
+                    applyPagination();
+
+                    if (filteredParks.length === 0) {
+                        mostrarMensaje(
+                            'No se encontraron parques que coincidan con los criterios de búsqueda.',
+                            'warning'
+                        );
+                    } else {
+                        mostrarMensaje(`Se encontraron ${filteredParks.length} parques.`, 'success');
+                    }
+                    return;
+                } else {
+                    handleApiError(res, 'búsqueda por comunidad');
+                    return;
+                }
+            } catch (error) {
+                console.error('Error en búsqueda por comunidad:', error);
+                mostrarMensaje('Error de conexión al realizar la búsqueda por comunidad.', 'error');
+                return;
+            }
+        }
+    }
+
+    // Si llegamos aquí, usamos la búsqueda general normal
+    // Construir la URL con los parámetros de búsqueda
+    let url = new URL(API, window.location.origin);
+
+    // Añadir parámetros no vacíos
+    if (searchParams.national_park)
+        url.searchParams.append('national_park', searchParams.national_park);
+    if (searchParams.autonomous_community)
+        url.searchParams.append('autonomous_community', searchParams.autonomous_community);
+    if (searchParams.from) url.searchParams.append('from', searchParams.from);
+    if (searchParams.to) url.searchParams.append('to', searchParams.to);
+
+    // Para áreas, usar lógica adicional en el backend
+    if (searchParams.initial_area_min)
+        url.searchParams.append('initial_area_min', searchParams.initial_area_min);
+    if (searchParams.initial_area_max)
+        url.searchParams.append('initial_area_max', searchParams.initial_area_max);
+    if (searchParams.current_area_min)
+        url.searchParams.append('current_area_min', searchParams.current_area_min);
+    if (searchParams.current_area_max)
+        url.searchParams.append('current_area_max', searchParams.current_area_max);
+
+    console.log('Realizando búsqueda general en URL:', url.toString());
+
+    try {
+        const res = await fetch(url, { method: 'GET' });
+        
+        if (res.ok) {
             const data = await res.json();
             
-            if (res.ok) {
-                // Guardar todos los resultados filtrados
-                filteredParks = data;
-                filteredTotalItems = data.length;
-                filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
-                isFiltered = true;
-                
-                // Aplicar paginación local
-                currentPage = 1;
-                const endIndex = Math.min(itemsPerPage, filteredParks.length);
-                national_parks = filteredParks.slice(0, endIndex);
-                
-                // Actualizar la interfaz con los datos de paginación filtrada
-                totalItems = filteredTotalItems;
-                totalPages = filteredTotalPages;
-                
-                if (data.length === 0) {
-                    mostrarMensaje(
-                        'No se encontraron parques que coincidan con los criterios de búsqueda.',
-                        'warning'
-                    );
-                } else {
-                    mostrarMensaje(`Se encontraron ${data.length} parques.`, 'success');
-                }
-			} else {
-				mostrarMensaje('Error al realizar la búsqueda.', 'error');
-			}
-		} catch (error) {
-			console.error('Error al realizar la búsqueda:', error);
-			mostrarMensaje('Error de conexión al realizar la búsqueda.', 'error');
-		}
-	}
+            // Guardar todos los resultados filtrados
+            filteredParks = data;
+            filteredTotalItems = data.length;
+            filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+            isFiltered = true;
+            
+            // Actualizar la interfaz con los datos de paginación filtrada
+            totalItems = filteredTotalItems;
+            totalPages = filteredTotalPages;
+            
+            // Aplicar paginación local
+            currentPage = 1;
+            applyPagination();
+
+            if (data.length === 0) {
+                mostrarMensaje(
+                    'No se encontraron parques que coincidan con los criterios de búsqueda.',
+                    'warning'
+                );
+            } else {
+                mostrarMensaje(`Se encontraron ${data.length} parques.`, 'success');
+            }
+            
+            // Debug
+            console.log('Después de filtrar:', {
+                isFiltered,
+                filteredParks: filteredParks.length,
+                filteredTotalPages
+            });
+        } else {
+            handleApiError(res, 'búsqueda general');
+        }
+    } catch (error) {
+        console.error('Error al realizar la búsqueda general:', error);
+        mostrarMensaje('Error de conexión al realizar la búsqueda.', 'error');
+    }
+}
+
+// Función auxiliar para manejar errores de API de manera consistente
+function handleApiError(response, operacion) {
+    console.error(`Error en ${operacion}: ${response.status}`);
+    
+    if (response.status === 400) {
+        mostrarMensaje('Parámetros de búsqueda inválidos.', 'warning');
+    } else if (response.status === 404) {
+        mostrarMensaje('No se encontraron resultados con esos criterios.', 'warning');
+    } else if (response.status >= 500) {
+        mostrarMensaje('Error del servidor. Inténtelo más tarde.', 'error');
+    } else {
+        mostrarMensaje(`Error al realizar la ${operacion}. Código: ${response.status}`, 'error');
+    }
+}
 	/* ----------------------------------------------------------- */
 
 	/* ------------------ LIMPIAR LOS CAMPOS DE LA BÚSQUEDAS Y EL FILTRADO ------------------------- */
@@ -264,18 +318,23 @@
 			current_area_min: '',
 			current_area_max: ''
 		};
-
+		/* ------------------ DEBUGGING ------------------ */
+		// Al final de clearSearchForm
+		console.log('Después de limpiar filtros:', {
+			isFiltered,
+			filteredParks: filteredParks.length
+		});
 		// Resetear la bandera de intento de búsqueda
 		searchIntent = false;
-         // Resetear el estado de filtrado
-         isFiltered = false;
-        filteredParks = [];
+		// Resetear el estado de filtrado
+		isFiltered = false;
+		filteredParks = [];
 
 		// Recargar todos los parques
 		getNationalParks();
 
 		// Mostrar mensaje de confirmación
-        mostrarMensaje('Búsqueda limpiada. Mostrando todos los parques.', 'info');
+		mostrarMensaje('Búsqueda limpiada. Mostrando todos los parques.', 'info');
 	}
 	/* ------------------------------------------------------------------------------------------ */
 
@@ -285,7 +344,7 @@
 	function toggleQuickSearch() {
 		showQuickSearch = !showQuickSearch;
 	}
-	
+
 	async function searchByCommunityAndYear() {
 		// Verificar que tenemos comunidad y un año específico (from = to)
 		if (!searchParams.autonomous_community) {
@@ -301,47 +360,47 @@
 			return;
 		}
 
-    try {
-        // Usar la ruta especial del backend
-        const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}/${searchParams.from}`;
-        console.log('Realizando búsqueda en URL:', specificURL);
+		try {
+			// Usar la ruta especial del backend
+			const specificURL = `${API}/${encodeURIComponent(searchParams.autonomous_community)}/${searchParams.from}`;
+			console.log('Realizando búsqueda en URL:', specificURL);
 
-        const res = await fetch(specificURL, { method: 'GET' });
-        console.log('Respuesta status:', res.status);
+			const res = await fetch(specificURL, { method: 'GET' });
+			console.log('Respuesta status:', res.status);
 
-        if (res.ok) {
-            const data = await res.json();
-            console.log('Datos recibidos:', JSON.stringify(data));
+			if (res.ok) {
+				const data = await res.json();
+				console.log('Datos recibidos:', JSON.stringify(data));
 
-            // Si devuelve un objeto en lugar de array, convertirlo a array
-            const parksData = Array.isArray(data) ? data : [data];
-            
-            // Actualizar el estado de filtrado
-            filteredParks = parksData;
-            filteredTotalItems = parksData.length;
-            filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
-            isFiltered = true;
-            
-            // Aplicar paginación local
-            currentPage = 1;
-            const endIndex = Math.min(itemsPerPage, filteredParks.length);
-            national_parks = filteredParks.slice(0, endIndex);
-            
-            // Actualizar totales para la interfaz
-            totalItems = filteredTotalItems;
-            totalPages = filteredTotalPages;
+				// Si devuelve un objeto en lugar de array, convertirlo a array
+				const parksData = Array.isArray(data) ? data : [data];
 
-            if (parksData.length === 0) {
-                mostrarMensaje(
-                    `No se encontraron parques en ${searchParams.autonomous_community} declarados en ${searchParams.from}.`,
-                    'warning'
-                );
-            } else {
-                mostrarMensaje(
-                    `Se encontraron ${parksData.length} parques en ${searchParams.autonomous_community} declarados en ${searchParams.from}.`,
-                    'success'
-                );
-            }
+				// Actualizar el estado de filtrado
+				filteredParks = parksData;
+				filteredTotalItems = parksData.length;
+				filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+				isFiltered = true;
+
+				// Aplicar paginación local
+				currentPage = 1;
+				const endIndex = Math.min(itemsPerPage, filteredParks.length);
+				national_parks = filteredParks.slice(0, endIndex);
+
+				// Actualizar totales para la interfaz
+				totalItems = filteredTotalItems;
+				totalPages = filteredTotalPages;
+
+				if (parksData.length === 0) {
+					mostrarMensaje(
+						`No se encontraron parques en ${searchParams.autonomous_community} declarados en ${searchParams.from}.`,
+						'warning'
+					);
+				} else {
+					mostrarMensaje(
+						`Se encontraron ${parksData.length} parques en ${searchParams.autonomous_community} declarados en ${searchParams.from}.`,
+						'success'
+					);
+				}
 			} else {
 				const errorText = await res.text();
 				console.error('Error en la respuesta:', errorText);
@@ -359,10 +418,19 @@
 				}
 			}
 		} catch (error) {
-        console.error('Error en búsqueda específica:', error);
-        mostrarMensaje('Error de conexión al realizar la búsqueda específica.', 'error');
-    }
+			console.error('Error en búsqueda específica:', error);
+			mostrarMensaje('Error de conexión al realizar la búsqueda específica.', 'error');
+		}
 	}
+
+	/* ------------------ DEBUGGING ------------------ */
+	// Al final de searchNationalParks y searchByCommunityAndYear
+	console.log('Después de filtrar:', {
+		isFiltered,
+		filteredParks: filteredParks.length,
+		filteredTotalPages
+	});
+
 	/* ----------------------------------------------------------- */
 
 	let searchIntent = false; // Variable para controlar si el usuario ha intentado buscar (búsqueda rápida)
@@ -371,7 +439,7 @@
 	function toggleCreateForm() {
 		showCreateForm = !showCreateForm;
 	}
-    // Función para limpiar todos los campos
+	// Función para limpiar todos los campos
 	function clearCreateForm() {
 		// Limpiar todos los campos del formulario
 		newNationalParkName = '';
@@ -390,27 +458,43 @@
 		setTimeout(() => (mensaje = ''), 5000);
 	}
 
-	/* ------------------ PAGINACIÓN ------------------ */
+	/* ----------------------------------- PAGINACIÓN ------------------------------------ */
 
-	// Maneja bien los resultados si son filtrados
-    function goToPage(page) {
-        if (page >= 1 && page <= (isFiltered ? filteredTotalPages : totalPages)) {
+	// Versión mejorada de goToPage con mejora en la paginacion
+	function goToPage(page) {
+    console.log('goToPage:', { page, isFiltered, filteredParks: filteredParks?.length || 0 });
+
+    // Comprobación defensiva: si hay datos filtrados, usamos esos independientemente del valor de isFiltered
+    if (filteredParks && filteredParks.length > 0) {
+        // Si tenemos datos filtrados, rectificamos el estado
+        isFiltered = true;
+        
+        if (page >= 1 && page <= filteredTotalPages) {
             currentPage = page;
-            
-            if (isFiltered) {
-                // Aplicar paginación local a los resultados filtrados
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = Math.min(startIndex + itemsPerPage, filteredParks.length);
-                national_parks = filteredParks.slice(startIndex, endIndex);
+            // Usar la función centralizada de paginación
+            applyPagination();
+        }
+    } else {
+        // Si no hay datos filtrados, comportamiento normal
+        isFiltered = false;
+        
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            // Si tienes todos los parques en memoria (allParks)
+            if (allParks && allParks.length > 0) {
+                applyPagination();
             } else {
-                // Comportamiento normal para datos no filtrados
+                // Si no tienes los datos en memoria, obtenerlos del servidor
                 getNationalParks();
             }
         }
     }
+}
 
 	function nextPage() {
-		if (currentPage < totalPages) {
+		const maxPage = filteredParks && filteredParks.length > 0 ? filteredTotalPages : totalPages;
+
+		if (currentPage < maxPage) {
 			goToPage(currentPage + 1);
 		}
 	}
@@ -420,91 +504,123 @@
 			goToPage(currentPage - 1);
 		}
 	}
-
 	function changeItemsPerPage(newValue) {
-        itemsPerPage = newValue;
-        currentPage = 1; // Resetear a la primera página cuando cambia items por página
-        
-        if (isFiltered) {
-            filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
-            goToPage(1); // Esto aplicará la paginación local con el nuevo tamaño
-        } else {
-            getNationalParks();
-        }
-    }
-	/* -------------------------------------------------------*/
+		itemsPerPage = newValue;
+		currentPage = 1; // Resetear a la primera página cuando cambia items por página
+
+		if (isFiltered) {
+			filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+			goToPage(1); // Esto aplicará la paginación local con el nuevo tamaño
+		} else {
+			getNationalParks();
+		}
+	}
+	function applyPagination() {
+    const sourceData = isFiltered ? filteredParks : allParks;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, sourceData.length);
+    
+    displayedParks = sourceData.slice(startIndex, endIndex);
+    national_parks = displayedParks; // Actualiza la variable que muestra la UI
+    
+    console.log(`Mostrando ${isFiltered ? 'resultados filtrados' : 'todos los parques'}:`, 
+                { page: currentPage, displayed: displayedParks.length, total: sourceData.length });
+}
+
+
+	/* --------------------------------------------------------------------------------------*/
 
 	/* ------------------ FUNCIONES DE API ------------------ */
 
+	/* ------------------ DEBUGGING ------------------ */
+	// Al inicio de getNationalParks
+	console.log('Inicio de getNationalParks:', { isFiltered });
+
 	// Devolver todos los parques nacionales + paginación
 	async function getNationalParks() {
-		resultStatus = result = '';
-		try {
-			// Obtener primero el total de parques
-			const countRes = await fetch(API, { method: 'GET' });
+    // No resetear el resultado si estamos en modo filtrado
+    if (!isFiltered) {
+        resultStatus = result = '';
+    }
+    
+    // Si estamos en modo filtrado, aplicar paginación local
+    if (isFiltered && filteredParks && filteredParks.length > 0) {
+        console.log('Aplicando paginación local a resultados filtrados');
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredParks.length);
+        national_parks = filteredParks.slice(startIndex, endIndex);
+        return; // Importante: salir de la función sin hacer peticiones a la API
+    }
+    
+    // Continuar con el comportamiento normal para datos no filtrados
+    try {
+        // Obtener primero el total de parques
+        const countRes = await fetch(API, { method: 'GET' });
 
-			if (!countRes.ok) {
-				if (countRes.status === 404) {
-					console.log('No National Parks found');
-					result = "No hay datos de parques nacionales. Utiliza el botón 'Cargar datos iniciales'.";
-					resultStatus = 'warning';
-					return;
-				} else if (countRes.status >= 500) {
-					console.log(`Server error (${countRes.status}) when retrieving National Parks`);
-					result = 'El servidor no pudo procesar la solicitud. Inténtelo más tarde.';
-					resultStatus = 'error';
-					return;
-				} else {
-					console.log(`Error retrieving National Parks: ${countRes.status}`);
-					result = `Error al obtener los parques nacionales. Código: ${countRes.status}`;
-					resultStatus = 'error';
-					return;
-				}
-			}
+        if (!countRes.ok) {
+            // Manejo de errores como ya lo tienes
+            if (countRes.status === 404) {
+                console.log('No National Parks found');
+                result = "No hay datos de parques nacionales. Utiliza el botón 'Cargar datos iniciales'.";
+                resultStatus = 'warning';
+                return;
+            } else if (countRes.status >= 500) {
+                console.log(`Server error (${countRes.status}) when retrieving National Parks`);
+                result = 'El servidor no pudo procesar la solicitud. Inténtelo más tarde.';
+                resultStatus = 'error';
+                return;
+            } else {
+                console.log(`Error retrieving National Parks: ${countRes.status}`);
+                result = `Error al obtener los parques nacionales. Código: ${countRes.status}`;
+                resultStatus = 'error';
+                return;
+            }
+        }
 
-			const allData = await countRes.json();
-			totalItems = allData.length;
-			totalPages = Math.ceil(totalItems / itemsPerPage);
+        const allData = await countRes.json();
+        totalItems = allData.length;
+        totalPages = Math.ceil(totalItems / itemsPerPage);
 
-			// Ajustar la página actual si es necesario
-			if (currentPage > totalPages && totalPages > 0) {
-				currentPage = totalPages;
-			}
+        // Ajustar la página actual si es necesario
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+        }
 
-			// Calcular offset basado en la página actual
-			const offset = (currentPage - 1) * itemsPerPage;
+        // Calcular offset basado en la página actual
+        const offset = (currentPage - 1) * itemsPerPage;
 
-			// Realizar la consulta paginada
-			const res = await fetch(`${API}?limit=${itemsPerPage}&offset=${offset}`, { method: 'GET' });
-			const data = await res.json();
+        // Realizar la consulta paginada
+        const res = await fetch(`${API}?limit=${itemsPerPage}&offset=${offset}`, { method: 'GET' });
+        const data = await res.json();
 
-			// Reordenar si hay highlight
-			const highlight = $page.url.searchParams.get('highlight');
-			if (highlight) {
-				const idx = data.findIndex((p) => p.national_park === highlight);
-				if (idx > -1) {
-					const [park] = data.splice(idx, 1);
-					data.unshift(park);
-					// Desactivar la ordenación personalizada
-					isCustomSorted = false;
-				}
-			}
+        // El resto de tu código para el highlight, etc.
+        const highlight = $page.url.searchParams.get('highlight');
+        if (highlight) {
+            const idx = data.findIndex((p) => p.national_park === highlight);
+            if (idx > -1) {
+                const [park] = data.splice(idx, 1);
+                data.unshift(park);
+                isCustomSorted = false;
+            }
+        }
 
-			national_parks = data;
+        national_parks = data;
 
-			// Verificar si no hay parques y mostrar mensaje
-			if (national_parks.length === 0) {
-				result = "No hay datos de parques nacionales. Utiliza el botón 'Cargar datos iniciales'.";
-				resultStatus = 'warning';
-			}
+        // Verificar si no hay parques y mostrar mensaje
+        if (national_parks.length === 0) {
+            result = "No hay datos de parques nacionales. Utiliza el botón 'Cargar datos iniciales'.";
+            resultStatus = 'warning';
+        }
 
-			console.log(`Response received: \n${JSON.stringify(national_parks, null, 2)}`);
-		} catch (error) {
-			console.log(`Error getting data from ${API}: ${error}`);
-			result = 'No se pudo conectar con el servidor. Verifique su conexión a internet.';
-			resultStatus = 'error';
-		}
-	}
+        console.log(`Response received: \n${JSON.stringify(national_parks, null, 2)}`);
+    } catch (error) {
+        console.log(`Error getting data from ${API}: ${error}`);
+        result = 'No se pudo conectar con el servidor. Verifique su conexión a internet.';
+        resultStatus = 'error';
+    }
+}
+
+
 	// Crear un nuevo parque nacional
 	async function createNationalPark() {
 		// Resetea los mensajes
@@ -1025,13 +1141,13 @@
 				/>
 			</div>
 			<div class="col-auto d-flex align-items-end gap-2">
-                <Button color="primary" on:click={createNationalPark} style="margin-top: 1.5rem;">
-                    <span class="glyphicon glyphicon-ok"></span> Crear
-                </Button>
-                <Button color="secondary" on:click={clearCreateForm} style="margin-top: 1.5rem;">
-                    <span class="glyphicon glyphicon-erase"></span> Limpiar
-                </Button>
-            </div>
+				<Button color="primary" on:click={createNationalPark} style="margin-top: 1.5rem;">
+					<span class="glyphicon glyphicon-ok"></span> Crear
+				</Button>
+				<Button color="secondary" on:click={clearCreateForm} style="margin-top: 1.5rem;">
+					<span class="glyphicon glyphicon-erase"></span> Limpiar
+				</Button>
+			</div>
 		</div>
 	</div>
 {/if}
@@ -1174,16 +1290,16 @@
 		</div>
 
 		<!-- Información de paginación con nuevo color -->
-        <div
-        style="background-color: #e7f5ff; padding: 6px 12px; border-radius: 4px; font-weight: 500; color: #0d6efd;"
-    >
-        Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(
-            currentPage * itemsPerPage,
-            isFiltered ? filteredTotalItems : totalItems
-        )} de {isFiltered ? filteredTotalItems : totalItems} parques
-        {#if isFiltered}
-            <span style="font-style: italic;">(Resultados filtrados)</span>
-        {/if}
-    </div>
+		<div
+			style="background-color: #e7f5ff; padding: 6px 12px; border-radius: 4px; font-weight: 500; color: #0d6efd;"
+		>
+			Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(
+				currentPage * itemsPerPage,
+				isFiltered ? filteredTotalItems : totalItems
+			)} de {isFiltered ? filteredTotalItems : totalItems} parques
+			{#if isFiltered}
+				<span style="font-style: italic;">(Resultados filtrados)</span>
+			{/if}
+		</div>
 	</div>
 {/if}

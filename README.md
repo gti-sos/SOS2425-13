@@ -1,38 +1,22 @@
-# sv
-
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## SOS2425 - Grupo 13
+ ### Team
+ - [Blanca García Alonso](https://github.com/blancagrclns)
+ - [Alvaro Morillo Navajas](https://github.com/alvmornav)
+ - [Darío López Villegas](https://github.com/darlopvil)
+ 
+ ### Project Description
+ Our project is based on the integration of data on forest fires, natural parks, 
+ and water supply aid, aiming to analyze the relationship between the availability of this resource
+ and its impact on environmental and social management. Through this data convergence, we seek to identify
+ patterns that enhance fire prevention and response, optimize ecosystem conservation in protected areas,
+ and assess the effectiveness of subsidies aimed at mitigating water scarcity in vulnerable municipalities.
+ This comprehensive approach will contribute to the development of more efficient and sustainable strategies for managing water as an essential resource.
+ 
+ ### Repository: [gti-sos/SOS2425-13](https://github.com/gti-sos/SOS2425-13)
+ ### URL: [sos2425-13.onrender.com](https://sos2425-13.onrender.com/)
+ 
+ - **APIs**:  
+   - https://sos2425-13.onrender.com/api/v1/water-supply-improvements/docs (developed by Blanca García Alonso)
+   - https://sos2425-13.onrender.com/api/v1/national-parks/docs (developed by Darío López Villegas )
+   - https://sos2425-13.onrender.com/api/v1/forest-fires/docs (developed by Álvaro Morillo Navajas )
+ 
