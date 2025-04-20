@@ -1,5 +1,5 @@
 <svelte:head>
-     <title>SOS2223-13</title>
+     <title>SOS2425-13</title>
  </svelte:head>
  <main>
      <nav>
