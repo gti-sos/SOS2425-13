@@ -1,6 +1,6 @@
 import dataStore from "nedb";
 let db = new dataStore();
-const BASE_API = "/api/v1";
+const BASE_API = "/api/v2";
 
 //loadInitialData
 // Datos iniciales para cargar en la API
@@ -173,7 +173,7 @@ app.get(BASE_API + "/national-parks", (request, response) => {
         if (docs.length === 0 && !hasQueryParams) {
             return response.status(404).send({
                 error: "No hay datos que mostrar",
-                message: "Utiliza GET /api/v1/national-parks/loadInitialData para cargar datos iniciales",
+                message: "Utiliza GET /api/v2/national-parks/loadInitialData para cargar datos iniciales",
                 data: []
             });
         }

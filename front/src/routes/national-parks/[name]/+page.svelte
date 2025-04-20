@@ -10,7 +10,7 @@
     let DEVEL_HOST = 'http://localhost:16078';
     let PRODUCTION_HOST = 'https://sos2425-13.onrender.com';
 
-    let API = '/api/v1/national-parks';
+    let API = '/api/v2/national-parks'; // Fixed the API endpoint
     if (dev) {
         API = DEVEL_HOST + API; // Use development host if in development mode
     } else {

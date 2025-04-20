@@ -2,9 +2,10 @@
 	"info": {
 		"_postman_id": "734e29c8-c1ec-438b-ab7f-33968ce0d043",
 		"name": "API for national parks in Spain",
+		"description": "UPDATED API to v2 due to recent changes in the frontend:\n\n\\-> Bigger data array (loadInitialData)\n\n\\-> New method to fetch results by a range of values (declaration_year, initial_area, current_area)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "14944672",
-		"_collection_link": "https://sos2425-13.postman.co/workspace/b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/14944672-734e29c8-c1ec-438b-ab7f-33968ce0d043?action=share&source=collection_link&creator=14944672"
+		"_collection_link": "https://sos2425-13.postman.co/workspace/SOS2425-13-~b3461b93-8aac-4e5b-8b9e-3a008d3dd1ea/collection/14944672-734e29c8-c1ec-438b-ab7f-33968ce0d043?action=share&source=collection_link&creator=14944672"
 	},
 	"item": [
 		
@@ -50,13 +51,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -102,13 +103,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -154,13 +155,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -202,13 +203,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -249,13 +250,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -288,13 +289,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Cabañeros2",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Cabañeros2"
 							]
@@ -341,13 +342,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -391,13 +392,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Cabañeros2",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Cabañeros2",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Cabañeros2"
 							]
@@ -449,13 +450,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -496,13 +497,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -543,13 +544,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -581,15 +582,15 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Sierra Nevada",
+							"raw": "{{Base_URL}}/api/v2/national-parks/parqueQueNoExiste",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
-								"Sierra Nevada"
+								"parqueQueNoExiste"
 							]
 						}
 					},
@@ -613,9 +614,6 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Response body has 16 items\", function () {\r",
-									"    pm.expect(pm.response.json()).to.have.lengthOf(16);\r",
-									"});\r",
 									"\r",
 									""
 								],
@@ -631,13 +629,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -672,13 +670,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -725,13 +723,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks",
+							"raw": "{{Base_URL}}/api/v2/national-parks",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks"
 							]
 						}
@@ -777,13 +775,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Teide",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Teide",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Teide"
 							]
@@ -816,13 +814,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{Base_URL}}/api/v1/national-parks/Garajonay2",
+							"raw": "{{Base_URL}}/api/v2/national-parks/Garajonay2",
 							"host": [
 								"{{Base_URL}}"
 							],
 							"path": [
 								"api",
-								"v1",
+								"v2",
 								"national-parks",
 								"Garajonay2"
 							]
@@ -860,13 +858,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?autonomous_community=Baleares",
+					"raw": "{{Base_URL}}/api/v2/national-parks?autonomous_community=Baleares",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -903,13 +901,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?current_area=15608",
+					"raw": "{{Base_URL}}/api/v2/national-parks?current_area=15608",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -946,13 +944,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?initial_area=3984",
+					"raw": "{{Base_URL}}/api/v2/national-parks?initial_area=3984",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -989,13 +987,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?national_park=Teide",
+					"raw": "{{Base_URL}}/api/v2/national-parks?national_park=Teide",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -1032,13 +1030,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?declaration_date=1995",
+					"raw": "{{Base_URL}}/api/v2/national-parks?declaration_date=1995",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -1075,13 +1073,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Canarias",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Canarias"
 					]
@@ -1113,13 +1111,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias/1981",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Canarias/1981",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Canarias",
 						"1981"
@@ -1152,13 +1150,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias/1954",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Canarias/1954",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Canarias",
 						"1954"
@@ -1191,13 +1189,13 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Teide/1999",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Teide",
 						"1999"
@@ -1239,13 +1237,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Teide/1999",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Teide",
 						"1999"
@@ -1282,13 +1280,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Canarias?from=1980&to=2000",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Canarias?from=1980&to=2000",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Canarias"
 					],
@@ -1330,13 +1328,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?from=1950&to=1980",
+					"raw": "{{Base_URL}}/api/v2/national-parks?from=1950&to=1980",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -1381,23 +1379,23 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?from=2000&to=2010",
+					"raw": "{{Base_URL}}/api/v2/national-parks?from=2023&to=2025",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
 						{
 							"key": "from",
-							"value": "2000"
+							"value": "2023"
 						},
 						{
 							"key": "to",
-							"value": "2010"
+							"value": "2025"
 						}
 					]
 				}
@@ -1432,13 +1430,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks?limit=3&offset=4",
+					"raw": "{{Base_URL}}/api/v2/national-parks?limit=3&offset=4",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks"
 					],
 					"query": [
@@ -1479,13 +1477,13 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/1999",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Teide/1999",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Teide",
 						"1999"
@@ -1518,13 +1516,13 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/Teide/abc",
+					"raw": "{{Base_URL}}/api/v2/national-parks/Teide/abc",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						"Teide",
 						"abc"
@@ -1566,13 +1564,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{Base_URL}}/api/v1/national-parks/",
+					"raw": "{{Base_URL}}/api/v2/national-parks/",
 					"host": [
 						"{{Base_URL}}"
 					],
 					"path": [
 						"api",
-						"v1",
+						"v2",
 						"national-parks",
 						""
 					]
