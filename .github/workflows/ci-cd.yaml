@@ -33,12 +33,21 @@ jobs:
 
       - name: Run server for e2e tests
         run: |
+          # Obtener el puerto dinámicamente
+          export SERVER_PORT=$(node -e "console.log(process.env.PORT || 16078)")
+          
+          # Iniciar el servidor
           npm run start &
-          # Esperar a que el servidor esté listo (ajusta el tiempo según sea necesario)
-          echo "Esperando que el servidor inicie..."
+          
+          # Esperar a que el servidor esté listo
+          echo "Esperando que el servidor inicie en puerto $SERVER_PORT..."
           sleep 10
-          # Verificar que el servidor responde
-          npx wait-on http://localhost:5173 -t 30000
+          
+          # Guardar el puerto para usarlo en los siguientes pasos
+          echo "SERVER_PORT=$SERVER_PORT" >> $GITHUB_ENV
+          
+          # Verificar que el servidor responde en el puerto correcto
+          npx wait-on http://localhost:$SERVER_PORT -t 30000
 
       - name: Install Playwright dependencies
         run: |
@@ -48,8 +57,8 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          # Configura la URL base para los tests
-          PLAYWRIGHT_TEST_BASE_URL: http://localhost:5173
+          # Usar el puerto detectado dinámicamente
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:${{ env.SERVER_PORT }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
