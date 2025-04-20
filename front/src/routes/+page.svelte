@@ -41,7 +41,7 @@
             <a href="http://sos2425-13.onrender.com/api/v1/water-supply-improvements">API Blanca García Alonso</a>
         </li>
         <li>
-            <a href="http://sos2425-13.onrender.com/api/v1/national-parks">API Darío López Villegas</a>
+            <a href="http://sos2425-13.onrender.com/api/v2/national-parks">API Darío López Villegas</a>
         </li>
         <li>
             <a href="http://sos2425-13.onrender.com/api/v1/forest-fires">API Alvaro Morillo Navajas</a>
