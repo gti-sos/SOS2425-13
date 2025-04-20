@@ -138,3 +138,6 @@ front\node_modules
 /blob-report/
 
 /playwright/.cache/
+
+# Playwright
+node_modules/
