@@ -44,14 +44,11 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "nedb": "^1.8.0",
-    "svelte": "^5.28.1",
-    "svelte-routing": "^2.13.0",
+
     "sveltestrap": "^5.11.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.14.1",
-    "playwright": "^1.51.1",
+ 
     "start-server-and-test": "^2.0.11"
   }
 }
