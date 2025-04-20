@@ -66,11 +66,21 @@
 
 	async function obtenerDatos() {
 		try {
+			console.log('Llamando a la API:', API + query);
 			const res = await fetch(API + query);
-			if (!res.ok) throw new Error();
+			console.log('Respuesta de la API:', res);
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				throw new Error(errorData.error || 'Error al obtener los datos.');
+			}
+
 			Datos = await res.json();
+			console.log('Datos obtenidos:', Datos);
 		} catch (error) {
-			mensaje = error instanceof Error ? error.message : '❌ No existen datos, cargue los iniciales';
+			console.error('Error al obtener los datos:', error);
+			mensaje =
+				error instanceof Error ? error.message : '❌ No existen datos, cargue los iniciales';
 			tipoMensaje = 'danger';
 		}
 	}
@@ -152,15 +162,24 @@
 	}
 
 	async function buscarIntervalo() {
-		try {
-			const res = await fetch(`${API}?from=${desde}&to=${hasta}`);
-			if (!res.ok) throw new Error();
-			Datos = await res.json();
-			mostrarMensaje('✅ Resultados del intervalo obtenidos', 'info');
-		} catch {
-			mostrarMensaje('❌ No se encontraron resultados para ese intervalo', 'warning');
-		}
-	}
+    try {
+        // Construir la consulta con los valores de "desde" y "hasta"
+        let filtros = [];
+        if (desde) filtros.push(`from=${desde}`);
+        if (hasta) filtros.push(`to=${hasta}`);
+
+        // Actualizar la consulta con paginación
+        filtrosAplicados = filtros.length ? '&' + filtros.join('&') : '';
+        offset = 0; // Reinicia el offset al aplicar un filtro
+        query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
+
+        // Llamar a la API con la nueva consulta
+        await obtenerDatos();
+        mostrarMensaje('✅ Resultados del intervalo obtenidos', 'info');
+    } catch (error) {
+        mostrarMensaje('❌ No se encontraron resultados para ese intervalo', 'warning');
+    }
+}
 
 	let filtrosAplicados = '';
 	async function buscar() {
@@ -225,7 +244,10 @@
 				editMode = false;
 				obtenerDatos();
 			} else if (res.status === 409) {
-				mostrarMensaje('❌ Ya existe otro recurso con esos datos. No se puede modificar.', 'warning');
+				mostrarMensaje(
+					'❌ Ya existe otro recurso con esos datos. No se puede modificar.',
+					'warning'
+				);
 			} else if (res.status === 400) {
 				mostrarMensaje('❌ Datos incompletos o no válidos. Revisa los campos.', 'warning');
 			} else {
@@ -235,6 +257,35 @@
 			mostrarMensaje('❌ Error al intentar actualizar el recurso.', 'danger');
 		}
 	}
+
+	async function eliminarRecurso(recurso: Datos) {
+    try {
+        const res = await fetch(
+            `${API}/${recurso.year}/${encodeURIComponent(recurso.autonomous_community)}`,
+            {
+                method: 'DELETE'
+            }
+        );
+
+        if (res.ok) {
+            mostrarMensaje('✅ Recurso eliminado correctamente.', 'success');
+            // Actualizar la lista de datos eliminando el recurso
+            Datos = Datos.filter(
+                (d) =>
+                    d.year !== recurso.year ||
+                    d.autonomous_community !== recurso.autonomous_community
+            );
+        } else {
+            const errorData = await res.json();
+            throw new Error(errorData.error || '❌ No se pudo eliminar el recurso.');
+        }
+    } catch (error) {
+        mostrarMensaje(
+            error instanceof Error ? error.message : '❌ Error al eliminar el recurso.',
+            'danger'
+        );
+    }
+}
 
 	function cancelarEdicion() {
 		editMode = false;
@@ -327,11 +378,9 @@
 							<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
 							<button class="btn btn-secondary btn-sm" on:click={cancelarEdicion}>Cancelar</button>
 						{:else}
-							<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}
-								>Editar</button
-							>
+							<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
+							<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}>Eliminar</button>
 						{/if}
-					
 					</td>
 				</tr>
 			{/each}
