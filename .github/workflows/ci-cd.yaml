@@ -31,7 +31,7 @@ jobs:
       - name: Run backend tests
         run: npm test
 
-        - name: Run server for e2e tests
+      - name: Run server for e2e tests
         run: |
           npm run start &
           # Esperar a que el servidor esté listo (ajusta el tiempo según sea necesario)
