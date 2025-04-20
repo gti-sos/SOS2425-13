@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
 
-  // Interfaz en singular
   interface Incendio {
     year: number;
     autonomous_community: string;
@@ -10,11 +9,8 @@
     percentage_of_large_fires: number;
   }
 
-  // 🔧 URL dinámica
   const dev = import.meta.env.DEV;
-  const BASE_URL = dev
-    ? 'http://localhost:16078' 
-    : 'https://sos2425-13.onrender.com'; 
+  const BASE_URL = dev ? 'http://localhost:16078' : 'https://sos2425-13.onrender.com';
   const API = `${BASE_URL}/api/v1/forest-fires`;
 
   let incendios: Incendio[] = [];
@@ -23,6 +19,12 @@
   let filtroDesde: string = '';
   let filtroHasta: string = '';
   let filtroComunidad: string = '';
+
+  // Datos del formulario
+  let year = '';
+  let autonomous_community = '';
+  let number_of_accidents = '';
+  let percentage_of_large_fires = '';
 
   const cargarIncendios = async () => {
     try {
@@ -35,6 +37,58 @@
       error = '❌ No se pudieron cargar los datos de incendios forestales.';
       mensaje = '';
       console.error(err);
+    }
+  };
+
+  const crearIncendio = async () => {
+    mensaje = '';
+    error = '';
+
+    if (!year || !autonomous_community || !number_of_accidents || !percentage_of_large_fires) {
+      error = '⚠️ Todos los campos son obligatorios.';
+      return;
+    }
+
+    const porcentaje = Number(percentage_of_large_fires);
+    if (porcentaje < 0 || porcentaje > 1) {
+      error = '⚠️ El porcentaje debe estar entre 0 y 1.';
+      return;
+    }
+
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          year: parseInt(year),
+          autonomous_community: autonomous_community.trim().toLowerCase(),
+          number_of_accidents: parseInt(number_of_accidents),
+          percentage_of_large_fires: parseFloat(percentage_of_large_fires)
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.status === 201) {
+        mensaje = '✅ Recurso creado correctamente.';
+        error = '';
+        await cargarIncendios();
+
+        // Limpiar formulario
+        year = '';
+        autonomous_community = '';
+        number_of_accidents = '';
+        percentage_of_large_fires = '';
+      } else if (res.status === 409) {
+        error = '❌ Ya existe un incendio registrado con esos datos.';
+      } else if (res.status === 400) {
+        error = '❌ Por favor, completa todos los campos obligatorios correctamente.';
+      } else {
+        error = '❌ No se pudo crear el recurso. Inténtalo más tarde.';
+      }
+    } catch (err) {
+      console.error(err);
+      error = '❌ Error de conexión con el servidor.';
     }
   };
 
@@ -129,17 +183,22 @@
   <div style="color: red;">{error}</div>
 {/if}
 
+<h2>➕ Añadir nuevo incendio forestal</h2>
+<form on:submit|preventDefault={crearIncendio}>
+  <input placeholder="Año" type="number" bind:value={year} required />
+  <input placeholder="Comunidad Autónoma" type="text" bind:value={autonomous_community} required />
+  <input placeholder="Accidentes" type="number" min="0" bind:value={number_of_accidents} required />
+  <input placeholder="% Grandes Incendios (0-1)" type="number" step="0.01" min="0" max="1" bind:value={percentage_of_large_fires} required />
+  <button type="submit">✅ Crear recurso</button>
+</form>
+
+<hr />
+
 <h2>🔎 Buscar incendios</h2>
 <form on:submit|preventDefault={buscar}>
-  <label for="desde">Desde el año:</label>
-  <input id="desde" type="number" bind:value={filtroDesde} />
-
-  <label for="hasta">Hasta el año:</label>
-  <input id="hasta" type="number" bind:value={filtroHasta} />
-
-  <label for="comunidad">Comunidad Autónoma:</label>
-  <input id="comunidad" type="text" bind:value={filtroComunidad} />
-
+  <input placeholder="Desde año" type="number" bind:value={filtroDesde} />
+  <input placeholder="Hasta año" type="number" bind:value={filtroHasta} />
+  <input placeholder="Comunidad Autónoma" type="text" bind:value={filtroComunidad} />
   <button type="submit">Buscar</button>
   <button type="button" on:click={limpiarFiltros}>Limpiar</button>
 </form>
@@ -159,6 +218,7 @@
         <th>Comunidad Autónoma</th>
         <th>Accidentes</th>
         <th>% Grandes Incendios</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -188,13 +248,18 @@
   }
 
   form input {
-    width: 150px;
-    padding: 0.3rem;
+    padding: 0.4rem;
+    font-size: 1rem;
+    width: 200px;
   }
 
   button {
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
     cursor: pointer;
+  }
+
+  table {
+    width: 100%;
   }
 </style>
