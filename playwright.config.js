@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // Usar la variable de entorno o un valor predeterminado
-const baseURL =  'http://localhost:16078';
+const baseURL =  'http://localhost:5173';
 
 /**
  * @see https://playwright.dev/docs/test-configuration
