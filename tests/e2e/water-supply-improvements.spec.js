@@ -36,7 +36,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
 
   test('✅ Carga inicial y muestra tabla', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements');
+    await page.goto('http://localhost:16078/water-supply-improvements');
     
     // Interceptar la llamada de la API y asegurarse de que devuelve los datos correctos
     const apiUrl = 'http://localhost:16078/api/v1/water-supply-improvements';
@@ -57,7 +57,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
 
   
   test('➕ Crear un nuevo recurso', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements');
+    await page.goto('http://localhost:16078/water-supply-improvements');
     await page.waitForLoadState('networkidle');
   
     // Wait for the 'Añadir' button to be visible
@@ -181,7 +181,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
 
   test('Encabezado principal correcto', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements'); // Asegúrate de que la URL sea correcta
+    await page.goto('http://localhost:16078/water-supply-improvements'); // Asegúrate de que la URL sea correcta
   
     // Verificar que el encabezado principal sea el esperado
     const header = page.locator('h1');
@@ -189,7 +189,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
   
   test('Botones principales visibles', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements'); // Asegúrate de que la URL sea correcta
+    await page.goto('http://localhost:16078/water-supply-improvements'); // Asegúrate de que la URL sea correcta
   
     // Verificar que los botones principales sean visibles
     const addButton = page.getByRole('button', { name: 'Añadir' });
@@ -200,7 +200,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
   
   test('Tabla de mejoras en abastecimiento de agua visible con encabezados correctos', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements'); // Asegúrate de que la URL sea correcta
+    await page.goto('http://localhost:16078/water-supply-improvements'); // Asegúrate de que la URL sea correcta
   
     // Verificar que la tabla de mejoras en abastecimiento de agua sea visible
     const table = page.locator('table');
@@ -219,7 +219,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
 
   test('🔍 Filtrar recursos por campos', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements');
+    await page.goto('http://localhost:16078/water-supply-improvements');
   
     // Esperar a que el formulario de filtros sea visible
     const yearFilter = page.locator('input[placeholder="Año"]');
@@ -239,7 +239,7 @@ test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
   });
   
   test('📑 Navegar entre páginas con paginación', async ({ page }) => {
-    await page.goto('http://localhost:5173/water-supply-improvements');
+    await page.goto('http://localhost:16078/water-supply-improvements');
   
     // Hacer clic en "Siguiente" para ir a la siguiente página
     const nextPageButton = page.locator('button:has-text("Siguiente")');
