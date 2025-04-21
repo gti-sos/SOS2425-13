@@ -33,20 +33,21 @@ jobs:
 
       - name: Run server for e2e tests
         run: |
-          # Iniciar el servidor de backend y frontend en paralelo
-          npm run start &  # Backend
-          cd front && npm run start &  # Frontend en el puerto 5173
+          # Obtener el puerto dinámicamente
+          export SERVER_PORT=$(node -e "console.log(process.env.PORT || 16078)")
           
-          # Esperar a que los servidores estén listos
-          echo "Esperando que el servidor backend y frontend inicien..."
+          # Iniciar el servidor
+          npm run start &
+          
+          # Esperar a que el servidor esté listo
+          echo "Esperando que el servidor inicie en puerto $SERVER_PORT..."
           sleep 10
           
-          # Verificar que ambos servidores están activos
-          echo "Verificando que el servidor backend responde..."
-          npx wait-on http://localhost:16078 -t 30000  # Cambia si el puerto del backend es otro
+          # Guardar el puerto para usarlo en los siguientes pasos
+          echo "SERVER_PORT=$SERVER_PORT" >> $GITHUB_ENV
           
-          echo "Verificando que el frontend responde..."
-          npx wait-on http://localhost:5173 -t 30000  # Asegurarse de que el frontend está listo
+          # Verificar que el servidor responde en el puerto correcto
+          npx wait-on http://localhost:$SERVER_PORT -t 30000
 
       - name: Install Playwright dependencies
         run: |
@@ -56,7 +57,7 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          # Usar el puerto detectado dinámicamente para las pruebas
+          # Usar el puerto detectado dinámicamente
           PLAYWRIGHT_TEST_BASE_URL: http://localhost:${{ env.SERVER_PORT }}
 
       - uses: actions/upload-artifact@v4
@@ -71,4 +72,3 @@ jobs:
         with:
           service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
           api-key: ${{ secrets.MY_RENDER_API_KEY }}
-
