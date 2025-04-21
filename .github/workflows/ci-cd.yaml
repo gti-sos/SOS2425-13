@@ -10,22 +10,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Solución para el error de Rollup
+      - name: Fix npm dependencies issue
+        run: |
+          cd front
+          rm -rf node_modules package-lock.json
+          cd ..
+
       - name: Install backend dependencies
         run: npm install
 
-      - name: Build front
-        run: npm run build
+      - name: Install and build frontend
+        run: |
+          cd front
+          npm install --no-package-lock
+          npm run build
+          cd ..
+          
       - name: Run tests
         run: npm test
+        
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+        
       - name: Run server for e2e tests
         run: npm run start &
     
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          # Usar el puerto detectado dinámicamente
           PLAYWRIGHT_TEST_BASE_URL: http://localhost:${{ env.SERVER_PORT }}
 
       - uses: actions/upload-artifact@v4
@@ -40,5 +58,3 @@ jobs:
         with:
           service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
           api-key: ${{ secrets.MY_RENDER_API_KEY }}
-      
-
