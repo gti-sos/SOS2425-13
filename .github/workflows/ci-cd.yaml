@@ -47,7 +47,7 @@ jobs:
           echo "SERVER_PORT=$SERVER_PORT" >> $GITHUB_ENV
           
           # Verificar que el servidor responde en el puerto correcto
-          npx wait-on http://localhost:$SERVER_PORT -t 5173
+          npx wait-on http://localhost:$SERVER_PORT -t 30000
 
       - name: Install Playwright dependencies
         run: |
