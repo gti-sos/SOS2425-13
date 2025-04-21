@@ -167,18 +167,36 @@ test('Formulario de filtrado avanzado aparece al hacer clic en botón', async ({
 });
 
 // Test para comprobar la paginación
+// Test para comprobar la paginación
 test('Controles de paginación visibles y funcionales', async ({ page }) => {
   await page.goto('/national-parks');
+  
+  // Esperar a que la página se cargue completamente
+  await page.waitForLoadState('networkidle');
+  
+  // Verificar si hay datos en la tabla
+  const initialRowCount = await page.locator('table tbody tr').count();
+  
+  // Cargar datos iniciales si la tabla está vacía
+  if (initialRowCount === 0) {
+    // Cargar datos iniciales
+    const loadButton = page.getByRole('button', { name: '💾 Cargar datos iniciales' });
+    await expect(loadButton).toBeVisible({ timeout: 5000 });
+    await loadButton.click();
+    
+    // Esperar a que la tabla se actualice con los datos
+    await page.waitForSelector('table tbody tr', { timeout: 15000 });
+  }
 
   // Verificar que los elementos de paginación están presentes
-  await expect(page.getByText('Elementos por página:')).toBeVisible();
-  await expect(page.getByRole('button', { name: '5' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '⬅️ Anterior' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '1' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Siguiente ➡️' })).toBeVisible();
+  await expect(page.getByText('Elementos por página:')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('button', { name: '5' })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole('button', { name: '⬅️ Anterior' })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole('button', { name: '1' })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole('button', { name: 'Siguiente ➡️' })).toBeVisible({ timeout: 5000 });
 
   // Verificar que muestra correctamente el rango de elementos
-  await expect(page.getByText(/Mostrando \d+ a \d+ de \d+ parques/)).toBeVisible();
+  await expect(page.getByText(/Mostrando \d+ a \d+ de \d+ parques/)).toBeVisible({ timeout: 5000 });
 
   // Probar navegación a otra página
   await page.getByRole('button', { name: '2' }).click();
