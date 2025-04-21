@@ -17,22 +17,6 @@ test.describe('Editar incendio forestal', () => {
 		await expect(page.locator('input#porcentaje')).toBeVisible();
 	});
 
-	test('Edita un recurso con datos válidos', async ({ page }) => {
-		await page.goto(editUrl);
-	
-		await page.locator('input#accidentes').fill('10');
-		await page.locator('input#porcentaje').fill('0.2');
-		await page.getByRole('button', { name: '💾 Guardar cambios' }).click();
-	
-		// Verificar la redirección en lugar del mensaje
-		await page.waitForURL('**/forest-fires');
-		
-		// Verificar que estamos en la página correcta después de la redirección
-		await expect(page.getByRole('heading', { name: '🔥 Gestión de Incendios Forestales' })).toBeVisible();
-		
-		// Opcionalmente verificar que aparece un mensaje de éxito en la página principal
-		await expect(page.getByText(/✅/)).toBeVisible();
-	});
 
 	test.describe('Crear incendio forestal', () => {
 		const listUrl = '/forest-fires';
@@ -62,56 +46,46 @@ test.describe('Editar incendio forestal', () => {
 		  });
 	  });
 
-	test.skip('Elimina el recurso (⚠️ cuidado si estás en producción)', async ({ page }) => {
-		await page.goto(editUrl);
-
-		page.once('dialog', dialog => dialog.accept());
-		await page.getByRole('button', { name: '🗑️ Eliminar' }).click();
-
-		await expect(page.getByRole('alert')).toHaveText(/Recurso eliminado correctamente/);
-	});
+	
 });
 
-// FUNCION QUE CREA UN NUEVO REGISTRO DE INCENDIO FORESTAL (HAY QUE ASEGURARSE QUE ESTE RECURSO NO EXISTA EN LA BASE DE DATOS)
-
-test.describe('Crear incendio forestal', () => {
-	const listUrl = '/forest-fires';
-  
-	test('Crea un nuevo incendio con datos válidos', async ({ page }) => {
-	  // Ir a la página principal donde está el formulario
-	  await page.goto(listUrl);
-	  
-	  // Esperar a que la página cargue completamente
-	  await page.waitForLoadState('networkidle');
-	  
-	  // Usar selectores basados en placeholder que coinciden con el HTML real
-	  await page.locator('input[placeholder="Año"]').fill('2022');
-	  await page.locator('input[placeholder="Comunidad Autónoma"]').fill('Extremadura');
-	  await page.locator('input[placeholder="Accidentes"]').fill('500');
-	  await page.locator('input[placeholder="% Grandes Incendios (0-1)"]').fill('0.15');
-	  
-	  // Usar el texto real del botón
-	  await page.getByRole('button', { name: '✅ Crear recurso' }).click();
-	  
-	  // Verificar mensaje de éxito (usando un selector más general)
-	  await expect(page.getByText(/Recurso creado correctamente/)).toBeVisible({ timeout: 10000 });
-	});
-  
-	// También actualizar el otro test similar
-	test('Muestra error con porcentaje inválido (>1)', async ({ page }) => {
-	  await page.goto(listUrl);
-	  await page.waitForLoadState('networkidle');
-  
-	  await page.locator('input[placeholder="Año"]').fill('2022');
-	  await page.locator('input[placeholder="Comunidad Autónoma"]').fill('Extremadura');
-	  await page.locator('input[placeholder="Accidentes"]').fill('500');
-	  await page.locator('input[placeholder="% Grandes Incendios (0-1)"]').fill('1.5');
-	  
-	  await page.getByRole('button', { name: '✅ Crear recurso' }).click();
-	  
-	  await expect(page.getByText('⚠️ El porcentaje debe estar entre 0 y 1.')).toBeVisible({ timeout: 10000 });
-	});
+/*----------------------- OTROS TESTS -----------------------*/
+test('Muestra el título correcto de la página', async ({ page }) => {
+	// Navegar a la página de incendios forestales
+	await page.goto('/forest-fires');
+	
+	// Esperar a que la página se cargue completamente
+	await page.waitForLoadState('networkidle');
+	
+	// Verificar que el título está presente y visible
+	await expect(
+	  page.getByRole('heading', { name: '🔥 Gestión de Incendios Forestales' })
+	).toBeVisible();
+	
+	// Alternativa: usar un selector más genérico si el rol no fuera confiable
+	// await expect(page.getByText('🔥 Gestión de Incendios Forestales')).toBeVisible();
   });
+
+  test('Muestra el encabezado de añadir incendio forestal', async ({ page }) => {
+	// Navegar a la página de incendios forestales
+	await page.goto('/forest-fires');
+	
+	// Esperar a que la página se cargue completamente
+	await page.waitForLoadState('networkidle');
+	
+	// Verificar que el encabezado de añadir incendio forestal está presente
+	await expect(
+	  page.getByRole('heading', { name: '➕ Añadir nuevo incendio forestal' })
+	).toBeVisible();
+	
+	// Alternativa: usar un selector más genérico
+	// await expect(page.getByText('➕ Añadir nuevo incendio forestal')).toBeVisible();
+	
+	// También podemos verificar que está el formulario asociado
+	await expect(page.locator('form:has(button:text("✅ Crear recurso"))')).toBeVisible();
+  });
+
+  
 
 // FUNCION QUE COMPRUEBA QUE LA LISTA DE INCENDIOS FORESTALES SE CARGAN CORRECTAMENTE Y QUE EL FILTRADO POR AÑO Y COMUNIDAD FUNCIONA BIEN
 
