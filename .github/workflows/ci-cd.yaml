@@ -13,49 +13,15 @@ jobs:
       - name: Install backend dependencies
         run: npm install
 
-      - name: Install frontend dependencies
-        run: cd front && npm install
-
-      - name: Fix npm dependencies issue
-        run: |
-          cd front
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm 
-          
-      - name: Build frontend
-        run: cd front && npm run build
-        
-        
-      - name: Check handler.js exists
-        run: test -f front/build/handler.js
-
-      - name: Run backend tests
+      - name: Build front
+        run: npm run build
+      - name: Run tests
         run: npm test
-
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Run server for e2e tests
-        run: |
-          # Obtener el puerto dinámicamente
-          export SERVER_PORT=$(node -e "console.log(process.env.PORT || 16078)")
-          
-          # Iniciar el servidor
-          npm run start &
-          
-          # Esperar a que el servidor esté listo
-          echo "Esperando que el servidor inicie en puerto $SERVER_PORT..."
-          sleep 10
-          
-          # Guardar el puerto para usarlo en los siguientes pasos
-          echo "SERVER_PORT=$SERVER_PORT" >> $GITHUB_ENV
-          
-          # Verificar que el servidor responde en el puerto correcto
-          npx wait-on http://localhost:$SERVER_PORT -t 30000
-
-      - name: Install Playwright dependencies
-        run: |
-          npx playwright install --with-deps
-          npm install -g wait-on
-
+        run: npm run start &
+    
       - name: Run Playwright tests
         run: npx playwright test
         env:
