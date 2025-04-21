@@ -11,7 +11,10 @@ test.describe('Editar incendio forestal', () => {
 
 	test('Carga la vista de edición correctamente', async ({ page }) => {
 		await page.goto(editUrl);
+		let url = await page.url();
 
+		console.log(`URL: ${url}`);
+		
 		await expect(page.getByText(`Editar incendio: ${autonomous_community} - ${year}`)).toBeVisible();
 		await expect(page.locator('input#accidentes')).toBeVisible();
 		await expect(page.locator('input#porcentaje')).toBeVisible();
@@ -24,7 +27,9 @@ test.describe('Editar incendio forestal', () => {
 		test('Muestra error con porcentaje inválido (>1)', async ({ page }) => {
 			await page.goto(listUrl);
 			await page.waitForLoadState('networkidle');
-			
+			let url = await page.url();
+
+			console.log(`URL: ${url}`)
 			// Desactivar la validación nativa del formulario
 			await page.evaluate(() => {
 			  const form = document.querySelector('form:has(button[type="submit"])');
@@ -53,7 +58,9 @@ test.describe('Editar incendio forestal', () => {
 test('Muestra el título correcto de la página', async ({ page }) => {
 	// Navegar a la página de incendios forestales
 	await page.goto('/forest-fires');
-	
+	let url = await page.url();
+
+	console.log(`URL: ${url}`)
 	// Esperar a que la página se cargue completamente
 	await page.waitForLoadState('networkidle');
 	
@@ -69,7 +76,9 @@ test('Muestra el título correcto de la página', async ({ page }) => {
   test('Muestra el encabezado de añadir incendio forestal', async ({ page }) => {
 	// Navegar a la página de incendios forestales
 	await page.goto('/forest-fires');
-	
+	let url = await page.url();
+
+	console.log(`URL: ${url}`)
 	// Esperar a que la página se cargue completamente
 	await page.waitForLoadState('networkidle');
 	
@@ -96,7 +105,9 @@ test.describe('Listado de incendios forestales', () => {
 
 	test('Carga correctamente la lista de incendios', async ({ page }) => {
 		await page.goto(listUrl);
-		
+		let url = await page.url();
+
+		console.log(`URL: ${url}`)
 		// Esperar a que la página se cargue completamente
 		await page.waitForLoadState('networkidle');
 	
@@ -108,7 +119,9 @@ test.describe('Listado de incendios forestales', () => {
 	});
 	test('Filtra los incendios por año y comunidad', async ({ page }) => {
 		await page.goto(listUrl);
-		
+		let url = await page.url();
+
+		console.log(`URL: ${url}`)
 		// Cargar datos iniciales primero para asegurar que hay datos
 		await page.getByRole('button', { name: '📋 Cargar datos iniciales' }).click();
 		await page.waitForTimeout(1000); // Esperar que carguen los datos
