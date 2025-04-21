@@ -10,7 +10,11 @@ import { defineConfig, devices } from '@playwright/test';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // Usar la variable de entorno o un valor predeterminado
+<<<<<<< HEAD
 const baseURL =  process.env.PLAYWRIGHT_TEST_BASE_URL ||'http://localhost:16078';
+=======
+const baseURL =  'http://localhost:5173';
+>>>>>>> 056febb886e3be5e244279783103683387e95e44
 
 /**
  * @see https://playwright.dev/docs/test-configuration
