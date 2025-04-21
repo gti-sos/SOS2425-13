@@ -1,8 +1,13 @@
 <script>
-	import { page } from '$app/stores';
+	//@ts-nocheck
+	//@ts-ignore
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import 'bootstrap/dist/css/bootstrap.min.css';
+	import { Button, Table, Alert } from '@sveltestrap/sveltestrap';
+	import { dev } from '$app/environment'; // Importing the dev variable to check the environment
+	import { page } from '$app/stores'; // Importing the page store to access route parameters
+	import { goto } from '$app/navigation'; // Importing goto for navigation
+	
+	const BASE_URL = dev ? 'http://localhost:16078' : 'https://sos2425-13.onrender.com';
 
 	let year, autonomous_community;
 	let number_of_accidents = '';
@@ -14,102 +19,113 @@
 	$: ({ year, autonomous_community } = $page.params);
 
 	const cargarDato = async () => {
-		cargando = true;
-		try {
-			const res = await fetch(`/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`);
-			const data = await res.json();
+  cargando = true;
+  try {
+    // Use the base URL in dev environment
+    const apiUrl = dev 
+      ? `${BASE_URL}/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`
+      : `/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`;
+    
+    const res = await fetch(apiUrl);
+    const data = await res.json();
 
-			if (res.ok) {
-				number_of_accidents = data.number_of_accidents;
-				percentage_of_large_fires = data.percentage_of_large_fires;
-				mensaje = '';
-				error = '';
-			} else {
-				error = data.message || '❌ No se pudo encontrar el recurso.';
-			}
-		} catch (e) {
-			error = '❌ Error al conectar con el servidor.';
-		} finally {
-			cargando = false;
-		}
-	};
+    if (res.ok) {
+      number_of_accidents = data.number_of_accidents;
+      percentage_of_large_fires = data.percentage_of_large_fires;
+      mensaje = '';
+      error = '';
+    } else {
+      error = data.message || '❌ No se pudo encontrar el recurso.';
+    }
+  } catch (e) {
+    error = '❌ Error al conectar con el servidor.';
+  } finally {
+    cargando = false;
+  }
+};
 
-	const guardarCambios = async () => {
-		error = '';
-		mensaje = '';
+const guardarCambios = async () => {
+    error = '';
+    mensaje = '';
 
-		const accidentes = parseInt(number_of_accidents);
-		const porcentaje = parseFloat(percentage_of_large_fires);
+    const accidentes = parseInt(number_of_accidents);
+    const porcentaje = parseFloat(percentage_of_large_fires);
 
-		if (
-			isNaN(accidentes) ||
-			isNaN(porcentaje) ||
-			porcentaje < 0 ||
-			porcentaje > 1
-		) {
-			error = '❌ Asegúrate de que los datos son numéricos y el porcentaje está entre 0 y 1.';
-			return;
-		}
+    if (isNaN(accidentes) || isNaN(porcentaje) || porcentaje < 0 || porcentaje > 1) {
+        error = '❌ Asegúrate de que los datos son numéricos y el porcentaje está entre 0 y 1.';
+        return;
+    }
 
-		cargando = true;
+    cargando = true;
 
-		try {
-			const res = await fetch(`/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					year: parseInt(year),
-					autonomous_community,
-					number_of_accidents: accidentes,
-					percentage_of_large_fires: porcentaje
-				})
-			});
+    try {
+        // URL con BASE_URL para desarrollo
+        const apiUrl = dev 
+            ? `${BASE_URL}/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`
+            : `/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`;
+        
+        const res = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                year: parseInt(year),
+                autonomous_community,
+                number_of_accidents: accidentes,
+                percentage_of_large_fires: porcentaje
+            })
+        });
 
-			const data = await res.json();
+        const data = await res.json();
 
-			if (res.ok) {
-				mensaje = '✅ Cambios guardados correctamente.';
-				setTimeout(() => goto('/forest-fires'), 1000);
-			} else if (res.status === 409) {
-				error = '❌ No se puede cambiar el año o la comunidad. Son datos únicos.';
-			} else if (res.status === 404) {
-				error = `❌ No existe un incendio registrado para "${autonomous_community}" en ${year}.`;
-			} else if (res.status === 400) {
-				error = '❌ Faltan campos o hay datos inválidos.';
-			} else {
-				error = '❌ Error desconocido al guardar los cambios.';
-			}
-		} catch (e) {
-			error = '❌ Error al conectar con el servidor.';
-		} finally {
-			cargando = false;
-		}
-	};
+        if (res.ok) {
+            mensaje = '✅ Cambios guardados correctamente.';
+            setTimeout(() => goto('/forest-fires'), 10000);
+        } else if (res.status === 409) {
+            error = '❌ No se puede cambiar el año o la comunidad. Son datos únicos.';
+        } else if (res.status === 404) {
+            error = `❌ No existe un incendio registrado para "${autonomous_community}" en ${year}.`;
+        } else if (res.status === 400) {
+            error = '❌ Faltan campos o hay datos inválidos.';
+        } else {
+            error = '❌ Error desconocido al guardar los cambios.';
+        }
+    } catch (e) {
+        error = '❌ Error al conectar con el servidor.';
+    } finally {
+        cargando = false;
+    }
+};
 
-	const eliminarRecurso = async () => {
-		if (!confirm(`¿Estás seguro de eliminar el incendio de ${autonomous_community} en ${year}?`)) return;
+const eliminarRecurso = async () => {
+    if (!confirm(`¿Estás seguro de eliminar el incendio de ${autonomous_community} en ${year}?`))
+        return;
 
-		cargando = true;
+    cargando = true;
 
-		try {
-			const res = await fetch(`/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`, {
-				method: 'DELETE'
-			});
+    try {
+        // URL con BASE_URL para desarrollo
+        const apiUrl = dev 
+            ? `${BASE_URL}/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`
+            : `/api/v1/forest-fires/${year}/${encodeURIComponent(autonomous_community)}`;
+        
+        const res = await fetch(apiUrl, {
+            method: 'DELETE'
+        });
 
-			const data = await res.json();
+        const data = await res.json();
 
-			if (res.ok) {
-				mensaje = data.message || '✅ Recurso eliminado correctamente.';
-				setTimeout(() => goto('/forest-fires'), 1000);
-			} else {
-				error = data.error || '❌ Error al eliminar el recurso.';
-			}
-		} catch (e) {
-			error = '❌ Error al conectar con el servidor.';
-		} finally {
-			cargando = false;
-		}
-	};
+        if (res.ok) {
+            mensaje = data.message || '✅ Recurso eliminado correctamente.';
+            setTimeout(() => goto('/forest-fires'), 1000);
+        } else {
+            error = data.error || '❌ Error al eliminar el recurso.';
+        }
+    } catch (e) {
+        error = '❌ Error al conectar con el servidor.';
+    } finally {
+        cargando = false;
+    }
+};
 
 	onMount(cargarDato);
 </script>
