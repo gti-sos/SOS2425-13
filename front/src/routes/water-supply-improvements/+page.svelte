@@ -2,393 +2,367 @@
 	import { onMount } from 'svelte';
 	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import 'bootstrap/dist/css/bootstrap.min.css';
 	import { messageStore } from '$lib/stores/messageStore';
-
+  
 	interface Datos {
-		year: number;
-		autonomous_community: string;
-		amount: number;
-		benefited_population: number;
-		project_count: number;
+	  year: number;
+	  autonomous_community: string;
+	  amount: number;
+	  benefited_population: number;
+	  project_count: number;
 	}
-
-	let Datos: Datos[] = [];
+  
+	let datos: Datos[] = [];
 	let mensaje = '';
-	let tipoMensaje = 'primary';
+	let tipoMensaje: string = 'primary';
 	let limit = 10;
 	let offset = 0;
 	const BASE_URL = dev ? 'http://localhost:16078' : 'https://sos2425-13.onrender.com';
-
 	const API = `${BASE_URL}/api/v1/water-supply-improvements`;
-
+  
+	let filtrosAplicados = '';
 	let query = `?limit=${limit}&offset=${offset}`;
-
-	// Formulario de creación
+  
+	// Campos de formulario y búsqueda
 	let year = '';
 	let comunidad = '';
 	let cantidad = '';
 	let poblacion = '';
 	let proyectos = '';
-
-	// Búsqueda
+  
 	let busquedaYear = '';
 	let busquedaComunidad = '';
 	let busquedaCantidad = '';
 	let busquedaPoblacion = '';
 	let busquedaProyectos = '';
+  
 	let desde = '';
 	let hasta = '';
-
-	// Modo de edición
+  
 	let editMode = false;
 	let currentEdit: Datos | null = null;
-
+  
 	onMount(() => {
-		const unsubscribe = messageStore.subscribe((value) => {
-			if (value) {
-				mensaje = value.message;
-				tipoMensaje = value.type;
-
-				// Limpiar el mensaje después de mostrarlo
-				setTimeout(() => {
-					mensaje = '';
-					messageStore.set(null);
-				}, 1000);
-			}
-		});
-		// Obtener datos iniciales al montar el componente
-		obtenerDatos();
-
-		// Limpiar la suscripción al desmontar el componente
-		return () => unsubscribe();
+	  const unsubscribe = messageStore.subscribe(value => {
+		if (value) {
+		  mensaje = value.message;
+		  tipoMensaje = value.type;
+		  setTimeout(() => {
+			mensaje = '';
+			messageStore.set(null);
+		  }, 3000);
+		}
+	  });
+	  obtenerDatos();
+	  return () => unsubscribe();
 	});
-
+  
 	async function obtenerDatos() {
-		try {
-			console.log('Llamando a la API:', API + query);
-			const res = await fetch(API + query);
-			console.log('Respuesta de la API:', res);
-
-			if (!res.ok) {
-				const errorData = await res.json();
-				throw new Error(errorData.error || 'Error al obtener los datos.');
-			}
-
-			Datos = await res.json();
-			console.log('Datos obtenidos:', Datos);
-		} catch (error) {
-			console.error('Error al obtener los datos:', error);
-			mensaje =
-				error instanceof Error ? error.message : '❌ No existen datos, cargue los iniciales';
-			tipoMensaje = 'danger';
+	  try {
+		const res = await fetch(API + query);
+		if (!res.ok) {
+		  const err = await res.json();
+		  throw new Error(err.error || 'Error al obtener datos');
 		}
+		datos = await res.json();
+	  } catch (err) {
+		mensaje = err instanceof Error ? err.message : 'Error desconocido';
+		tipoMensaje = 'danger';
+	  }
 	}
-
-	function mostrarMensaje(texto: string, tipo: string = 'info') {
-		mensaje = texto;
-		tipoMensaje = tipo;
-		setTimeout(() => (mensaje = ''), 10000);
+  
+	function mostrarMensaje(texto: string, tipo: typeof tipoMensaje = 'info') {
+	  mensaje = texto;
+	  tipoMensaje = tipo;
+	  setTimeout(() => (mensaje = ''), 4000);
 	}
-
+  
 	async function cargarIniciales() {
-		try {
-			const res = await fetch(API + '/loadInitialData');
-			if (!res.ok) throw new Error();
-			mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
-			obtenerDatos();
-		} catch {
-			mostrarMensaje('✅ Ya existen datos.', 'danger');
-		}
+	  try {
+		const res = await fetch(API + '/loadInitialData');
+		if (!res.ok) throw new Error();
+		mostrarMensaje('✅ Datos iniciales cargados', 'success');
+		await obtenerDatos();
+	  } catch {
+		mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
+	  }
 	}
-
-	async function crear() {
-		try {
-			const nuevoRecurso = {
-				year: parseInt(year),
-				autonomous_community: comunidad,
-				amount: parseFloat(cantidad),
-				benefited_population: parseInt(poblacion),
-				project_count: parseInt(proyectos)
-			};
-
-			const res = await fetch(API, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(nuevoRecurso)
-			});
-
-			if (res.status === 201) {
-				mostrarMensaje('✅ Recurso creado correctamente', 'success');
-				limpiarFormulario();
-
-				// Agregar el nuevo recurso al principio de la lista
-				Datos = [nuevoRecurso, ...Datos];
-			} else if (res.status === 409) {
-				mostrarMensaje('❌ Ya existe un recurso con ese año y comunidad.', 'warning');
-			} else if (res.status === 400) {
-				mostrarMensaje('❌ Por favor, completa todos los campos correctamente.', 'warning');
-			} else {
-				const errorData = await res.json();
-				throw new Error(errorData.error || '❌ Error al crear el recurso.');
-			}
-		} catch (error) {
-			mostrarMensaje(
-				error instanceof Error ? error.message : '❌ Error al crear el recurso.',
-				'danger'
-			);
-		}
-	}
-
+  
 	function limpiarFormulario() {
-		year = comunidad = cantidad = poblacion = proyectos = '';
+	  year = comunidad = cantidad = poblacion = proyectos = '';
 	}
-
+  
+	async function crear() {
+	  try {
+		const nuevo: Datos = {
+		  year: +year,
+		  autonomous_community: comunidad,
+		  amount: +cantidad,
+		  benefited_population: +poblacion,
+		  project_count: +proyectos
+		};
+		const res = await fetch(API, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify(nuevo)
+		});
+		if (res.status === 201) {
+		  mostrarMensaje('✅ Recurso creado', 'success');
+		  datos = [nuevo, ...datos];
+		  limpiarFormulario();
+		} else if (res.status === 409) mostrarMensaje('⚠️ Recurso ya existe', 'warning');
+		else if (res.status === 400) mostrarMensaje('⚠️ Campos incompletos', 'warning');
+		else {
+		  const err = await res.json();
+		  throw new Error(err.error);
+		}
+	  } catch (e) {
+		mostrarMensaje(e instanceof Error ? e.message : 'Error al crear', 'danger');
+	  }
+	}
+  
 	async function eliminarTodo() {
-		try {
-			const res = await fetch(API, { method: 'DELETE' });
-			if (!res.ok) {
-				const errorData = await res.json();
-				throw new Error(errorData.error || '❌ No se pudieron eliminar los datos.');
-			}
-			Datos = [];
-			mostrarMensaje('✅ Todos los datos fueron eliminados.', 'success');
-		} catch (error) {
-			mostrarMensaje(
-				error instanceof Error ? error.message : '❌ No se pudieron eliminar los datos.',
-				'danger'
-			);
+	  try {
+		const res = await fetch(API, { method: 'DELETE' });
+		if (!res.ok) {
+		  const err = await res.json();
+		  throw new Error(err.error);
 		}
+		datos = [];
+		mostrarMensaje('🗑️ Todos los datos eliminados', 'success');
+	  } catch (e) {
+		mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
+	  }
 	}
-
-	async function buscarIntervalo() {
-    try {
-        // Construir la consulta con los valores de "desde" y "hasta"
-        let filtros = [];
-        if (desde) filtros.push(`from=${desde}`);
-        if (hasta) filtros.push(`to=${hasta}`);
-
-        // Actualizar la consulta con paginación
-        filtrosAplicados = filtros.length ? '&' + filtros.join('&') : '';
-        offset = 0; // Reinicia el offset al aplicar un filtro
-        query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
-
-        // Llamar a la API con la nueva consulta
-        await obtenerDatos();
-        mostrarMensaje('✅ Resultados del intervalo obtenidos', 'info');
-    } catch (error) {
-        mostrarMensaje('❌ No se encontraron resultados para ese intervalo', 'warning');
-    }
-}
-
-	let filtrosAplicados = '';
-	async function buscar() {
-		let filtros = [];
-		if (busquedaYear) filtros.push(`year=${busquedaYear}`);
-		if (busquedaComunidad) filtros.push(`autonomous_community=${busquedaComunidad}`);
-		if (busquedaCantidad) filtros.push(`amount=${busquedaCantidad}`);
-		if (busquedaPoblacion) filtros.push(`benefited_population=${busquedaPoblacion}`);
-		if (busquedaProyectos) filtros.push(`project_count=${busquedaProyectos}`);
-
-		filtrosAplicados = filtros.length ? '&' + filtros.join('&') : '';
-		offset = 0; // Reinicia el offset al aplicar un filtro
-		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
-		obtenerDatos();
+  
+	function aplicarPaginacion() {
+	  query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
 	}
-
-	function siguientePagina() {
-		offset += limit;
-		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
-		obtenerDatos();
-	}
-
+  
 	function paginaAnterior() {
-		if (offset - limit >= 0) {
-			offset -= limit;
-			query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
-			obtenerDatos();
-		} else {
-			mostrarMensaje('Ya estás en la primera página', 'warning');
-		}
+	  if (offset >= limit) {
+		offset -= limit;
+		aplicarPaginacion();
+		obtenerDatos();
+	  } else mostrarMensaje('⚠️ Primera página', 'warning');
 	}
-
-	function editarRecurso(recurso: Datos) {
-		currentEdit = { ...recurso };
-		editMode = true;
-
-		// Redirigir al recurso seleccionado
-		const recursoUrl = `/water-supply-improvements/${recurso.year}/${recurso.autonomous_community}`;
-		goto(recursoUrl);
+  
+	function siguientePagina() {
+	  offset += limit;
+	  aplicarPaginacion();
+	  obtenerDatos();
 	}
-
+  
+	function buildFilters() {
+	  const f: string[] = [];
+	  if (busquedaYear) f.push(`year=${busquedaYear}`);
+	  if (busquedaComunidad) f.push(`autonomous_community=${busquedaComunidad}`);
+	  if (busquedaCantidad) f.push(`amount=${busquedaCantidad}`);
+	  if (busquedaPoblacion) f.push(`benefited_population=${busquedaPoblacion}`);
+	  if (busquedaProyectos) f.push(`project_count=${busquedaProyectos}`);
+	  filtrosAplicados = f.length ? '&' + f.join('&') : '';
+	  offset = 0;
+	  aplicarPaginacion();
+	  obtenerDatos();
+	}
+  
+	function buscarIntervalo() {
+	  const f: string[] = [];
+	  if (desde) f.push(`from=${desde}`);
+	  if (hasta) f.push(`to=${hasta}`);
+	  filtrosAplicados = f.length ? '&' + f.join('&') : '';
+	  offset = 0;
+	  aplicarPaginacion();
+	  obtenerDatos();
+	  mostrarMensaje('🕒 Intervalo aplicado', 'info');
+	}
+  
+	function editarRecurso(r: Datos) {
+	  currentEdit = { ...r };
+	  editMode = true;
+	  goto(`/water-supply-improvements/${r.year}/${encodeURIComponent(r.autonomous_community)}`);
+	}
+  
 	async function actualizarRecurso() {
-		try {
-			if (!currentEdit) {
-				mostrarMensaje('❌ No hay recurso seleccionado para actualizar.', 'danger');
-				return;
-			}
-			const res = await fetch(API + `/${currentEdit.year}/${currentEdit.autonomous_community}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					year: currentEdit.year,
-					autonomous_community: currentEdit.autonomous_community,
-					amount: currentEdit.amount,
-					benefited_population: currentEdit.benefited_population,
-					project_count: currentEdit.project_count
-				})
-			});
-
-			if (res.ok) {
-				mostrarMensaje('✅ Recurso actualizado correctamente', 'success');
-				editMode = false;
-				obtenerDatos();
-			} else if (res.status === 409) {
-				mostrarMensaje(
-					'❌ Ya existe otro recurso con esos datos. No se puede modificar.',
-					'warning'
-				);
-			} else if (res.status === 400) {
-				mostrarMensaje('❌ Datos incompletos o no válidos. Revisa los campos.', 'warning');
-			} else {
-				throw new Error();
-			}
-		} catch {
-			mostrarMensaje('❌ Error al intentar actualizar el recurso.', 'danger');
+	  if (!currentEdit) return mostrarMensaje('⚠️ Ningún recurso seleccionado', 'danger');
+	  try {
+		const res = await fetch(
+		  `${API}/${currentEdit.year}/${encodeURIComponent(currentEdit.autonomous_community)}`,
+		  { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(currentEdit) }
+		);
+		if (res.ok) {
+		  mostrarMensaje('✅ Recurso actualizado', 'success');
+		  editMode = false;
+		  obtenerDatos();
+		} else if (res.status === 409) mostrarMensaje('⚠️ Conflicto de datos', 'warning');
+		else if (res.status === 400) mostrarMensaje('⚠️ Datos inválidos', 'warning');
+		else throw new Error();
+	  } catch {
+		mostrarMensaje('Error al actualizar', 'danger');
+	  }
+	}
+  
+	async function eliminarRecurso(r: Datos) {
+	  try {
+		const res = await fetch(
+		  `${API}/${r.year}/${encodeURIComponent(r.autonomous_community)}`,
+		  { method: 'DELETE' }
+		);
+		if (res.ok) {
+		  datos = datos.filter(d => d.year !== r.year || d.autonomous_community !== r.autonomous_community);
+		  mostrarMensaje('🗑️ Recurso eliminado', 'success');
+		} else {
+		  const err = await res.json();
+		  throw new Error(err.error);
 		}
+	  } catch (e) {
+		mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
+	  }
 	}
-
-	async function eliminarRecurso(recurso: Datos) {
-    try {
-        const res = await fetch(
-            `${API}/${recurso.year}/${encodeURIComponent(recurso.autonomous_community)}`,
-            {
-                method: 'DELETE'
-            }
-        );
-
-        if (res.ok) {
-            mostrarMensaje('✅ Recurso eliminado correctamente.', 'success');
-            // Actualizar la lista de datos eliminando el recurso
-            Datos = Datos.filter(
-                (d) =>
-                    d.year !== recurso.year ||
-                    d.autonomous_community !== recurso.autonomous_community
-            );
-        } else {
-            const errorData = await res.json();
-            throw new Error(errorData.error || '❌ No se pudo eliminar el recurso.');
-        }
-    } catch (error) {
-        mostrarMensaje(
-            error instanceof Error ? error.message : '❌ Error al eliminar el recurso.',
-            'danger'
-        );
-    }
-}
-
+  
 	function cancelarEdicion() {
-		editMode = false;
-		currentEdit = null;
+	  editMode = false;
+	  currentEdit = null;
 	}
-</script>
-
-<main class="container my-4">
+  </script>
+  
+  <svelte:head>
+	<title>Gestión de Recursos de Abastecimiento de Agua</title>
+  </svelte:head>
+  
+  <style>
+	:root {
+	  --primary: #0056b3;
+	  --secondary: #6c757d;
+	  --bg: #f5f5f5;
+	  --card-bg: #ffffff;
+	  --border: #dee2e6;
+	  --radius: 6px;
+	  --shadow: rgba(0,0,0,0.08);
+	  --font: 'Roboto', sans-serif;
+	}
+	body { font-family: var(--font); background: var(--bg); color: #212529; }
+	.container { max-width: 900px; margin: 2rem auto; padding: 1.5rem; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 4px 12px var(--shadow); }
+	h1 { font-size: 1.75rem; margin-bottom: 1rem; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; }
+	h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--secondary); }
+	.flex { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+	.section { margin-bottom: 1.5rem; }
+	.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; box-shadow: 0 2px 6px var(--shadow); }
+	.table-wrapper { overflow-x: auto; margin-top: 1rem; }
+	table { width: 100%; border-collapse: collapse; }
+	th, td { padding: 0.75rem 0.5rem; border: 1px solid var(--border); }
+	th { background: var(--bg); position: sticky; top: 0; }
+	tr:nth-child(even) { background: #fafafa; }
+	tr:hover { background: #f1f1f1; }
+	input { flex: 1; min-width: 120px; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius); }
+	.btn { padding: 0.5rem 1rem; border: none; border-radius: var(--radius); cursor: pointer; transition: transform 0.1s ease; }
+	.btn:hover { transform: translateY(-1px); }
+	.btn:active { transform: translateY(0); }
+	.btn-primary { background: var(--primary); color: white; }
+	.btn-success { background: #28a745; color: white; }
+	.btn-info { background: #17a2b8; color: white; }
+	.btn-warning { background: #ffc107; color: #212529; }
+	.btn-danger { background: #dc3545; color: white; }
+	.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+	.btn-sm { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+	.alert { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-weight: 500; }
+	.alert-primary { background: rgba(0,86,179,0.1); color: var(--primary); }
+	.alert-success { background: rgba(40,167,69,0.1); color: #28a745; }
+	.alert-info { background: rgba(23,162,184,0.1); color: #17a2b8; }
+	.alert-warning { background: rgba(255,193,7,0.1); color: #856404; }
+	.alert-danger { background: rgba(220,53,69,0.1); color: #dc3545; }
+	@media(max-width:600px) { .flex { flex-direction: column; } }
+  </style>
+  
+  <main class="container">
 	{#if mensaje}
-		<div class="alert alert-{tipoMensaje}" role="alert">{mensaje}</div>
+	  <div class="alert alert-{tipoMensaje}">{mensaje}</div>
 	{/if}
-
-	<h1 class="mb-4">Gestión de Recursos de Abastecimiento de Agua</h1>
-
-	<div class="d-flex gap-3 mb-2">
+  
+	<h1>Gestión de Recursos de Abastecimiento de Agua</h1>
+  
+	<div class="section card">
+	  <div class="flex">
 		<button class="btn btn-info" on:click={cargarIniciales}>Cargar datos iniciales</button>
 		<button class="btn btn-danger" on:click={eliminarTodo}>Eliminar todo</button>
+	  </div>
 	</div>
-
-	<h5>Búsqueda por intervalo de años</h5>
-	<div class="row mb-3">
-		<div class="col"><input class="form-control" placeholder="Desde" bind:value={desde} /></div>
-		<div class="col"><input class="form-control" placeholder="Hasta" bind:value={hasta} /></div>
-		<div class="col">
-			<button class="btn btn-primary w-100" on:click={buscarIntervalo}>Buscar</button>
-		</div>
+  
+	<div class="section card">
+	  <h3>Búsqueda por intervalo de años</h3>
+	  <div class="flex">
+		<input type="number" placeholder="Desde" bind:value={desde} />
+		<input type="number" placeholder="Hasta" bind:value={hasta} />
+		<button class="btn btn-primary" on:click={buscarIntervalo}>Buscar</button>
+	  </div>
 	</div>
-
-	<h5>Filtrado por campos</h5>
-	<div class="row g-2 mb-4">
-		<div class="col">
-			<input class="form-control" placeholder="Año" bind:value={busquedaYear} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Comunidad Autónoma" bind:value={busquedaComunidad} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Cantidad" bind:value={busquedaCantidad} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Población" bind:value={busquedaPoblacion} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Proyectos" bind:value={busquedaProyectos} />
-		</div>
-		<div class="col">
-			<button class="btn btn-secondary w-100" on:click={buscar}>Filtrar</button>
-		</div>
+  
+	<div class="section card">
+	  <h3>Filtrado por campos</h3>
+	  <div class="flex">
+		<input placeholder="Año" bind:value={busquedaYear} />
+		<input placeholder="Comunidad Autónoma" bind:value={busquedaComunidad} />
+		<input placeholder="Cantidad" bind:value={busquedaCantidad} />
+		<input placeholder="Población" bind:value={busquedaPoblacion} />
+		<input placeholder="Proyectos" bind:value={busquedaProyectos} />
+		<button class="btn btn-warning" on:click={buildFilters}>Filtrar</button>
+	  </div>
 	</div>
-
-	<h5>Crear nuevo recurso</h5>
-	<div class="row g-2 mb-4">
-		<div class="col"><input class="form-control" placeholder="Año" bind:value={year} /></div>
-		<div class="col">
-			<input class="form-control" placeholder="Comunidad Autónoma" bind:value={comunidad} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Cantidad" bind:value={cantidad} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Población beneficiada" bind:value={poblacion} />
-		</div>
-		<div class="col">
-			<input class="form-control" placeholder="Proyectos" bind:value={proyectos} />
-		</div>
-		<div class="col"><button class="btn btn-success w-100" on:click={crear}>Añadir</button></div>
+  
+	<div class="section card">
+	  <h3>{editMode ? 'Editar recurso' : 'Crear nuevo recurso'}</h3>
+	  <div class="flex">
+		<input type="number" placeholder="AñoC" bind:value={year} />
+		<input placeholder="Comunidad AutónomaC" bind:value={comunidad} />
+		<input type="number" step="0.01" placeholder="CantidadC (€)" bind:value={cantidad} />
+		<input type="number" placeholder="Población beneficiadaC" bind:value={poblacion} />
+		<input type="number" placeholder="ProyectosC" bind:value={proyectos} />
+		{#if editMode}
+		  <button class="btn btn-success" on:click={actualizarRecurso}>Guardar</button>
+		  <button class="btn btn-outline" on:click={cancelarEdicion}>Cancelar</button>
+		{:else}
+		  <button class="btn btn-success" on:click={crear}>Añadir</button>
+		{/if}
+	  </div>
 	</div>
-
-	<table class="table table-striped table-hover">
-		<thead class="table-dark">
-			<tr>
-				<th>Año</th>
-				<th>Comunidad Autónoma</th>
-				<th>Cantidad (€)</th>
-				<th>Población beneficiada</th>
-				<th>Proyectos</th>
-				<th>Acciones</th>
-			</tr>
+  
+	<div class="section card table-wrapper">
+	  <table>
+		<thead>
+		  <tr>
+			<th>Año</th>
+			<th>Comunidad</th>
+			<th>Cantidad (€)</th>
+			<th>Población</th>
+			<th>Proyectos</th>
+			<th>Acciones</th>
+		  </tr>
 		</thead>
 		<tbody>
-			{#each Datos as d}
-				<tr>
-					<td>{d.year}</td>
-					<td>{d.autonomous_community}</td>
-					<td>{d.amount}</td>
-					<td>{d.benefited_population}</td>
-					<td>{d.project_count}</td>
-					<td>
-						{#if editMode && currentEdit?.year === d.year}
-							<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
-							<button class="btn btn-secondary btn-sm" on:click={cancelarEdicion}>Cancelar</button>
-						{:else}
-							<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
-							<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}>Eliminar</button>
-						{/if}
-					</td>
-				</tr>
-			{/each}
+		  {#each datos as d}
+			<tr>
+			  <td>{d.year}</td>
+			  <td>{d.autonomous_community}</td>
+			  <td>{d.amount.toLocaleString()}</td>
+			  <td>{d.benefited_population.toLocaleString()}</td>
+			  <td>{d.project_count}</td>
+			  <td class="flex">
+				{#if editMode && currentEdit?.year === d.year}
+				  <button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
+				  <button class="btn btn-outline btn-sm" on:click={cancelarEdicion}>Cancelar</button>
+				{:else}
+				  <button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
+				  <button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}>Eliminar</button>
+				{/if}
+			  </td>
+			</tr>
+		  {/each}
 		</tbody>
-	</table>
-
-	<div class="d-flex gap-3 my-3">
-		<button class="btn btn-outline-primary" on:click={paginaAnterior}>Anterior</button>
-		<button class="btn btn-outline-primary" on:click={siguientePagina}>Siguiente</button>
+	  </table>
 	</div>
-</main>
+  
+	<div class="section flex">
+	  <button class="btn btn-outline" on:click={paginaAnterior}>Anterior</button>
+	  <button class="btn btn-outline" on:click={siguientePagina}>Siguiente</button>
+	</div>
+  </main>
