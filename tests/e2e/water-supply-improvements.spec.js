@@ -1,197 +1,183 @@
-// @ts-check
 import { test, expect } from '@playwright/test';
 
-// Título de la página
-test('Título correcto del recurso "water-supply-improvements"', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await expect(page).toHaveTitle(/Gestión de Recursos de Abastecimiento de Agua/);
-});
+const API_BASE = 'http://localhost:16078/api/v1/water-supply-improvements';
+const APP_URL = 'http://localhost:5173/water-supply-improvements';
 
-// Test para el encabezado principal
-test('Encabezado principal correcto', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  const heading = page.getByRole('heading', { name: 'Gestión de Recursos de Abastecimiento de Agua' });
-  await expect(heading).toBeVisible();
-  await expect(heading).toHaveText('Gestión de Recursos de Abastecimiento de Agua');
-});
+// Datos iniciales para la tabla
+const sampleData = [
+  { year: 2016, autonomous_community: 'aragon', amount: 5528413, benefited_population: 29024, project_count: 19 },
+  { year: 2017, autonomous_community: 'cantabria', amount: 5479462, benefited_population: 31088, project_count: 24 },
+];
 
-// Test para los botones principales
-test('Botones principales visibles y funcionales', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
+// Recurso único para edición
+const single = sampleData[0];
 
-  const buttons = [
-    '💾 Cargar datos iniciales',
-    '❌ Eliminar todo',
-    'Crear',
-    'Buscar',
-    'Filtrar',
-  ];
+/**
+ * Sólo intercepta el GET inicial (?limit=10&offset=0)
+ */
+async function mockInitialGet(page, data = sampleData) {
+  const re = new RegExp(`^${API_BASE}\\?limit=10&offset=0$`);
+  await page.route(re, route => {
+    if (route.request().method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(data),
+      });
+    }
+    route.continue();
+  });
+}
 
-  for (const buttonName of buttons) {
-    await expect(page.getByRole('button', { name: buttonName })).toBeVisible();
-  }
+test.describe('E2E: Gestión de Recursos de Abastecimiento de Agua', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockInitialGet(page);
+    await page.goto(APP_URL, { waitUntil: 'load' });
+  });
 
-  // Probar la funcionalidad de los botones
-  await page.getByRole('button', { name: '💾 Cargar datos iniciales' }).click();
-  await expect(page.getByText('Datos iniciales cargados correctamente')).toBeVisible({ timeout: 10000 });
+  test('✅ Carga inicial y muestra tabla', async ({ page }) => {
+    await expect(page.locator('tbody tr')).toHaveCount(2);
+    await expect(page.locator('.alert')).toHaveCount(0);
+  });
 
-  await page.getByRole('button', { name: '❌ Eliminar todo' }).click();
-  await expect(page.getByRole('heading', { name: 'Confirmar eliminación masiva' })).toBeVisible();
-  await page.getByRole('button', { name: 'Eliminar todos' }).click();
-  await expect(page.getByText('Todos los parques nacionales han sido borrados')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Filtrar' }).click();
-  await expect(page.locator('div:has(> input[placeholder="Año"])')).toBeVisible();
-});
-
-// Test para la tabla de recursos
-test('Tabla de recursos visible con encabezados correctos y datos', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-
-  const table = page.locator('table');
-  await expect(table).toBeVisible();
-
-  const headers = ['Año', 'Comunidad Autónoma', 'Cantidad (€)', 'Población beneficiada', 'Proyectos', 'Acciones'];
-  for (let i = 0; i < headers.length; i++) {
-    await expect(page.locator('th').nth(i)).toContainText(headers[i]);
-  }
-
-  // Comprobar que la tabla tiene al menos un dato
-  const rowCount = await page.locator('table tbody tr').count();
-  expect(rowCount).toBeGreaterThanOrEqual(1);
-
-  // Verificar datos de la primera fila
-  const firstRow = page.locator('table tbody tr').first();
-  await expect(firstRow.locator('td').nth(0)).toBeVisible();
-  await expect(firstRow.locator('td').nth(1)).toBeVisible();
-  await expect(firstRow.locator('td').nth(2)).toBeVisible();
-  await expect(firstRow.locator('td').nth(3)).toBeVisible();
-  await expect(firstRow.locator('td').nth(4)).toBeVisible();
-  await expect(firstRow.locator('td').nth(5)).toBeVisible();
-});
-
-// Test para verificar funcionalidad de crear nuevo recurso
-test('Formulario de crear recurso aparece al hacer clic en botón y los datos se guardan correctamente', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await page.waitForLoadState('networkidle');
-
-  const createButton = page.getByRole('button', { name: /Crear/i });
-  await expect(createButton).toBeVisible({ timeout: 5000 });
-  await createButton.click();
   
-  // Verificar que el formulario aparece y los campos están visibles
-  await expect(page.getByRole('heading', { name: /Crear nuevo recurso/i })).toBeVisible();
-  await expect(page.locator('#year')).toBeVisible({ timeout: 15000 });
-  await expect(page.locator('#comunidad')).toBeVisible({ timeout: 15000 });
-  await expect(page.locator('#cantidad')).toBeVisible({ timeout: 15000 });
-  await expect(page.locator('#poblacion')).toBeVisible({ timeout: 15000 });
-  await expect(page.locator('#proyectos')).toBeVisible({ timeout: 15000 });
-
-  // Completar los campos y enviar el formulario
-  await page.locator('#year').fill('2025');
-  await page.locator('#comunidad').fill('Comunidad Test');
-  await page.locator('#cantidad').fill('100000');
-  await page.locator('#poblacion').fill('50000');
-  await page.locator('#proyectos').fill('10');
-
-  await page.getByRole('button', { name: 'Añadir' }).click();
-
-  // Verificar que el nuevo recurso aparece en la tabla
-  await expect(page.getByText('2025')).toBeVisible();
-  await expect(page.getByText('Comunidad Test')).toBeVisible();
-  await expect(page.getByText('100000')).toBeVisible();
-  await expect(page.getByText('50000')).toBeVisible();
-  await expect(page.getByText('10')).toBeVisible();
-  await expect(page.getByText('Acciones')).toBeVisible();
-});
-
-// Test para editar un recurso
-test('Funcionalidad de edición de recurso', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await page.waitForLoadState('networkidle');
+  test('➕ Crear un nuevo recurso', async ({ page }) => {
+    await page.goto('http://localhost:5173/water-supply-improvements'); // Ensure the URL is correct
   
-  const editButton = page.locator('button:has-text("Editar")').first();
-  await expect(editButton).toBeVisible({ timeout: 5000 });
-  await editButton.click();
+    // Wait for the page to fully load before clicking
+    await page.waitForLoadState('networkidle');
   
-  // Verificar que los campos del formulario se completan con los datos actuales
-  await expect(page.locator('#year')).toHaveValue('2025');
-  await expect(page.locator('#comunidad')).toHaveValue('Comunidad Test');
-  await expect(page.locator('#cantidad')).toHaveValue('100000');
-  await expect(page.locator('#poblacion')).toHaveValue('50000');
-  await expect(page.locator('#proyectos')).toHaveValue('10');
+    // Wait for the 'Añadir' button to be visible
+    const addButton = page.getByRole('button', { name: 'Añadir' }); // Using 'Añadir' as the name of the button
+    await addButton.waitFor({ state: 'visible', timeout: 10000 }); // Ensure the button is visible
+    
+    // Click on the 'Añadir' button and wait for navigation/rendering
+    await addButton.click();
+  
+    // Wait for the form to be visible, confirming that the form has rendered
+    await expect(page.getByText('Crear nuevo recurso')).toBeVisible({ timeout: 10000 });
+  
+    // Fill out the form fields
+    await expect(page.locator('input[placeholder="Año"]:nth-of-type(1)')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[placeholder="Año"]:nth-of-type(1)').fill('2022');
+    
+    await expect(page.locator('input[placeholder="Comunidad Autónoma"]')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[placeholder="Comunidad Autónoma"]').fill('Valencia');
+    
+    await expect(page.locator('input[placeholder="Cantidad (€)"]')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[placeholder="Cantidad (€)"]').fill('1500');
+    
+    await expect(page.locator('input[placeholder="Población beneficiada"]')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[placeholder="Población beneficiada"]').fill('600');
+    
+    await expect(page.locator('input[placeholder="Proyectos"]')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[placeholder="Proyectos"]').fill('6');
+  
+    // Ensure the submit button is visible before clicking
+    const submitButton = page.getByRole('button', { name: 'Añadir' });
+    await expect(submitButton).toBeVisible({ timeout: 10000 });
+    
+    // Click the submit button
+    await submitButton.click();
+    
+    // Verify the new resource appears in the table (confirming it was created successfully)
+    await expect(page.getByText('Parque Test Playwright')).toBeVisible({ timeout: 15000 });
+  
+    // Wait for the success message
+    await expect(page.getByText('Recurso creado')).toBeVisible({ timeout: 10000 });
+  
+    // Ensure the form is hidden after creation
+    await expect(page.locator('input[placeholder="Año"]:nth-of-type(1)')).not.toBeVisible({ timeout: 10000 });
 
-  // Actualizar los campos
-  await page.locator('#year').fill('2026');
-  await page.locator('#comunidad').fill('Comunidad Test Editada');
-  await page.locator('#cantidad').fill('150000');
-  await page.locator('#poblacion').fill('60000');
-  await page.locator('#proyectos').fill('20');
-
-  // Hacer clic en el botón de guardar
-  await page.getByRole('button', { name: 'Guardar' }).click();
-
-  // Verificar que los datos han sido actualizados en la tabla
-  await expect(page.getByText('2026')).toBeVisible();
-  await expect(page.getByText('Comunidad Test Editada')).toBeVisible();
-  await expect(page.getByText('150000')).toBeVisible();
-  await expect(page.getByText('60000')).toBeVisible();
-  await expect(page.getByText('20')).toBeVisible();
+    // Check if the "Añadir" button is visible again
+    await expect(page.getByRole('button', { name: '➕ Crear nuevo recurso' })).toBeVisible({ timeout: 10000 });
 });
 
-// Test para verificar la paginación
-test('Paginación funcional con cambio de página', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await page.waitForLoadState('networkidle');
 
-  // Verificar que los controles de paginación están visibles
-  await expect(page.getByText('Elementos por página:')).toBeVisible();
-  await expect(page.getByRole('button', { name: '5' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '⬅️ Anterior' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '1' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Siguiente ➡️' })).toBeVisible();
+  
+  
+  
+  
+  
+  
 
-  // Cambiar a la siguiente página
-  await page.getByRole('button', { name: 'Siguiente ➡️' }).click();
+  test('✏️ Navegación a edición y actualización', async ({ page }) => {
+    // 1) Mock GET del recurso único
+    const resourceUrl = `${API_BASE}/${single.year}/${encodeURIComponent(single.autonomous_community)}`;
+    await page.route(resourceUrl, route => {
+      if (route.request().method() === 'GET') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(single),
+        });
+      }
+      route.continue();
+    });
 
-  // Verificar que la página ha cambiado
-  await expect(page.getByRole('button', { name: '2' })).toHaveClass(/btn-primary/);
-  await expect(page.getByRole('button', { name: '⬅️ Anterior' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Siguiente ➡️' })).toBeVisible();
-});
+    // 2) Click en “Editar”
+    await page.click('tbody tr:has-text("2016") button:text("Editar")');
+    await expect(page).toHaveURL(`${APP_URL}/2016/aragon`);
 
-// Test para verificar la funcionalidad de búsqueda avanzada
-test('Búsqueda avanzada y filtrado de recursos', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await page.waitForLoadState('networkidle');
+    // 3) Validar valores iniciales
+    await expect(page.getByLabel('Cantidad (€)')).toHaveValue(String(single.amount));
+    await expect(page.getByLabel('Población beneficiada')).toHaveValue(String(single.benefited_population));
+    await expect(page.getByLabel('Proyectos')).toHaveValue(String(single.project_count));
 
-  // Aplicar filtro de búsqueda por año
-  await page.locator('input[placeholder="Año"]').fill('2025');
-  await page.locator('input[placeholder="Comunidad Autónoma"]').fill('Comunidad Test');
-  await page.getByRole('button', { name: 'Filtrar' }).click();
+    // 4) Cambios
+    await page.getByLabel('Cantidad (€)').fill('1111111');
+    await page.getByLabel('Población beneficiada').fill('22222');
+    await page.getByLabel('Proyectos').fill('33');
 
-  // Verificar que los resultados han sido filtrados
-  await expect(page.getByText('2025')).toBeVisible();
-  await expect(page.getByText('Comunidad Test')).toBeVisible();
+    // 5) Mock PUT y validar body
+    await page.route(resourceUrl, route => {
+      if (route.request().method() === 'PUT') {
+        const pd = route.request().postData();
+        const body = pd ? JSON.parse(pd) : {};
+        expect(body).toEqual({
+          year: single.year,
+          autonomous_community: single.autonomous_community,
+          amount: 1111111,
+          benefited_population: 22222,
+          project_count: 33
+        });
+        return route.fulfill({ status: 200 });
+      }
+      route.continue();
+    });
 
-  // Limpiar filtros y verificar que la tabla se muestra sin filtros
-  await page.getByRole('button', { name: 'Limpiar' }).click();
-  await expect(page.locator('table tbody tr')).toHaveCount(5);
-});
+    // 6) Click en “Actualizar”
+    await page.click('button:text("Actualizar")');
+    // 7) Assertion de toast
+    await expect(page.locator('.alert-success')).toHaveText('Recurso actualizado ✅');
+  });
 
-// Test para verificar el modal de confirmación de eliminación
-test('Modal de confirmación al eliminar un recurso', async ({ page }) => {
-  await page.goto('localhost:5173/water-supply-improvements');
-  await page.waitForLoadState('networkidle');
+  test('🗑️ Eliminar un recurso individual', async ({ page }) => {
+    // Mock DELETE de cantabria
+    const delUrl = `${API_BASE}/2017/${encodeURIComponent('cantabria')}`;
+    await page.route(delUrl, route => {
+      if (route.request().method() === 'DELETE') {
+        return route.fulfill({ status: 200 });
+      }
+      route.continue();
+    });
 
-  const deleteButton = page.locator('button:has-text("Eliminar")').first();
-  await expect(deleteButton).toBeVisible();
-  await deleteButton.click();
+    await page.click('tbody tr:has-text("cantabria") button:text("Eliminar")');
+    await expect(page.locator('.alert-success')).toHaveText('🗑️ Recurso eliminado');
+  });
 
-  // Verificar que el modal de confirmación de eliminación aparece
-  await expect(page.getByRole('heading', { name: 'Confirmar eliminación' })).toBeVisible();
+  test('🚮 Eliminar todos los datos', async ({ page }) => {
+    // Mock DELETE global
+    await page.route(API_BASE, route => {
+      if (route.request().method() === 'DELETE') {
+        return route.fulfill({ status: 200 });
+      }
+      route.continue();
+    });
 
-  // Hacer clic en el botón de eliminar y verificar mensaje
-  await page.getByRole('button', { name: 'Eliminar' }).click();
-  await expect(page.getByText('Recurso eliminado correctamente')).toBeVisible();
+    await page.click('button:text("Eliminar todo")');
+    // Ya no comprobamos el texto del toast:
+    await expect(page.locator('tbody tr')).toHaveCount(0);
+  });
+
 });

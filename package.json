@@ -36,7 +36,7 @@
     "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
     "test": "npm run test-DLV  && npm run test-BGA && npm run test-AMN",
-    "test:e2e": "npm --prefix front run test:e2e"
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "dependencies": {
