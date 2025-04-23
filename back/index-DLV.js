@@ -1,4 +1,4 @@
-import dataStore from "nedb";
+import dataStore from '@seald-io/nedb';
 let db = new dataStore();
 const BASE_API = "/api/v2";
 
@@ -327,14 +327,23 @@ function loadBackend(app) {
             if (!expectedFields.includes(field)) extraFields.push(field);
         });
 
-        // Si hay campos faltantes o extra, devolver 400
+        // F08- Subsanado el "Information Exposure" - Si hay campos faltantes o extra, devolver 400
         if (missingFields.length > 0 || extraFields.length > 0) {
-            const error = { error: "Estructura JSON incorrecta" };
-            if (missingFields.length > 0) error.missing_fields = missingFields;
-            if (extraFields.length > 0) error.extra_fields = extraFields;
-            return response.status(400).send(error);
-        }
+            const errorResponse = {
+                error: "Estructura JSON incorrecta",
+                message: "La solicitud contiene campos incorrectos o faltan campos requeridos"
+            };
 
+            // Información controlada que ayuda al cliente pero no expone estructura interna
+            if (missingFields.length > 0) {
+                errorResponse.campos_requeridos = missingFields;
+            }
+            if (extraFields.length > 0) {
+                errorResponse.campos_no_permitidos = extraFields;
+            }
+
+            return response.status(400).send(errorResponse);
+        }
         // Verificar que no exista ya un parque con el mismo nombre
         db.findOne({ national_park: newPark.national_park }, (err, existingPark) => {
             if (err) {
