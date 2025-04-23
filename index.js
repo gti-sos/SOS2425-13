@@ -15,19 +15,19 @@ app.use(cors());
 
 
 // ---- PARTE BLANCA (modularizada correctamente) ----
-import { loadBackend as loadBackendB } from "./src/back_D01/index-BGA.js";
+import { loadBackend as loadBackendB } from "./back/index-BGA.js";
 loadBackendB(app);
 
 
 
 // ---- PARTE DARÍO (modularizada correctamente) ----
-import { loadBackend as loadBackendD} from "./src/back_D01/index-DLV.js";
+import { loadBackend as loadBackendD} from "./back/index-DLV.js";
 loadBackendD(app);
 
 
 // ---- PARTE ÁLVARO (modularizada correctamente) ----
 
-import { loadBackend as loadBackendA } from "./src/back_D01/index-AMN.js";
+import { loadBackend as loadBackendA } from "./back/index-AMN.js";
 loadBackendA(app);
 
 
