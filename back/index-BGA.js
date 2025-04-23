@@ -273,6 +273,17 @@ function loadBackend(app) {
         });
     });
 
+
+    //POST a recursos específicos
+    app.post(BASE_API + "/water-supply-improvements/:param", (req, res) => {
+        return res.status(405).send({
+            error: "Método no permitido",
+            message: "No se permite POST a un recurso específico"
+        });
+    });
+
+
+
     // PUT
     // PUT a un conjunto de recursos: no permitido
     app.put(BASE_API + "/water-supply-improvements", (req, res) => {
