@@ -1,4 +1,4 @@
-## SOS2425 - Grupo 13
+## SOS2425 - Grupo 13 (F08 edition)
 [![Known Vulnerabilities](https://snyk.io/test/github/gti-sos/SOS2425-13-F08/badge.svg)](https://snyk.io/test/github/gti-sos/SOS2425-13-F08)
  ### Team
  - [Blanca García Alonso](https://github.com/blancagrclns)
