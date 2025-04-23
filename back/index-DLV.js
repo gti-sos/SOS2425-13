@@ -272,8 +272,9 @@ function loadBackend(app) {
         }
 
         // Consultar la base de datos
+        const sanitizedCommunity = sanitizeRegex(community);
         db.find({
-            autonomous_community: { $regex: new RegExp(community, "i") },
+            autonomous_community: { $regex: new RegExp(sanitizedCommunity, "i") },
             declaration_date: year
         }, (err, parks) => {
             if (err) {
