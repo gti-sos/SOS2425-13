@@ -1,0 +1,17 @@
+{
+    "all": true,
+    "include": [
+      "back/**/*.js"
+    ],
+    "exclude": [
+      "tests/**",
+      "node_modules/**",
+      "**/svelte.config.js",
+      "**/rollup.config.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "report-dir": "./coverage"
+  }
