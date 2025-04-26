@@ -15,8 +15,8 @@ jobs:
       - name: Build front
         run: npm run build
 
-      - name: Run tests with coverage
-        run: npm run simple-coverage
+      - name: Run tests 
+        run: npm run test
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -40,17 +40,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
-        
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Verify coverage file exists
-        run: |
-          ls -la coverage/
-          cat coverage/lcov.info | head -20
-        continue-on-error: true
+      

@@ -35,19 +35,9 @@
     "test-AMN": "npm run test-local-AMN-L",
     "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
-    "start-for-coverage": "node index.js",
-    "test-with-coverage": "nyc --reporter=lcov --reporter=text-summary npm-run-all test-local-DLV test-local-BGA test-local-AMN",
     "test": "start-server-and-test start-for-coverage http://localhost:16078 test-with-coverage",
-    "test-coverage-DLV": "start-server-and-test start-with-coverage http://localhost:16078 test-local-DLV",
-    "test-coverage-BGA": "start-server-and-test start-with-coverage http://localhost:16078 test-local-BGA",
-    "test-coverage-AMN": "start-server-and-test start-with-coverage http://localhost:16078 test-local-AMN",
-    "test-coverage-all": "npm-run-all --serial test-coverage-DLV test-coverage-BGA test-coverage-AMN",
-    "coverage-test": "node test-coverage.js",
-    "coverage": "nyc report --reporter=lcov --reporter=text-summary",
-    "test:e2e": "playwright test",
-     "simple-coverage": "nyc --reporter=lcov --reporter=text-summary node simple-test.js"
-}
-  ,
+    "test:e2e": "playwright test"
+  },
   "keywords": [],
   "dependencies": {
     "@seald-io/nedb": "^4.0.2",
@@ -62,7 +52,6 @@
     "@playwright/test": "^1.52.0",
     "@types/node": "^22.14.1",
     "npm-run-all": "^4.1.5",
-    "nyc": "^17.1.0",
     "rollup": "^4.40.0",
     "start-server-and-test": "^2.0.11"
   }
