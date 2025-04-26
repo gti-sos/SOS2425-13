@@ -36,7 +36,7 @@
     "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
     "run-tests-local": "npm-run-all --serial test-local-DLV test-local-BGA test-local-AMN",
-    "test": "start-server-and-test start-instrumented http://localhost:16078 run-tests-local && nyc report --reporter=lcov --reporter=text-summary",
+    "test": "start-server-and-test http://localhost:16078 run-tests-local && nyc report --reporter=lcov --reporter=text-summary",
     "test:e2e": "playwright test"
   },
   "keywords": [],
