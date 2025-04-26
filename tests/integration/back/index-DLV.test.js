@@ -1,37 +1,33 @@
 import request from 'supertest';
 import express from 'express';
-import { loadBackend } from '../../../back/index-DLV.js'; // Ajusta la ruta relativa si es necesario
+import { loadBackend } from '../../../back/index-DLV.js';
 
-let app; // Variable para nuestra app Express de prueba
+let app;
 
-// Antes de todas las pruebas en este archivo
 beforeAll(() => {
-  app = express(); // Crea una nueva instancia de Express
-  app.use(express.json()); // Asegúrate de que use JSON middleware si tus rutas lo necesitan
-  loadBackend(app); // ¡Importante! Llama a tu función para que defina las rutas en la app de prueba
+  app = express();
+  app.use(express.json());
+  loadBackend(app);
 });
 
-// Describe un conjunto de pruebas para la API de National Parks
 describe('API de National Parks (index-DLV)', () => {
 
-
-  // Prueba para GET /api/v2/national-parks (sin filtros)
-  it('GET /api/v2/national-parks debería devolver un array y status 200', async () => {
-    // Realiza una petición GET a la ruta base de tu API
-    const response = await request(app).get('/api/v2/national-parks');
-
-    // Verifica que el código de estado sea 200 (OK)
-    expect(response.statusCode).toBe(200);
-
-    // Verifica que el cuerpo de la respuesta sea un array
-    // (puede estar vacío si la base de datos no tiene datos, o lleno si los tiene)
-    expect(Array.isArray(response.body)).toBe(true);
+  // Añade un test para cargar datos iniciales PRIMERO
+  it('GET /loadInitialData debería cargar datos iniciales y devolver 200', async () => {
+    const response = await request(app).get('/api/v2/national-parks/loadInitialData');
+    // Puede que necesites ajustar la expectativa si la BD ya tiene datos de un test anterior
+    // O asegurarte de que la BD se limpie antes de cada test (con beforeEach)
+    expect([200, 405]).toContain(response.statusCode); // Acepta 200 (cargado) o 405 (ya cargado)
   });
-  
+
+
+  it('GET /api/v2/national-parks debería devolver un array y status 200 (después de cargar datos)', async () => {
+    // Ahora que los datos (probablemente) existen, este GET debería devolver 200
+    const response = await request(app).get('/api/v2/national-parks');
+    expect(response.statusCode).toBe(200); // Ahora sí debería ser 200
+    expect(Array.isArray(response.body)).toBe(true);
+    // Opcional: verificar que el array no esté vacío
+    expect(response.body.length).toBeGreaterThan(0);
+  });
 
 });
-
-// (Opcional) Limpiar después de las pruebas si es necesario
-// afterAll(async () => {
-//   // Cerrar conexiones a BD, etc.
-// });
