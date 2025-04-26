@@ -15,9 +15,23 @@ jobs:
       - name: Build front
         run: npm run build
 
-      - name: Run tests 
+      - name: Run tests with coverage
         run: npm run test
 
+      - name: Check if coverage directory exists
+        run: ls -R coverage
+
+      - name: Check lcov.info content
+        run: |
+          echo "--- Start of lcov.info ---"
+          head -n 20 coverage/lcov.info || echo "lcov.info might be empty or missing"
+          echo "--- End of lcov.info snippet ---"
+
+      - name: Coveralls report
+        uses: coverallsapp/github-action@v2.3.6
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
@@ -41,7 +55,4 @@ jobs:
         with:
           args: --severity-threshold=high
 
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v2.3.6
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      
