@@ -1,6 +1,7 @@
 ## SOS2425 - Grupo 13 (F08 edition)
 [![Known Vulnerabilities](https://snyk.io/test/github/darlopvil/SOS2425-13-F08/badge.svg)](https://snyk.io/test/github/darlopvil/SOS2425-13-F08)
-
+[![codecov](https://codecov.io/gh/darlopvil/SOS2425-13-F08/graph/badge.svg?token=ZDZ31GGXNU)](https://codecov.io/gh/darlopvil/SOS2425-13-F08)
+[![CI/CD](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml)
  ### Team
  - [Blanca García Alonso](https://github.com/blancagrclns)
  - [Alvaro Morillo Navajas](https://github.com/alvmornav)
