@@ -1,5 +1,5 @@
-// test-coverage.js
-const { exec } = require('child_process');
+import { exec } from 'child_process';
+
 const server = exec('node index.js');
 
 // Esperar a que el servidor esté listo
