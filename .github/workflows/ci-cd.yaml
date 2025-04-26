@@ -9,25 +9,66 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm install --save-dev npm-run-all
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # O la versión que uses
 
-      - name: Build front
+      - name: Install dependencies
+        run: npm install # Instala todas las dependencias, incluyendo nyc, npm-run-all
+
+      - name: Build front-end
         run: npm run build
 
-      - name: Run tests with coverage
-        run: npm run test
+      # --- Backend Tests and Coverage ---
+      - name: Start server instrumented in background
+        run: npm run start-instrumented & # Usa tu script "nyc node index.js" y lo manda a segundo plano
+        env:
+          PORT: 16078 # Asegura el puerto si es necesario
 
-     
+      - name: Wait for server to be ready
+        run: sleep 15 # Aumenta la espera para asegurar que el servidor instrumentado esté listo
 
+      - name: Run local API tests (Newman)
+        run: npm run run-tests-local # Ejecuta los tests contra el servidor en segundo plano
+
+      - name: Stop instrumented server
+        run: pkill -f 'node index.js' || echo "Server already stopped or failed to stop" # Intenta detener el proceso node
+
+      - name: Generate coverage report from .nyc_output
+        run: nyc report --reporter=lcov --reporter=text-summary # Genera lcov.info a partir de los datos crudos
+
+      - name: Check if coverage directory exists
+        run: ls -R coverage || echo "Coverage directory not found"
+
+      - name: Check lcov.info content
+        run: |
+          echo "--- Start of lcov.info ---"
+          head -n 50 coverage/lcov.info || echo "lcov.info might be empty or missing"
+          echo "--- End of lcov.info snippet ---"
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2.3.6
+        with:
+          path-to-lcov: ./coverage/lcov.info # Ruta explícita al archivo lcov
+          github-token: ${{ github.token }} # Usa el token de GitHub Actions (preferido)
+        # env: # No necesitas COVERALLS_REPO_TOKEN si usas github-token
+        #   COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+      # --- Playwright E2E Tests ---
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run server for e2e tests
-        run: npm run start &
+      - name: Run server for e2e tests (non-instrumented)
+        run: npm run start & # Inicia un servidor normal para Playwright
+        env:
+          PORT: 16079 # Usa un puerto diferente si el anterior sigue ocupado
+
+      - name: Wait for E2E server
+        run: sleep 10
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --port=16079 # Asegúrate que Playwright apunte al puerto correcto si es necesario
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
@@ -36,26 +77,10 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+      # --- Security Scan ---
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
-
-      - name: Check if coverage directory exists
-        run: ls -R coverage
-
-      - name: Check lcov.info content
-        run: |
-          echo "--- Start of lcov.info ---"
-          head -n 50 coverage/lcov.info || echo "lcov.info might be empty or missing"
-          echo "--- End of lcov.info snippet ---"
-
-      - name: Coveralls report
-        uses: coverallsapp/github-action@v2.3.6
-        with:
-          path-to-lcov: ./coverage/lcov.info
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
