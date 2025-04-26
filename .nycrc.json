@@ -1,7 +1,8 @@
 {
     "all": true,
     "include": [
-      "back/**/*.js"
+      "back/**/*.js",
+      "index.js"
     ],
     "exclude": [
       "tests/**",

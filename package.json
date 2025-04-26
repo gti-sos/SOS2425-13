@@ -35,8 +35,8 @@
     "test-AMN": "npm run test-local-AMN-L",
     "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
-    "test": "nyc --reporter=lcov npm run test-DLV && npm run test-BGA && npm run test-AMN",
-    "coverage": "nyc report --reporter=lcov --reporter=text-summary",
+    "test": "nyc npm-run-all test-DLV test-BGA test-AMN",
+    "coverage": "nyc report --reporter=lcov --reporter=text",
     "test:e2e": "playwright test"
   },
   "keywords": [],
