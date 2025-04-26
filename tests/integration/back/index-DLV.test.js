@@ -1,11 +1,12 @@
 import request from 'supertest';
 import express from 'express';
 import { loadBackend } from '../../../back/index-DLV.js';
+import helmet from "helmet";
 
-let app;
+const app = express();
 
 beforeAll(() => {
-    app = express();
+    app.use(helmet());
     app.use(express.json());
     loadBackend(app);
 });
