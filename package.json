@@ -44,7 +44,8 @@
     "test-coverage-all": "npm-run-all --serial test-coverage-DLV test-coverage-BGA test-coverage-AMN",
     "coverage-test": "node test-coverage.js",
     "coverage": "nyc report --reporter=lcov --reporter=text-summary",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+     "simple-coverage": "nyc --reporter=lcov --reporter=text-summary node simple-test.js"
 }
   ,
   "keywords": [],
