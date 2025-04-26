@@ -21,22 +21,12 @@ jobs:
         run: npm run build
 
       # --- Backend Tests and Coverage ---
-      - name: Start server instrumented in background
-        run: npm run start-instrumented & # Usa tu script "nyc node index.js" y lo manda a segundo plano
-        env:
-          PORT: 16078 # Asegura el puerto si es necesario
+      - name: Run tests with coverage collection (using start-server-and-test)
+        run: npm run test:ci-coverage # Ejecuta el script que usa start-server-and-test
 
-      - name: Wait for server to be ready
-        run: sleep 15 # Aumenta la espera para asegurar que el servidor instrumentado esté listo
-
-      - name: Run local API tests (Newman)
-        run: npm run run-tests-local # Ejecuta los tests contra el servidor en segundo plano
-
-      - name: Stop instrumented server
-        run: pkill -f 'node index.js' || echo "Server already stopped or failed to stop" # Intenta detener el proceso node
-
-      - name: Generate coverage report from .nyc_output
-        run: npx c8 report --reporter=lcov --reporter=text-summary
+      # ESTE PASO ES CRUCIAL: Genera el informe DESPUÉS de que el paso anterior termine
+      - name: Generate coverage report from c8 output
+        run: npx c8 report --reporter=lcov --reporter=text-summary # Usa npx c8 report
 
       - name: Check if coverage directory exists
         run: ls -R coverage || echo "Coverage directory not found"
@@ -50,11 +40,8 @@ jobs:
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2.3.6
         with:
-          path-to-lcov: ./coverage/lcov.info # Ruta explícita al archivo lcov
-          github-token: ${{ github.token }} # Usa el token de GitHub Actions (preferido)
-        # env: # No necesitas COVERALLS_REPO_TOKEN si usas github-token
-        #   COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
+          path-to-lcov: ./coverage/lcov.info
+          github-token: ${{ github.token }}
       # --- Playwright E2E Tests ---
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps

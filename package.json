@@ -38,6 +38,8 @@
     "test-coverage": "c8 --reporter=lcov npm-run-all --serial test-local-DLV test-local-BGA test-local-AMN",
     "start-instrumented": "c8 node index.js",
     "run-tests-local": "npm-run-all --serial test-local-DLV test-local-BGA test-local-AMN",
+    
+   "test:ci-coverage": "start-server-and-test start-instrumented http://localhost:16078 run-tests-local",
     "test": "start-server-and-test start-instrumented http://localhost:16078 run-tests-local && nyc report --reporter=lcov --reporter=text-summary",
     "test:e2e": "playwright test"
   },
