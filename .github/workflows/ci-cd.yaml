@@ -21,12 +21,12 @@ jobs:
         run: npm run build
 
       # --- Backend Tests and Coverage ---
-      - name: Run tests with coverage collection (using start-server-and-test)
-        run: npm run test:ci-coverage # Ejecuta el script que usa start-server-and-test
+      - name: Run tests and collect coverage data
+        run: npm run test:ci-coverage # Ejecuta: c8 --reporter=none start-server-and-test ...
 
       # ESTE PASO ES CRUCIAL: Genera el informe DESPUÉS de que el paso anterior termine
       - name: Generate coverage report from c8 output
-        run: npx c8 report --reporter=lcov --reporter=text-summary # Usa npx c8 report
+        run: npx c8 report --reporter=lcov --reporter=text-summary # Genera lcov.info
 
       - name: Check if coverage directory exists
         run: ls -R coverage || echo "Coverage directory not found"
