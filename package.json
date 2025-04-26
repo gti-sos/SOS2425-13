@@ -39,7 +39,8 @@
     "test-coverage-DLV": "start-server-and-test start-with-coverage http://localhost:16078 test-local-DLV",
     "test-coverage-BGA": "start-server-and-test start-with-coverage http://localhost:16078 test-local-BGA",
     "test-coverage-AMN": "start-server-and-test start-with-coverage http://localhost:16078 test-local-AMN",
-    "test": "npm run test-coverage-DLV && npm run test-coverage-BGA && npm run test-coverage-AMN && nyc report",
+    "test-coverage-all": "npm-run-all --serial test-coverage-DLV test-coverage-BGA test-coverage-AMN",
+   "test": "nyc --include=\"back/**/*.js\" --reporter=lcov --reporter=text-summary npm run test-coverage-all",
     "coverage": "nyc report --reporter=lcov --reporter=text-summary",
     "test:e2e": "playwright test"
   },
