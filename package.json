@@ -35,7 +35,7 @@
     "test-AMN": "npm run test-local-AMN-L",
     "test-alvmornav-local": "npx newman run test/back/alvmornav.postman_collection.json --environment test/back/local.postman_environment.json",
     "test-forest-fires": "start-server-and-test start http://localhost:16078 test-alvmornav-local",
-    "test": "start-server-and-test start-for-coverage http://localhost:16078 test-with-coverage",
+    "test": "npm-run-all --serial test-DLV test-BGA test-AMN",
     "test:e2e": "playwright test"
   },
   "keywords": [],
