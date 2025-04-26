@@ -49,10 +49,13 @@ jobs:
       - name: Check lcov.info content
         run: |
           echo "--- Start of lcov.info ---"
-          head -n 20 coverage/lcov.info || echo "lcov.info might be empty or missing"
+          head -n 50 coverage/lcov.info || echo "lcov.info might be empty or missing"
           echo "--- End of lcov.info snippet ---"
 
       - name: Coveralls report
         uses: coverallsapp/github-action@v2.3.6
+        with:
+          path-to-lcov: ./coverage/lcov.info
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
