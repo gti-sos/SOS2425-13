@@ -36,7 +36,7 @@ jobs:
         run: pkill -f 'node index.js' || echo "Server already stopped or failed to stop" # Intenta detener el proceso node
 
       - name: Generate coverage report from .nyc_output
-        run: npx nyc report --reporter=lcov --reporter=text-summary
+        run: npx c8 report --reporter=lcov --reporter=text-summary
 
       - name: Check if coverage directory exists
         run: ls -R coverage || echo "Coverage directory not found"
