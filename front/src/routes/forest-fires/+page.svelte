@@ -225,6 +225,10 @@
 	onMount(cargarIncendios);
 </script>
 
+<svelte:head>
+	<title>Incendios Forestales</title>
+</svelte:head>
+
 <h1>🔥 Gestión de Incendios Forestales</h1>
 
 {#if mensaje}
