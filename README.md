@@ -4,7 +4,6 @@
 [![CI/CD](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml)
 
 
-
  ### Team
  - [Blanca García Alonso](https://github.com/blancagrclns)
  - [Alvaro Morillo Navajas](https://github.com/alvmornav)
