@@ -31,7 +31,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: darlopvil/SOS2425-13-F08
+          slug: gti-sos/SOS2425-13
 
       - name: Deploy to Render
         uses: johnbeynon/render-deploy-action@v0.0.8
