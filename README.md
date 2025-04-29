@@ -4,8 +4,6 @@
 [![CI/CD](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/darlopvil/SOS2425-13-F08/actions/workflows/ci-cd.yaml)
 
 
-# IMPORTANTE:
-Instalar todo (nuevos módulos y dependencias) con `npm install`
 
  ### Team
  - [Blanca García Alonso](https://github.com/blancagrclns)
