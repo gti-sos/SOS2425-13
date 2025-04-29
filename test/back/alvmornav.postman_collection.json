@@ -272,7 +272,7 @@
 			"response": []
 		},
 		{
-			"name": "GET /forest-fires/andalucia POR COMUNIDAD",
+			"name": "GET /forest-fires/andalucia POR NUMERO DE INCENDIOS",
 			"event": [
 				{
 					"listen": "test",
@@ -326,6 +326,59 @@
 						"v1",
 						"forest-fires",
 						"andalucia"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/v1/forest-fires?number_of_accidents=10034 BUSQUEDA POR NUMERO DE ACCIDENTE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should be an array\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check if any record matches number_of_accidents=10034\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const found = jsonData.some(record => record.number_of_accidents === 10034);\r",
+							"    pm.expect(found).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:16078/api/v1/forest-fires?number_of_accidents=10034",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "16078",
+					"path": [
+						"api",
+						"v1",
+						"forest-fires"
+					],
+					"query": [
+						{
+							"key": "number_of_accidents",
+							"value": "10034"
+						}
 					]
 				}
 			},
