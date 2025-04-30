@@ -12,41 +12,7 @@
 		project_count: number;
 	}
 
-	function normalizeCommunity(input: string): string {
-		return input
-			.toLowerCase()
-			.normalize("NFD")
-			.replace(/[,]/g, '')
-			.replace(/[\u0300-\u036f]/g, '')
-			.replace(/\s+/g, ' ')
-			.trim();
-	}
-
-	function formatCommunity(input: string): string {
-		const map: Record<string, string> = {
-			"andalucia": "Andalucía",
-			"aragon": "Aragón",
-			"asturias": "Asturias",
-			"baleares": "Baleares",
-			"canarias": "Canarias",
-			"cantabria": "Cantabria",
-			"castilla-la mancha": "Castilla-La Mancha",
-			"castilla y leon": "Castilla y León",
-			"catalunya": "Cataluña",
-			"ceuta": "Ceuta",
-			"comunidad valenciana": "Comunidad Valenciana",
-			"extremadura": "Extremadura",
-			"galicia": "Galicia",
-			"la rioja": "La Rioja",
-			"madrid": "Madrid",
-			"melilla": "Melilla",
-			"murcia": "Murcia",
-			"navarra": "Navarra",
-			"pais vasco": "País Vasco"
-		};
-		const normalized = normalizeCommunity(input);
-		return map[normalized] || input.charAt(0).toUpperCase() + input.slice(1);
-	}
+	
 
 	let datos: Datos[] = [];
 	let mensaje = '';
@@ -93,13 +59,17 @@
 	});
 
 	async function obtenerDatos() {
+		const url = API + query;
+		console.log('Obteniendo datos de:', url);
 		try {
-			const res = await fetch(API + query, {
+			const res = await fetch(url, {
 				headers: {
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				}
 			});
+			
+			console.log('Respuesta del servidor:', res.status, res.statusText);
 			
 			if (!res.ok) {
 				if (res.status === 404) {
@@ -107,11 +77,14 @@
 					mostrarMensaje('⚠️ No hay datos disponibles', 'warning');
 					return;
 				}
-				throw new Error('Error al obtener datos');
+				throw new Error(`Error al obtener datos: ${res.status} ${res.statusText}`);
 			}
 			
 			const datosRecibidos = await res.json();
+			console.log('Datos recibidos:', datosRecibidos);
+			
 			if (!Array.isArray(datosRecibidos)) {
+				console.error('Formato de datos inválido:', datosRecibidos);
 				throw new Error('Formato de datos inválido');
 			}
 			
@@ -122,6 +95,8 @@
 			
 			if (datos.length === 0) {
 				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'warning');
+			} else {
+				console.log('Datos procesados:', datos);
 			}
 		} catch (err) {
 			console.error('Error en obtenerDatos:', err);
@@ -138,6 +113,8 @@
 	}
 
 	async function cargarIniciales() {
+		const url = API + '/loadInitialData';
+		console.log('Cargando datos iniciales desde:', url);
 		try {
 			const res = await fetch(API + '/loadInitialData', {
 				headers: {
@@ -146,15 +123,20 @@
 				}
 			});
 			
+			console.log('Respuesta del servidor:', res.status, res.statusText);
+			
 			let data;
 			try {
 				data = await res.json();
+				console.log('Datos de respuesta:', data);
 			} catch (e) {
+				console.error('Error al parsear respuesta:', e);
 				data = null;
 			}
 			
 			if (res.ok) {
 				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
+				console.log('Datos iniciales cargados correctamente');
 				// Resetear paginación y filtros
 				offset = 0;
 				filtrosAplicados = '';
@@ -163,6 +145,7 @@
 				await obtenerDatos();
 			} else if (res.status === 405 || res.status === 409) {
 				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
+				console.log('Ya existen datos, recargando datos existentes');
 				// Resetear paginación y filtros
 				offset = 0;
 				filtrosAplicados = '';
@@ -170,8 +153,10 @@
 				// Recargar datos existentes
 				await obtenerDatos();
 			} else if (res.status >= 500) {
+				console.error('Error del servidor:', res.status, data);
 				mostrarMensaje('❌ Error del servidor al cargar los datos', 'danger');
 			} else {
+				console.error('Error desconocido:', res.status, data);
 				mostrarMensaje(data?.error || '❌ Error al cargar los datos iniciales', 'danger');
 			}
 		} catch (err) {
@@ -182,6 +167,42 @@
 
 	function limpiarFormulario() {
 		year = comunidad = cantidad = poblacion = proyectos = '';
+	}
+
+	function normalizeCommunity(input: string): string {
+		return input
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[,]/g, '')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
+
+	function formatCommunity(input: string): string {
+		const map: Record<string, string> = {
+			"andalucia": "Andalucía",
+			"aragon": "Aragón",
+			"asturias": "Asturias",
+			"baleares": "Baleares",
+			"canarias": "Canarias",
+			"cantabria": "Cantabria",
+			"castilla-la mancha": "Castilla-La Mancha",
+			"castilla y leon": "Castilla y León",
+			"catalunya": "Cataluña",
+			"ceuta": "Ceuta",
+			"comunidad valenciana": "Comunidad Valenciana",
+			"extremadura": "Extremadura",
+			"galicia": "Galicia",
+			"la rioja": "La Rioja",
+			"madrid": "Madrid",
+			"melilla": "Melilla",
+			"murcia": "Murcia",
+			"navarra": "Navarra",
+			"pais vasco": "País Vasco"
+		};
+		const normalized = normalizeCommunity(input);
+		return map[normalized] || input.charAt(0).toUpperCase() + input.slice(1);
 	}
 
 	async function crear() {
