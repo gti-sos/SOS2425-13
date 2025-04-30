@@ -266,22 +266,25 @@
 		obtenerDatos();
 	}
 
-	function buscarIntervalo() {
+	async function buscarIntervalo() {
 		const f: string[] = [];
 		if (desde) f.push(`from=${desde}`);
 		if (hasta) f.push(`to=${hasta}`);
 		filtrosAplicados = f.length ? '&' + f.join('&') : '';
 		offset = 0;
 		aplicarPaginacion();
-		obtenerDatos();
+		await obtenerDatos();
 		mostrarMensaje('🕒 Intervalo aplicado', 'info');
 	}
-
 
 	function editarRecurso(r: Datos) {
 		currentEdit = { ...r };
 		editMode = true;
-		goto(`/water-supply-improvements/${r.year}/${encodeURIComponent(r.autonomous_community)}`);
+		year = r.year.toString();
+		comunidad = r.autonomous_community;
+		cantidad = r.amount.toString();
+		poblacion = r.benefited_population.toString();
+		proyectos = r.project_count.toString();
 	}
 
 	async function actualizarRecurso() {
@@ -298,13 +301,21 @@
 			if (res.ok) {
 				mostrarMensaje('✅ Recurso actualizado', 'success');
 				editMode = false;
-				obtenerDatos();
+				currentEdit = null;
+				limpiarFormulario();
+				await obtenerDatos();
 			} else if (res.status === 409) mostrarMensaje('⚠️ Conflicto de datos', 'warning');
 			else if (res.status === 400) mostrarMensaje('⚠️ Datos inválidos', 'warning');
 			else throw new Error();
 		} catch {
 			mostrarMensaje('Error al actualizar', 'danger');
 		}
+	}
+
+	function cancelarEdicion() {
+		editMode = false;
+		currentEdit = null;
+		limpiarFormulario();
 	}
 
 	async function eliminarRecurso(r: Datos) {
@@ -324,11 +335,6 @@
 		} catch (e) {
 			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
 		}
-	}
-
-	function cancelarEdicion() {
-		editMode = false;
-		currentEdit = null;
 	}
 
 	async function eliminarTodo() {
@@ -428,12 +434,8 @@
 								<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
 								<button class="btn btn-outline btn-sm" on:click={cancelarEdicion}>Cancelar</button>
 							{:else}
-								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}
-									>Editar</button
-								>
-								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}
-									>Eliminar</button
-								>
+								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
+								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}>Eliminar</button>
 							{/if}
 						</td>
 					</tr>
