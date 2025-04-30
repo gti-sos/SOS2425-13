@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { dev } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { messageStore } from '$lib/stores/messageStore';
 
 	interface Datos {
@@ -22,6 +23,7 @@
 	let filtrosAplicados = '';
 	let query = `?limit=${limit}&offset=${offset}`;
 
+	// Campos de formulario y búsqueda
 	let year = '';
 	let comunidad = '';
 	let cantidad = '';
@@ -40,14 +42,6 @@
 	let editMode = false;
 	let currentEdit: Datos | null = null;
 
-	$: if (editMode && currentEdit) {
-		year = currentEdit.year.toString();
-		comunidad = currentEdit.autonomous_community;
-		cantidad = currentEdit.amount.toString();
-		poblacion = currentEdit.benefited_population.toString();
-		proyectos = currentEdit.project_count.toString();
-	}
-
 	onMount(() => {
 		const unsubscribe = messageStore.subscribe((value) => {
 			if (value) {
@@ -64,50 +58,21 @@
 	});
 
 	async function obtenerDatos() {
-		const url = API + query;
-		console.log('Obteniendo datos de:', url);
 		try {
-			const res = await fetch(url, {
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				}
-			});
-			
-			console.log('Respuesta del servidor:', res.status, res.statusText);
-			
+			const res = await fetch(API + query);
 			if (!res.ok) {
-				if (res.status === 404) {
-					datos = [];
-					mostrarMensaje('⚠️ No hay datos disponibles', 'warning');
-					return;
-				}
-				throw new Error(`Error al obtener datos: ${res.status} ${res.statusText}`);
+				const err = await res.json();
+				throw new Error(err.error || 'Error al obtener datos');
 			}
-			
-			const datosRecibidos = await res.json();
-			console.log('Datos recibidos:', datosRecibidos);
-			
-			if (!Array.isArray(datosRecibidos)) {
-				console.error('Formato de datos inválido:', datosRecibidos);
-				throw new Error('Formato de datos inválido');
-			}
-			
-			datos = datosRecibidos.map((d: Datos) => ({
-				...d,
-				autonomous_community: formatCommunity(d.autonomous_community)
-			}));
-			
+			datos = await res.json();
 			if (datos.length === 0) {
-				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'warning');
-			} else {
-				console.log('Datos procesados:', datos);
+				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'danger');
+				// Redirigir a una página 404 si lo prefieres
+				// goto('/404');
 			}
 		} catch (err) {
-			console.error('Error en obtenerDatos:', err);
 			mensaje = err instanceof Error ? err.message : 'Error desconocido';
 			tipoMensaje = 'danger';
-			datos = [];
 		}
 	}
 
@@ -118,104 +83,25 @@
 	}
 
 	async function cargarIniciales() {
-		const url = API + '/loadInitialData';
-		console.log('Cargando datos iniciales desde:', url);
 		try {
-			const res = await fetch(API + '/loadInitialData', {
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				}
-			});
-			
-			console.log('Respuesta del servidor:', res.status, res.statusText);
-			
-			let data;
-			try {
-				data = await res.json();
-				console.log('Datos de respuesta:', data);
-			} catch (e) {
-				console.error('Error al parsear respuesta:', e);
-				data = null;
-			}
-			
-			if (res.ok) {
-				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
-				console.log('Datos iniciales cargados correctamente');
-				offset = 0;
-				filtrosAplicados = '';
-				query = `?limit=${limit}&offset=${offset}`;
-				await obtenerDatos();
-			} else if (res.status === 405 || res.status === 409) {
-				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
-				console.log('Ya existen datos, recargando datos existentes');
-				offset = 0;
-				filtrosAplicados = '';
-				query = `?limit=${limit}&offset=${offset}`;
-				await obtenerDatos();
-			} else if (res.status >= 500) {
-				console.error('Error del servidor:', res.status, data);
-				mostrarMensaje('❌ Error del servidor al cargar los datos', 'danger');
-			} else {
-				console.error('Error desconocido:', res.status, data);
-				mostrarMensaje(data?.error || '❌ Error al cargar los datos iniciales', 'danger');
-			}
-		} catch (err) {
-			console.error('Error al cargar datos iniciales:', err);
-			mostrarMensaje('❌ Error de conexión con el servidor', 'danger');
+			const res = await fetch(API + '/loadInitialData');
+			if (!res.ok) throw new Error();
+			mostrarMensaje('✅ Datos iniciales cargados', 'success');
+			await obtenerDatos();
+		} catch {
+			mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
 		}
 	}
 
 	function limpiarFormulario() {
-		year = '';
-		comunidad = '';
-		cantidad = '';
-		poblacion = '';
-		proyectos = '';
-	}
-
-	function normalizeCommunity(input: string): string {
-		return input
-			.toLowerCase()
-			.normalize("NFD")
-			.replace(/[,]/g, '')
-			.replace(/[\u0300-\u036f]/g, '')
-			.replace(/\s+/g, ' ')
-			.trim();
-	}
-
-	function formatCommunity(input: string): string {
-		const map: Record<string, string> = {
-			"andalucia": "Andalucía",
-			"aragon": "Aragón",
-			"asturias": "Asturias",
-			"baleares": "Baleares",
-			"canarias": "Canarias",
-			"cantabria": "Cantabria",
-			"castilla-la mancha": "Castilla-La Mancha",
-			"castilla y leon": "Castilla y León",
-			"catalunya": "Cataluña",
-			"ceuta": "Ceuta",
-			"comunidad valenciana": "Comunidad Valenciana",
-			"extremadura": "Extremadura",
-			"galicia": "Galicia",
-			"la rioja": "La Rioja",
-			"madrid": "Madrid",
-			"melilla": "Melilla",
-			"murcia": "Murcia",
-			"navarra": "Navarra",
-			"pais vasco": "País Vasco"
-		};
-		const normalized = normalizeCommunity(input);
-		return map[normalized] || input.charAt(0).toUpperCase() + input.slice(1);
+		year = comunidad = cantidad = poblacion = proyectos = '';
 	}
 
 	async function crear() {
 		try {
-			const normalizado = normalizeCommunity(comunidad);
 			const nuevo: Datos = {
 				year: +year,
-				autonomous_community: normalizado,
+				autonomous_community: comunidad,
 				amount: +cantidad,
 				benefited_population: +poblacion,
 				project_count: +proyectos
@@ -227,7 +113,7 @@
 			});
 			if (res.status === 201) {
 				mostrarMensaje('✅ Recurso creado', 'success');
-				datos = [{ ...nuevo, autonomous_community: formatCommunity(nuevo.autonomous_community) }, ...datos];
+				datos = [nuevo, ...datos];
 				limpiarFormulario();
 			} else if (res.status === 409) mostrarMensaje('⚠️ Recurso ya existe', 'warning');
 			else if (res.status === 400) mostrarMensaje('⚠️ Campos incompletos', 'warning');
@@ -240,39 +126,42 @@
 		}
 	}
 
+	async function eliminarTodo() {
+		try {
+			const res = await fetch(API, { method: 'DELETE' });
+			if (!res.ok) {
+				const err = await res.json();
+				throw new Error(err.error);
+			}
+			datos = [];
+			mostrarMensaje('🗑️ Todos los datos eliminados', 'success');
+		} catch (e) {
+			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
+		}
+	}
+
 	function aplicarPaginacion() {
 		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
 	}
 
-	async function paginaAnterior() {
+	function paginaAnterior() {
 		if (offset >= limit) {
 			offset -= limit;
 			aplicarPaginacion();
-			await obtenerDatos();
+			obtenerDatos();
 		} else mostrarMensaje('⚠️ Primera página', 'warning');
 	}
 
-	async function siguientePagina() {
+	function siguientePagina() {
 		offset += limit;
 		aplicarPaginacion();
-		await obtenerDatos();
-	}
-
-	async function buscarIntervalo() {
-		const f: string[] = [];
-		if (desde) f.push(`from=${desde}`);
-		if (hasta) f.push(`to=${hasta}`);
-		filtrosAplicados = f.length ? '&' + f.join('&') : '';
-		offset = 0;
-		aplicarPaginacion();
-		await obtenerDatos();
-		mostrarMensaje('🕒 Intervalo aplicado', 'info');
+		obtenerDatos();
 	}
 
 	function buildFilters() {
 		const f: string[] = [];
 		if (busquedaYear) f.push(`year=${busquedaYear}`);
-		if (busquedaComunidad) f.push(`autonomous_community=${normalizeCommunity(busquedaComunidad)}`);
+		if (busquedaComunidad) f.push(`autonomous_community=${busquedaComunidad}`);
 		if (busquedaCantidad) f.push(`amount=${busquedaCantidad}`);
 		if (busquedaPoblacion) f.push(`benefited_population=${busquedaPoblacion}`);
 		if (busquedaProyectos) f.push(`project_count=${busquedaProyectos}`);
@@ -282,9 +171,21 @@
 		obtenerDatos();
 	}
 
+	function buscarIntervalo() {
+		const f: string[] = [];
+		if (desde) f.push(`from=${desde}`);
+		if (hasta) f.push(`to=${hasta}`);
+		filtrosAplicados = f.length ? '&' + f.join('&') : '';
+		offset = 0;
+		aplicarPaginacion();
+		obtenerDatos();
+		mostrarMensaje('🕒 Intervalo aplicado', 'info');
+	}
+
 	function editarRecurso(r: Datos) {
 		currentEdit = { ...r };
 		editMode = true;
+		goto(`/water-supply-improvements/${r.year}/${encodeURIComponent(r.autonomous_community)}`);
 	}
 
 	async function actualizarRecurso() {
@@ -301,21 +202,13 @@
 			if (res.ok) {
 				mostrarMensaje('✅ Recurso actualizado', 'success');
 				editMode = false;
-				currentEdit = null;
-				limpiarFormulario();
-				await obtenerDatos();
+				obtenerDatos();
 			} else if (res.status === 409) mostrarMensaje('⚠️ Conflicto de datos', 'warning');
 			else if (res.status === 400) mostrarMensaje('⚠️ Datos inválidos', 'warning');
 			else throw new Error();
 		} catch {
 			mostrarMensaje('Error al actualizar', 'danger');
 		}
-	}
-
-	function cancelarEdicion() {
-		editMode = false;
-		currentEdit = null;
-		limpiarFormulario();
 	}
 
 	async function eliminarRecurso(r: Datos) {
@@ -337,19 +230,9 @@
 		}
 	}
 
-	async function eliminarTodo() {
-		try {
-			const res = await fetch(API, { method: 'DELETE' });
-			if (res.ok) {
-				datos = [];
-				mostrarMensaje('✅ Todos los datos han sido eliminados', 'success');
-			} else {
-				const err = await res.json();
-				throw new Error(err.error);
-			}
-		} catch (e) {
-			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
-		}
+	function cancelarEdicion() {
+		editMode = false;
+		currentEdit = null;
 	}
 </script>
 
@@ -384,8 +267,8 @@
 		<h3>Filtrado por campos</h3>
 		<div class="flex">
 			<input placeholder="Año" bind:value={busquedaYear} />
-			<input placeholder="CCAA" bind:value={busquedaComunidad} />
-			<input placeholder="Cantidad (€)" bind:value={busquedaCantidad} />
+			<input placeholder="Comunidad Autónoma" bind:value={busquedaComunidad} />
+			<input placeholder="Cantidad" bind:value={busquedaCantidad} />
 			<input placeholder="Población" bind:value={busquedaPoblacion} />
 			<input placeholder="Proyectos" bind:value={busquedaProyectos} />
 			<button class="btn btn-warning" on:click={buildFilters}>Filtrar</button>
@@ -395,11 +278,11 @@
 	<div class="section card">
 		<h3>{editMode ? 'Editar recurso' : 'Crear nuevo recurso'}</h3>
 		<div class="flex">
-			<input type="number" placeholder="Año" bind:value={year} />
-			<input placeholder="CCAA" bind:value={comunidad} />
-			<input type="number" step="0.01" placeholder="Cantidad (€)" bind:value={cantidad} />
-			<input type="number" placeholder="Población beneficiada" bind:value={poblacion} />
-			<input type="number" placeholder="Proyectos" bind:value={proyectos} />
+			<input type="number" placeholder="AñoC" bind:value={year} />
+			<input placeholder="Comunidad AutónomaC" bind:value={comunidad} />
+			<input type="number" step="0.01" placeholder="CantidadC (€)" bind:value={cantidad} />
+			<input type="number" placeholder="Población beneficiadaC" bind:value={poblacion} />
+			<input type="number" placeholder="ProyectosC" bind:value={proyectos} />
 			{#if editMode}
 				<button class="btn btn-success" on:click={actualizarRecurso}>Guardar</button>
 				<button class="btn btn-outline" on:click={cancelarEdicion}>Cancelar</button>
@@ -434,8 +317,12 @@
 								<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
 								<button class="btn btn-outline btn-sm" on:click={cancelarEdicion}>Cancelar</button>
 							{:else}
-								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
-								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}>Eliminar</button>
+								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}
+									>Editar</button
+								>
+								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}
+									>Eliminar</button
+								>
 							{/if}
 						</td>
 					</tr>
@@ -452,188 +339,156 @@
 
 <style>
 	:root {
-		--primary: #0d47a1;
-		--secondary: #424242;
-		--bg: #f5f7fa;
+		--primary: #0056b3;
+		--secondary: #6c757d;
+		--bg: #f5f5f5;
 		--card-bg: #ffffff;
-		--border: #d1d1d1;
-		--radius: 10px;
-		--shadow: rgba(0, 0, 0, 0.04);
-		--font: 'Segoe UI', sans-serif;
+		--border: #dee2e6;
+		--radius: 6px;
+		--shadow: rgba(0, 0, 0, 0.08);
+		--font: 'Roboto', sans-serif;
 	}
-
 	body {
 		font-family: var(--font);
 		background: var(--bg);
 		color: #212529;
 	}
-
 	.container {
-		max-width: 960px;
+		max-width: 900px;
 		margin: 2rem auto;
-		padding: 2rem;
+		padding: 1.5rem;
 		background: var(--card-bg);
 		border-radius: var(--radius);
-		box-shadow: 0 2px 6px var(--shadow);
-		border: 1px solid var(--border);
+		box-shadow: 0 4px 12px var(--shadow);
 	}
-
 	h1 {
-		font-size: 2rem;
-		margin-bottom: 1.5rem;
+		font-size: 1.75rem;
+		margin-bottom: 1rem;
 		color: var(--primary);
 		border-bottom: 2px solid var(--primary);
 		padding-bottom: 0.5rem;
-		text-align: center;
 	}
-
 	h3 {
 		font-size: 1.25rem;
 		margin-top: 1.5rem;
 		margin-bottom: 0.75rem;
 		color: var(--secondary);
 	}
-
 	.flex {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		align-items: center;
 	}
-
 	.section {
 		margin-bottom: 1.5rem;
 	}
-
 	.card {
-		background: #fafafa;
+		background: var(--card-bg);
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
-		padding: 1.25rem;
-		box-shadow: 0 1px 4px var(--shadow);
+		padding: 1rem;
+		box-shadow: 0 2px 6px var(--shadow);
 	}
-
 	.table-wrapper {
 		overflow-x: auto;
 		margin-top: 1rem;
 	}
-
 	table {
 		width: 100%;
 		border-collapse: collapse;
 	}
-
 	th,
 	td {
-		padding: 0.75rem;
+		padding: 0.75rem 0.5rem;
 		border: 1px solid var(--border);
-		text-align: left;
 	}
-
 	th {
-		background: #f0f0f0;
+		background: var(--bg);
 		position: sticky;
 		top: 0;
 	}
-
 	tr:nth-child(even) {
-		background: #fdfdfd;
+		background: #fafafa;
 	}
-
 	tr:hover {
-		background: #eff4fa;
+		background: #f1f1f1;
 	}
-
 	input {
 		flex: 1;
 		min-width: 120px;
 		padding: 0.5rem;
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
-		background-color: white;
 	}
-
 	.btn {
 		padding: 0.5rem 1rem;
 		border: none;
 		border-radius: var(--radius);
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: transform 0.1s ease;
 	}
-
 	.btn:hover {
-		transform: scale(1.02);
-		box-shadow: 0 1px 6px var(--shadow);
+		transform: translateY(-1px);
 	}
-
+	.btn:active {
+		transform: translateY(0);
+	}
 	.btn-primary {
 		background: var(--primary);
 		color: white;
 	}
-
 	.btn-success {
-		background: #2e7d32;
+		background: #28a745;
 		color: white;
 	}
-
 	.btn-info {
-		background: #0288d1;
+		background: #17a2b8;
 		color: white;
 	}
-
 	.btn-warning {
-		background: #f9a825;
-		color: white;
+		background: #ffc107;
+		color: #212529;
 	}
-
 	.btn-danger {
-		background: #c62828;
+		background: #dc3545;
 		color: white;
 	}
-
 	.btn-outline {
 		background: transparent;
 		border: 1px solid var(--primary);
 		color: var(--primary);
 	}
-
 	.btn-sm {
-		padding: 0.35rem 0.75rem;
+		padding: 0.4rem 0.75rem;
 		font-size: 0.85rem;
 	}
-
 	.alert {
 		padding: 0.75rem 1rem;
 		border-radius: var(--radius);
-		margin-bottom: 1.25rem;
+		margin-bottom: 1rem;
 		font-weight: 500;
 	}
-
 	.alert-primary {
-		background: rgba(13, 71, 161, 0.08);
+		background: rgba(0, 86, 179, 0.1);
 		color: var(--primary);
 	}
-
 	.alert-success {
-		background: rgba(46, 125, 50, 0.1);
-		color: #2e7d32;
+		background: rgba(40, 167, 69, 0.1);
+		color: #28a745;
 	}
-
 	.alert-info {
-		background: rgba(2, 136, 209, 0.1);
-		color: #0288d1;
+		background: rgba(23, 162, 184, 0.1);
+		color: #17a2b8;
 	}
-
 	.alert-warning {
-		background: rgba(249, 168, 37, 0.1);
-		color: #8a6d00;
+		background: rgba(255, 193, 7, 0.1);
+		color: #856404;
 	}
-
 	.alert-danger {
-		background: rgba(198, 40, 40, 0.1);
-		color: #c62828;
+		background: rgba(220, 53, 69, 0.1);
+		color: #dc3545;
 	}
-
 	@media (max-width: 600px) {
 		.flex {
 			flex-direction: column;

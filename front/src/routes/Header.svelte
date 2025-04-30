@@ -1,89 +1,44 @@
 <svelte:head>
-	<title>SOS2425-13</title>
+     <title>SOS2425-13</title>
 </svelte:head>
-
 <main>
-	<nav>
-		<div class="container">
-			<a id="inicio" href="/">Inicio</a>
-			<a id="about" href="/about.html">Acerca de nosotros</a>
-			<a id="forest-fires" href="/forest-fires">Incendios forestales</a>
-			<a id="national-parks" href="/national-parks">Parques naturales</a>
-			<a id="water-supply-improvements" href="/water-supply-improvements">Suministro de agua</a>
-		</div>
-	</nav>
+     <nav>
+         <div class="container">
+             <a id="inicio" href="/">Inicio</a>
+             <a id="about" href="/about.html">Acerca de</a> <!-- Enlace al archivo estático 'about.html' -->
+         </div>
+     </nav>
 </main>
 
 <style>
-	body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #fafafa; /* fondo general */
-    min-height: 100vh;
-}
+     #inicio {
+         margin-top: 15px;
+     }   
 
-	nav {
-		background-color: #f2f2f2; /* fondo neutro claro que sí combina */
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-		padding: 20px 0;
-		position: sticky;
-		top: 0;
-		z-index: 10;
-	}
+     #about {
+         margin-top: 15px; /* Espaciado similar al de 'inicio' */
+     }
 
-	.container {
-		max-width: 1200px;
-		margin: 0 auto;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		align-items: center;
-		gap: 20px;
-	}
+     a {
+         color : rgb(16, 16, 17);
+         text-decoration: none;
+         font-size: 21px;
+         padding-top: 20px;
+         margin-left: 10px;
+         text-align: center; 
+     }
 
-	a {
-		text-decoration: none;
-		font-size: 1.15rem;
-		padding: 10px 20px;
-		border-radius: 10px;
-		font-weight: 600;
-		color: #333;
-		background-color: #e0e0e0; /* color neutro base */
-		transition:
-			background-color 0.3s,
-			color 0.3s;
-	}
+     main {
+         margin-top: 20px;
+         position: relative;
+         height: 200px;
+     }
 
-	/* Hover temático por ID */
-	#inicio:hover {
-		background-color: #1a237e;
-		color: white;
-	}
-
-	#about:hover {
-		background-color: #424242;
-		color: white;
-	}
-
-	#forest-fires:hover {
-		background-color: #d32f2f;
-		color: white;
-	}
-
-	#national-parks:hover {
-		background-color: #2e7d32;
-		color: white;
-	}
-
-	#water-supply-improvements:hover {
-		background-color: #0288d1;
-		color: white;
-	}
-
-	@media (max-width: 768px) {
-		.container {
-			flex-direction: column;
-			gap: 12px;
-		}
-	}
+     .container {
+         width: 1200px;
+         height: 200px;
+         display: grid;
+         grid-template-rows: 50% 50%;
+         grid-template-columns: 20% 20% 20% 20% 20%;
+     }
 </style>
