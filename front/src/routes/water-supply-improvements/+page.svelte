@@ -12,6 +12,42 @@
 		project_count: number;
 	}
 
+	function normalizeCommunity(input: string): string {
+		return input
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[,]/g, '')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
+
+	function formatCommunity(input: string): string {
+		const map: Record<string, string> = {
+			"andalucia": "Andalucía",
+			"aragon": "Aragón",
+			"asturias": "Asturias",
+			"baleares": "Baleares",
+			"canarias": "Canarias",
+			"cantabria": "Cantabria",
+			"castilla-la mancha": "Castilla-La Mancha",
+			"castilla y leon": "Castilla y León",
+			"catalunya": "Cataluña",
+			"ceuta": "Ceuta",
+			"comunidad valenciana": "Comunidad Valenciana",
+			"extremadura": "Extremadura",
+			"galicia": "Galicia",
+			"la rioja": "La Rioja",
+			"madrid": "Madrid",
+			"melilla": "Melilla",
+			"murcia": "Murcia",
+			"navarra": "Navarra",
+			"pais vasco": "País Vasco"
+		};
+		const normalized = normalizeCommunity(input);
+		return map[normalized] || input.charAt(0).toUpperCase() + input.slice(1);
+	}
+
 	let datos: Datos[] = [];
 	let mensaje = '';
 	let tipoMensaje: string = 'primary';
@@ -23,7 +59,6 @@
 	let filtrosAplicados = '';
 	let query = `?limit=${limit}&offset=${offset}`;
 
-	// Campos de formulario y búsqueda
 	let year = '';
 	let comunidad = '';
 	let cantidad = '';
@@ -60,16 +95,13 @@
 	async function obtenerDatos() {
 		try {
 			const res = await fetch(API + query);
-			if (!res.ok) {
-				const err = await res.json();
-				throw new Error(err.error || 'Error al obtener datos');
-			}
-			datos = await res.json();
-			if (datos.length === 0) {
+			if (!res.ok) throw new Error('Error al obtener datos');
+			datos = (await res.json()).map((d: Datos) => ({
+				...d,
+				autonomous_community: formatCommunity(d.autonomous_community)
+			}));
+			if (datos.length === 0)
 				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'danger');
-				// Redirigir a una página 404 si lo prefieres
-				// goto('/404');
-			}
 		} catch (err) {
 			mensaje = err instanceof Error ? err.message : 'Error desconocido';
 			tipoMensaje = 'danger';
@@ -99,9 +131,10 @@
 
 	async function crear() {
 		try {
+			const normalizado = normalizeCommunity(comunidad);
 			const nuevo: Datos = {
 				year: +year,
-				autonomous_community: comunidad,
+				autonomous_community: normalizado,
 				amount: +cantidad,
 				benefited_population: +poblacion,
 				project_count: +proyectos
@@ -113,7 +146,7 @@
 			});
 			if (res.status === 201) {
 				mostrarMensaje('✅ Recurso creado', 'success');
-				datos = [nuevo, ...datos];
+				datos = [{ ...nuevo, autonomous_community: formatCommunity(nuevo.autonomous_community) }, ...datos];
 				limpiarFormulario();
 			} else if (res.status === 409) mostrarMensaje('⚠️ Recurso ya existe', 'warning');
 			else if (res.status === 400) mostrarMensaje('⚠️ Campos incompletos', 'warning');
@@ -123,20 +156,6 @@
 			}
 		} catch (e) {
 			mostrarMensaje(e instanceof Error ? e.message : 'Error al crear', 'danger');
-		}
-	}
-
-	async function eliminarTodo() {
-		try {
-			const res = await fetch(API, { method: 'DELETE' });
-			if (!res.ok) {
-				const err = await res.json();
-				throw new Error(err.error);
-			}
-			datos = [];
-			mostrarMensaje('🗑️ Todos los datos eliminados', 'success');
-		} catch (e) {
-			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
 		}
 	}
 
@@ -161,7 +180,7 @@
 	function buildFilters() {
 		const f: string[] = [];
 		if (busquedaYear) f.push(`year=${busquedaYear}`);
-		if (busquedaComunidad) f.push(`autonomous_community=${busquedaComunidad}`);
+		if (busquedaComunidad) f.push(`autonomous_community=${normalizeCommunity(busquedaComunidad)}`);
 		if (busquedaCantidad) f.push(`amount=${busquedaCantidad}`);
 		if (busquedaPoblacion) f.push(`benefited_population=${busquedaPoblacion}`);
 		if (busquedaProyectos) f.push(`project_count=${busquedaProyectos}`);
@@ -181,6 +200,7 @@
 		obtenerDatos();
 		mostrarMensaje('🕒 Intervalo aplicado', 'info');
 	}
+
 
 	function editarRecurso(r: Datos) {
 		currentEdit = { ...r };
@@ -267,8 +287,8 @@
 		<h3>Filtrado por campos</h3>
 		<div class="flex">
 			<input placeholder="Año" bind:value={busquedaYear} />
-			<input placeholder="Comunidad Autónoma" bind:value={busquedaComunidad} />
-			<input placeholder="Cantidad" bind:value={busquedaCantidad} />
+			<input placeholder="CCAA" bind:value={busquedaComunidad} />
+			<input placeholder="Cantidad (€)" bind:value={busquedaCantidad} />
 			<input placeholder="Población" bind:value={busquedaPoblacion} />
 			<input placeholder="Proyectos" bind:value={busquedaProyectos} />
 			<button class="btn btn-warning" on:click={buildFilters}>Filtrar</button>
@@ -278,11 +298,11 @@
 	<div class="section card">
 		<h3>{editMode ? 'Editar recurso' : 'Crear nuevo recurso'}</h3>
 		<div class="flex">
-			<input type="number" placeholder="AñoC" bind:value={year} />
-			<input placeholder="Comunidad AutónomaC" bind:value={comunidad} />
-			<input type="number" step="0.01" placeholder="CantidadC (€)" bind:value={cantidad} />
-			<input type="number" placeholder="Población beneficiadaC" bind:value={poblacion} />
-			<input type="number" placeholder="ProyectosC" bind:value={proyectos} />
+			<input type="number" placeholder="Año" bind:value={year} />
+			<input placeholder="CCAA" bind:value={comunidad} />
+			<input type="number" step="0.01" placeholder="Cantidad (€)" bind:value={cantidad} />
+			<input type="number" placeholder="Población beneficiada" bind:value={poblacion} />
+			<input type="number" placeholder="Proyectos" bind:value={proyectos} />
 			{#if editMode}
 				<button class="btn btn-success" on:click={actualizarRecurso}>Guardar</button>
 				<button class="btn btn-outline" on:click={cancelarEdicion}>Cancelar</button>
@@ -339,156 +359,188 @@
 
 <style>
 	:root {
-		--primary: #0056b3;
-		--secondary: #6c757d;
-		--bg: #f5f5f5;
+		--primary: #0d47a1;
+		--secondary: #424242;
+		--bg: #f5f7fa;
 		--card-bg: #ffffff;
-		--border: #dee2e6;
-		--radius: 6px;
-		--shadow: rgba(0, 0, 0, 0.08);
-		--font: 'Roboto', sans-serif;
+		--border: #d1d1d1;
+		--radius: 10px;
+		--shadow: rgba(0, 0, 0, 0.04);
+		--font: 'Segoe UI', sans-serif;
 	}
+
 	body {
 		font-family: var(--font);
 		background: var(--bg);
 		color: #212529;
 	}
+
 	.container {
-		max-width: 900px;
+		max-width: 960px;
 		margin: 2rem auto;
-		padding: 1.5rem;
+		padding: 2rem;
 		background: var(--card-bg);
 		border-radius: var(--radius);
-		box-shadow: 0 4px 12px var(--shadow);
+		box-shadow: 0 2px 6px var(--shadow);
+		border: 1px solid var(--border);
 	}
+
 	h1 {
-		font-size: 1.75rem;
-		margin-bottom: 1rem;
+		font-size: 2rem;
+		margin-bottom: 1.5rem;
 		color: var(--primary);
 		border-bottom: 2px solid var(--primary);
 		padding-bottom: 0.5rem;
+		text-align: center;
 	}
+
 	h3 {
 		font-size: 1.25rem;
 		margin-top: 1.5rem;
 		margin-bottom: 0.75rem;
 		color: var(--secondary);
 	}
+
 	.flex {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		align-items: center;
 	}
+
 	.section {
 		margin-bottom: 1.5rem;
 	}
+
 	.card {
-		background: var(--card-bg);
+		background: #fafafa;
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
-		padding: 1rem;
-		box-shadow: 0 2px 6px var(--shadow);
+		padding: 1.25rem;
+		box-shadow: 0 1px 4px var(--shadow);
 	}
+
 	.table-wrapper {
 		overflow-x: auto;
 		margin-top: 1rem;
 	}
+
 	table {
 		width: 100%;
 		border-collapse: collapse;
 	}
+
 	th,
 	td {
-		padding: 0.75rem 0.5rem;
+		padding: 0.75rem;
 		border: 1px solid var(--border);
+		text-align: left;
 	}
+
 	th {
-		background: var(--bg);
+		background: #f0f0f0;
 		position: sticky;
 		top: 0;
 	}
+
 	tr:nth-child(even) {
-		background: #fafafa;
+		background: #fdfdfd;
 	}
+
 	tr:hover {
-		background: #f1f1f1;
+		background: #eff4fa;
 	}
+
 	input {
 		flex: 1;
 		min-width: 120px;
 		padding: 0.5rem;
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
+		background-color: white;
 	}
+
 	.btn {
 		padding: 0.5rem 1rem;
 		border: none;
 		border-radius: var(--radius);
 		cursor: pointer;
-		transition: transform 0.1s ease;
+		transition: all 0.2s ease;
 	}
+
 	.btn:hover {
-		transform: translateY(-1px);
+		transform: scale(1.02);
+		box-shadow: 0 1px 6px var(--shadow);
 	}
-	.btn:active {
-		transform: translateY(0);
-	}
+
 	.btn-primary {
 		background: var(--primary);
 		color: white;
 	}
+
 	.btn-success {
-		background: #28a745;
+		background: #2e7d32;
 		color: white;
 	}
+
 	.btn-info {
-		background: #17a2b8;
+		background: #0288d1;
 		color: white;
 	}
+
 	.btn-warning {
-		background: #ffc107;
-		color: #212529;
-	}
-	.btn-danger {
-		background: #dc3545;
+		background: #f9a825;
 		color: white;
 	}
+
+	.btn-danger {
+		background: #c62828;
+		color: white;
+	}
+
 	.btn-outline {
 		background: transparent;
 		border: 1px solid var(--primary);
 		color: var(--primary);
 	}
+
 	.btn-sm {
-		padding: 0.4rem 0.75rem;
+		padding: 0.35rem 0.75rem;
 		font-size: 0.85rem;
 	}
+
 	.alert {
 		padding: 0.75rem 1rem;
 		border-radius: var(--radius);
-		margin-bottom: 1rem;
+		margin-bottom: 1.25rem;
 		font-weight: 500;
 	}
+
 	.alert-primary {
-		background: rgba(0, 86, 179, 0.1);
+		background: rgba(13, 71, 161, 0.08);
 		color: var(--primary);
 	}
+
 	.alert-success {
-		background: rgba(40, 167, 69, 0.1);
-		color: #28a745;
+		background: rgba(46, 125, 50, 0.1);
+		color: #2e7d32;
 	}
+
 	.alert-info {
-		background: rgba(23, 162, 184, 0.1);
-		color: #17a2b8;
+		background: rgba(2, 136, 209, 0.1);
+		color: #0288d1;
 	}
+
 	.alert-warning {
-		background: rgba(255, 193, 7, 0.1);
-		color: #856404;
+		background: rgba(249, 168, 37, 0.1);
+		color: #8a6d00;
 	}
+
 	.alert-danger {
-		background: rgba(220, 53, 69, 0.1);
-		color: #dc3545;
+		background: rgba(198, 40, 40, 0.1);
+		color: #c62828;
 	}
+
 	@media (max-width: 600px) {
 		.flex {
 			flex-direction: column;
