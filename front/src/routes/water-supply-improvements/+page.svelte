@@ -3,7 +3,6 @@
 	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { messageStore } from '$lib/stores/messageStore';
-	
 
 	interface Datos {
 		year: number;
@@ -11,6 +10,43 @@
 		amount: number;
 		benefited_population: number;
 		project_count: number;
+		original_autonomous_community?: string;
+	}
+
+	// Normalizar el nombre de la comunidad (minúsculas y sin tildes)
+	function normalizeCommunity(input: string): string {
+		return input
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+			.replace(/[,]/g, '')
+			.replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno solo
+			.trim()
+			
+	}
+
+	// Formatear la comunidad para mostrarla con mayúsculas y tildes
+	function formatCommunity(input: string): string {
+		const map: Record<string, string> = {
+			andalucia: 'Andalucía',
+			aragon: 'Aragón',
+			asturias: 'Asturias',
+			canarias: 'Canarias',
+			cantabria: 'Cantabria',
+			'castilla-la mancha': 'Castilla-La Mancha',
+			'castilla y leon': 'Castilla y León',
+			catalunia: 'Cataluña',
+			'comunidad valenciana': 'Comunidad Valenciana',
+			extremadura: 'Extremadura',
+			galicia: 'Galicia',
+			madrid: 'Madrid',
+			murcia: 'Murcia',
+			navarra: 'Navarra',
+			'pais vasco': 'País Vasco'
+		};
+
+		const normalized = normalizeCommunity(input);
+		return map[normalized] || input.charAt(0).toUpperCase() + input.slice(1); // Capitalizar si no se encuentra en el mapa
 	}
 
 	let datos: Datos[] = [];
@@ -58,6 +94,7 @@
 		return () => unsubscribe();
 	});
 
+	// Obtener los datos de la API
 	async function obtenerDatos() {
 		try {
 			const res = await fetch(API + query);
@@ -65,11 +102,17 @@
 				const err = await res.json();
 				throw new Error(err.error || 'Error al obtener datos');
 			}
-			datos = await res.json();
+
+			const data = await res.json(); // Obtener la respuesta
+			datos = data.map((d: Datos) => ({
+				...d,
+				// Guardar el valor original (sin formato) y mostrar el valor con formato
+				original_autonomous_community: d.autonomous_community, // Guardamos el valor original
+				autonomous_community: formatCommunity(d.autonomous_community) // Mostramos el valor con formato
+			}));
+
 			if (datos.length === 0) {
 				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'danger');
-				// Redirigir a una página 404 si lo prefieres
-				// goto('/404');
 			}
 		} catch (err) {
 			mensaje = err instanceof Error ? err.message : 'Error desconocido';
@@ -77,37 +120,36 @@
 		}
 	}
 
+	// Mostrar mensajes de error o éxito
 	function mostrarMensaje(texto: string, tipo: typeof tipoMensaje = 'info') {
 		mensaje = texto;
 		tipoMensaje = tipo;
 		setTimeout(() => (mensaje = ''), 4000);
 	}
 
-	async function cargarDatosIniciales() {
+	// Cargar los datos iniciales
+	async function cargarIniciales() {
 		try {
 			const res = await fetch(API + '/loadInitialData');
-			if (res.ok) {
-				mostrarMensaje('✅ Datos iniciales cargados', 'success');
-				await obtenerDatos();
-			} else if (res.status === 409) {
-				mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
-			} else {
-				throw new Error();
-			}
+			if (!res.ok) throw new Error();
+			mostrarMensaje('✅ Datos iniciales cargados', 'success');
+			await obtenerDatos();
 		} catch {
-			mostrarMensaje('⚠️ Error al cargar datos iniciales', 'danger');
+			mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
 		}
 	}
 
+	// Limpiar formulario
 	function limpiarFormulario() {
 		year = comunidad = cantidad = poblacion = proyectos = '';
 	}
 
+	// Crear un nuevo recurso
 	async function crear() {
 		try {
 			const nuevo: Datos = {
 				year: +year,
-				autonomous_community: comunidad,
+				autonomous_community: normalizeCommunity(comunidad), // Guardar en formato original (sin mayúsculas ni tildes)
 				amount: +cantidad,
 				benefited_population: +poblacion,
 				project_count: +proyectos
@@ -119,7 +161,10 @@
 			});
 			if (res.status === 201) {
 				mostrarMensaje('✅ Recurso creado', 'success');
-				datos = [nuevo, ...datos];
+				datos = [
+					{ ...nuevo, autonomous_community: formatCommunity(nuevo.autonomous_community) },
+					...datos
+				];
 				limpiarFormulario();
 			} else if (res.status === 409) mostrarMensaje('⚠️ Recurso ya existe', 'warning');
 			else if (res.status === 400) mostrarMensaje('⚠️ Campos incompletos', 'warning');
@@ -132,6 +177,7 @@
 		}
 	}
 
+	// Eliminar todos los recursos
 	async function eliminarTodo() {
 		try {
 			const res = await fetch(API, { method: 'DELETE' });
@@ -146,10 +192,12 @@
 		}
 	}
 
+	// Aplicar paginación
 	function aplicarPaginacion() {
 		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
 	}
 
+	// Navegar a la página anterior
 	function paginaAnterior() {
 		if (offset >= limit) {
 			offset -= limit;
@@ -158,16 +206,18 @@
 		} else mostrarMensaje('⚠️ Primera página', 'warning');
 	}
 
+	// Navegar a la siguiente página
 	function siguientePagina() {
 		offset += limit;
 		aplicarPaginacion();
 		obtenerDatos();
 	}
 
+	// Filtrar por campos
 	function buildFilters() {
 		const f: string[] = [];
 		if (busquedaYear) f.push(`year=${busquedaYear}`);
-		if (busquedaComunidad) f.push(`autonomous_community=${busquedaComunidad}`);
+		if (busquedaComunidad) f.push(`autonomous_community=${normalizeCommunity(busquedaComunidad)}`);
 		if (busquedaCantidad) f.push(`amount=${busquedaCantidad}`);
 		if (busquedaPoblacion) f.push(`benefited_population=${busquedaPoblacion}`);
 		if (busquedaProyectos) f.push(`project_count=${busquedaProyectos}`);
@@ -177,6 +227,7 @@
 		obtenerDatos();
 	}
 
+	// Buscar por intervalo de años
 	function buscarIntervalo() {
 		const f: string[] = [];
 		if (desde) f.push(`from=${desde}`);
@@ -188,50 +239,71 @@
 		mostrarMensaje('🕒 Intervalo aplicado', 'info');
 	}
 
+	// Editar un recurso
 	function editarRecurso(r: Datos) {
+		// Validar si r tiene los valores necesarios
+		if (!r.year || !r.autonomous_community) {
+			return mostrarMensaje('⚠️ Recurso incompleto', 'danger');
+		}
+
 		currentEdit = { ...r };
 		editMode = true;
-		goto(`/water-supply-improvements/${r.year}/${encodeURIComponent(r.autonomous_community)}`);
+		goto(
+			`/water-supply-improvements/${r.year}/${encodeURIComponent(r.original_autonomous_community || '')}`
+		);
 	}
 
-	async function actualizarRecursoActual() {
-		if (!currentEdit) return mostrarMensaje('⚠️ Ningún recurso seleccionado', 'danger');
+	// Actualizar un recurso
+	async function actualizarRecurso() {
+		if (!currentEdit || !currentEdit.year || !currentEdit.original_autonomous_community) {
+			return mostrarMensaje('⚠️ Ningún recurso seleccionado o datos incompletos', 'danger');
+		}
+
 		try {
 			const res = await fetch(
-				`${API}/${currentEdit.year}/${encodeURIComponent(currentEdit.autonomous_community)}`,
+				`${API}/${currentEdit.year}/${encodeURIComponent(currentEdit.original_autonomous_community)}`,
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(currentEdit)
+					body: JSON.stringify({
+						year: currentEdit.year,
+						autonomous_community: currentEdit.original_autonomous_community, // Usamos la comunidad original
+						amount: currentEdit.amount,
+						benefited_population: currentEdit.benefited_population,
+						project_count: currentEdit.project_count
+					})
 				}
 			);
 			if (res.ok) {
 				mostrarMensaje('✅ Recurso actualizado', 'success');
 				editMode = false;
-				await obtenerDatos();
-			} else if (res.status === 409) {
-				mostrarMensaje('⚠️ Conflicto de datos', 'warning');
-			} else if (res.status === 400) {
-				mostrarMensaje('⚠️ Datos inválidos', 'warning');
-			} else {
-				throw new Error();
-			}
+				obtenerDatos();
+			} else if (res.status === 409) mostrarMensaje('⚠️ Conflicto de datos', 'warning');
+			else if (res.status === 400) mostrarMensaje('⚠️ Datos inválidos', 'warning');
+			else throw new Error();
 		} catch {
 			mostrarMensaje('Error al actualizar', 'danger');
 		}
 	}
 
-	async function eliminarRecursoActual(r: Datos) {
+	// Eliminar un recurso
+	async function eliminarRecurso(r: Datos) {
+		// Validar que el recurso tenga año y comunidad antes de eliminar
+		if (!r.year || !r.original_autonomous_community) {
+			return mostrarMensaje('⚠️ Datos incompletos para eliminar', 'danger');
+		}
+
 		try {
 			const res = await fetch(
-				`${API}/${r.year}/${encodeURIComponent(r.autonomous_community)}`,
+				`${API}/${r.year}/${encodeURIComponent(r.original_autonomous_community)}`,
 				{ method: 'DELETE' }
 			);
 			if (res.ok) {
-				mostrarMensaje('🗑️ Recurso eliminado', 'success');
 				datos = datos.filter(
-					(d) => d.year !== r.year || d.autonomous_community !== r.autonomous_community
+					(d) =>
+						d.year !== r.year || d.original_autonomous_community !== r.original_autonomous_community
 				);
+				mostrarMensaje('🗑️ Recurso eliminado', 'success');
 			} else {
 				const err = await res.json();
 				throw new Error(err.error);
@@ -241,6 +313,7 @@
 		}
 	}
 
+	// Cancelar edición
 	function cancelarEdicion() {
 		editMode = false;
 		currentEdit = null;
@@ -260,7 +333,7 @@
 
 	<div class="section card">
 		<div class="flex">
-			<button class="btn btn-info" on:click={cargarDatosIniciales}>Cargar datos iniciales</button>
+			<button class="btn btn-info" on:click={cargarIniciales}>Cargar datos iniciales</button>
 			<button class="btn btn-danger" on:click={eliminarTodo}>Eliminar todo</button>
 		</div>
 	</div>
@@ -278,8 +351,8 @@
 		<h3>Filtrado por campos</h3>
 		<div class="flex">
 			<input placeholder="Año" bind:value={busquedaYear} />
-			<input placeholder="Comunidad Autónoma" bind:value={busquedaComunidad} />
-			<input placeholder="Cantidad" bind:value={busquedaCantidad} />
+			<input placeholder="CCAA" bind:value={busquedaComunidad} />
+			<input placeholder="Cantidad (€)" bind:value={busquedaCantidad} />
 			<input placeholder="Población" bind:value={busquedaPoblacion} />
 			<input placeholder="Proyectos" bind:value={busquedaProyectos} />
 			<button class="btn btn-warning" on:click={buildFilters}>Filtrar</button>
@@ -290,12 +363,12 @@
 		<h3>{editMode ? 'Editar recurso' : 'Crear nuevo recurso'}</h3>
 		<div class="flex">
 			<input type="number" placeholder="Año" bind:value={year} />
-			<input placeholder="Comunidad Autónoma" bind:value={comunidad} />
+			<input placeholder="CCAA" bind:value={comunidad} />
 			<input type="number" step="0.01" placeholder="Cantidad (€)" bind:value={cantidad} />
-			<input type="number" placeholder="Población beneficiada" bind:value={poblacion} />
+			<input type="number" placeholder="Población" bind:value={poblacion} />
 			<input type="number" placeholder="Proyectos" bind:value={proyectos} />
 			{#if editMode}
-				<button class="btn btn-success" on:click={actualizarRecursoActual}>Guardar</button>
+				<button class="btn btn-success" on:click={actualizarRecurso}>Guardar</button>
 				<button class="btn btn-outline" on:click={cancelarEdicion}>Cancelar</button>
 			{:else}
 				<button class="btn btn-success" on:click={crear}>Añadir</button>
@@ -325,11 +398,15 @@
 						<td>{d.project_count}</td>
 						<td class="flex">
 							{#if editMode && currentEdit?.year === d.year}
-								<button class="btn btn-success btn-sm" on:click={actualizarRecursoActual}>Guardar</button>
+								<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
 								<button class="btn btn-outline btn-sm" on:click={cancelarEdicion}>Cancelar</button>
 							{:else}
-								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
-								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecursoActual(d)}>Eliminar</button>
+								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}
+									>Editar</button
+								>
+								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}
+									>Eliminar</button
+								>
 							{/if}
 						</td>
 					</tr>
