@@ -3,7 +3,7 @@
 	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { messageStore } from '$lib/stores/messageStore';
-	import { cargarIniciales, actualizarRecurso, eliminarRecurso } from '$lib/waterSupplyActions';
+	
 
 	interface Datos {
 		year: number;
@@ -84,9 +84,18 @@
 	}
 
 	async function cargarDatosIniciales() {
-		const success = await cargarIniciales(API);
-		if (success) {
-			await obtenerDatos();
+		try {
+			const res = await fetch(API + '/loadInitialData');
+			if (res.ok) {
+				mostrarMensaje('✅ Datos iniciales cargados', 'success');
+				await obtenerDatos();
+			} else if (res.status === 409) {
+				mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
+			} else {
+				throw new Error();
+			}
+		} catch {
+			mostrarMensaje('⚠️ Error al cargar datos iniciales', 'danger');
 		}
 	}
 
@@ -187,19 +196,48 @@
 
 	async function actualizarRecursoActual() {
 		if (!currentEdit) return mostrarMensaje('⚠️ Ningún recurso seleccionado', 'danger');
-		const success = await actualizarRecurso(API, currentEdit);
-		if (success) {
-			editMode = false;
-			obtenerDatos();
+		try {
+			const res = await fetch(
+				`${API}/${currentEdit.year}/${encodeURIComponent(currentEdit.autonomous_community)}`,
+				{
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(currentEdit)
+				}
+			);
+			if (res.ok) {
+				mostrarMensaje('✅ Recurso actualizado', 'success');
+				editMode = false;
+				await obtenerDatos();
+			} else if (res.status === 409) {
+				mostrarMensaje('⚠️ Conflicto de datos', 'warning');
+			} else if (res.status === 400) {
+				mostrarMensaje('⚠️ Datos inválidos', 'warning');
+			} else {
+				throw new Error();
+			}
+		} catch {
+			mostrarMensaje('Error al actualizar', 'danger');
 		}
 	}
 
 	async function eliminarRecursoActual(r: Datos) {
-		const success = await eliminarRecurso(API, r);
-		if (success) {
-			datos = datos.filter(
-				(d) => d.year !== r.year || d.autonomous_community !== r.autonomous_community
+		try {
+			const res = await fetch(
+				`${API}/${r.year}/${encodeURIComponent(r.autonomous_community)}`,
+				{ method: 'DELETE' }
 			);
+			if (res.ok) {
+				mostrarMensaje('🗑️ Recurso eliminado', 'success');
+				datos = datos.filter(
+					(d) => d.year !== r.year || d.autonomous_community !== r.autonomous_community
+				);
+			} else {
+				const err = await res.json();
+				throw new Error(err.error);
+			}
+		} catch (e) {
+			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
 		}
 	}
 
