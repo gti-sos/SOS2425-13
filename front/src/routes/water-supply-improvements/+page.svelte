@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { dev } from '$app/environment';
-	import { goto } from '$app/navigation';
 	import { messageStore } from '$lib/stores/messageStore';
 
 	interface Datos {
@@ -11,8 +10,6 @@
 		benefited_population: number;
 		project_count: number;
 	}
-
-	
 
 	let datos: Datos[] = [];
 	let mensaje = '';
@@ -42,6 +39,14 @@
 
 	let editMode = false;
 	let currentEdit: Datos | null = null;
+
+	$: if (editMode && currentEdit) {
+		year = currentEdit.year.toString();
+		comunidad = currentEdit.autonomous_community;
+		cantidad = currentEdit.amount.toString();
+		poblacion = currentEdit.benefited_population.toString();
+		proyectos = currentEdit.project_count.toString();
+	}
 
 	onMount(() => {
 		const unsubscribe = messageStore.subscribe((value) => {
@@ -137,20 +142,16 @@
 			if (res.ok) {
 				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
 				console.log('Datos iniciales cargados correctamente');
-				// Resetear paginación y filtros
 				offset = 0;
 				filtrosAplicados = '';
 				query = `?limit=${limit}&offset=${offset}`;
-				// Forzar recarga de datos
 				await obtenerDatos();
 			} else if (res.status === 405 || res.status === 409) {
 				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
 				console.log('Ya existen datos, recargando datos existentes');
-				// Resetear paginación y filtros
 				offset = 0;
 				filtrosAplicados = '';
 				query = `?limit=${limit}&offset=${offset}`;
-				// Recargar datos existentes
 				await obtenerDatos();
 			} else if (res.status >= 500) {
 				console.error('Error del servidor:', res.status, data);
@@ -166,7 +167,11 @@
 	}
 
 	function limpiarFormulario() {
-		year = comunidad = cantidad = poblacion = proyectos = '';
+		year = '';
+		comunidad = '';
+		cantidad = '';
+		poblacion = '';
+		proyectos = '';
 	}
 
 	function normalizeCommunity(input: string): string {
@@ -239,18 +244,29 @@
 		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
 	}
 
-	function paginaAnterior() {
+	async function paginaAnterior() {
 		if (offset >= limit) {
 			offset -= limit;
 			aplicarPaginacion();
-			obtenerDatos();
+			await obtenerDatos();
 		} else mostrarMensaje('⚠️ Primera página', 'warning');
 	}
 
-	function siguientePagina() {
+	async function siguientePagina() {
 		offset += limit;
 		aplicarPaginacion();
-		obtenerDatos();
+		await obtenerDatos();
+	}
+
+	async function buscarIntervalo() {
+		const f: string[] = [];
+		if (desde) f.push(`from=${desde}`);
+		if (hasta) f.push(`to=${hasta}`);
+		filtrosAplicados = f.length ? '&' + f.join('&') : '';
+		offset = 0;
+		aplicarPaginacion();
+		await obtenerDatos();
+		mostrarMensaje('🕒 Intervalo aplicado', 'info');
 	}
 
 	function buildFilters() {
@@ -266,25 +282,9 @@
 		obtenerDatos();
 	}
 
-	async function buscarIntervalo() {
-		const f: string[] = [];
-		if (desde) f.push(`from=${desde}`);
-		if (hasta) f.push(`to=${hasta}`);
-		filtrosAplicados = f.length ? '&' + f.join('&') : '';
-		offset = 0;
-		aplicarPaginacion();
-		await obtenerDatos();
-		mostrarMensaje('🕒 Intervalo aplicado', 'info');
-	}
-
 	function editarRecurso(r: Datos) {
 		currentEdit = { ...r };
 		editMode = true;
-		year = r.year.toString();
-		comunidad = r.autonomous_community;
-		cantidad = r.amount.toString();
-		poblacion = r.benefited_population.toString();
-		proyectos = r.project_count.toString();
 	}
 
 	async function actualizarRecurso() {
