@@ -94,17 +94,40 @@
 
 	async function obtenerDatos() {
 		try {
-			const res = await fetch(API + query);
-			if (!res.ok) throw new Error('Error al obtener datos');
-			datos = (await res.json()).map((d: Datos) => ({
+			const res = await fetch(API + query, {
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				}
+			});
+			
+			if (!res.ok) {
+				if (res.status === 404) {
+					datos = [];
+					mostrarMensaje('⚠️ No hay datos disponibles', 'warning');
+					return;
+				}
+				throw new Error('Error al obtener datos');
+			}
+			
+			const datosRecibidos = await res.json();
+			if (!Array.isArray(datosRecibidos)) {
+				throw new Error('Formato de datos inválido');
+			}
+			
+			datos = datosRecibidos.map((d: Datos) => ({
 				...d,
 				autonomous_community: formatCommunity(d.autonomous_community)
 			}));
-			if (datos.length === 0)
-				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'danger');
+			
+			if (datos.length === 0) {
+				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'warning');
+			}
 		} catch (err) {
+			console.error('Error en obtenerDatos:', err);
 			mensaje = err instanceof Error ? err.message : 'Error desconocido';
 			tipoMensaje = 'danger';
+			datos = [];
 		}
 	}
 
@@ -116,8 +139,19 @@
 
 	async function cargarIniciales() {
 		try {
-			const res = await fetch(API + '/loadInitialData');
-			const data = await res.json();
+			const res = await fetch(API + '/loadInitialData', {
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				}
+			});
+			
+			let data;
+			try {
+				data = await res.json();
+			} catch (e) {
+				data = null;
+			}
 			
 			if (res.ok) {
 				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
@@ -138,7 +172,7 @@
 			} else if (res.status >= 500) {
 				mostrarMensaje('❌ Error del servidor al cargar los datos', 'danger');
 			} else {
-				mostrarMensaje('❌ Error al cargar los datos iniciales', 'danger');
+				mostrarMensaje(data?.error || '❌ Error al cargar los datos iniciales', 'danger');
 			}
 		} catch (err) {
 			console.error('Error al cargar datos iniciales:', err);
