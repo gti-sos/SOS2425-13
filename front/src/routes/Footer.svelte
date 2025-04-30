@@ -2,7 +2,7 @@
   <p>
     <a href="https://github.com/gti-sos/SOS2425-13" target="_blank" rel="noopener noreferrer">
       <img
-        src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+        src="/favicon.ico"
         alt="GitHub"
         class="icon"
       />
