@@ -117,11 +117,20 @@
 	async function cargarIniciales() {
 		try {
 			const res = await fetch(API + '/loadInitialData');
-			if (!res.ok) throw new Error();
-			mostrarMensaje('✅ Datos iniciales cargados', 'success');
-			await obtenerDatos();
-		} catch {
-			mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
+			const data = await res.json();
+			
+			if (res.ok) {
+				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
+				await obtenerDatos();
+			} else if (res.status === 405) {
+				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
+			} else if (res.status >= 500) {
+				mostrarMensaje('❌ Error del servidor al cargar los datos', 'danger');
+			} else {
+				mostrarMensaje('❌ Error al cargar los datos iniciales', 'danger');
+			}
+		} catch (err) {
+			mostrarMensaje('❌ Error de conexión con el servidor', 'danger');
 		}
 	}
 
@@ -253,6 +262,21 @@
 	function cancelarEdicion() {
 		editMode = false;
 		currentEdit = null;
+	}
+
+	async function eliminarTodo() {
+		try {
+			const res = await fetch(API, { method: 'DELETE' });
+			if (res.ok) {
+				datos = [];
+				mostrarMensaje('✅ Todos los datos han sido eliminados', 'success');
+			} else {
+				const err = await res.json();
+				throw new Error(err.error);
+			}
+		} catch (e) {
+			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
+		}
 	}
 </script>
 
