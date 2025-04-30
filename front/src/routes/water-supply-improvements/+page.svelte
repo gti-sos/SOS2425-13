@@ -121,15 +121,21 @@
 			
 			if (res.ok) {
 				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
+				// Forzar recarga de datos
+				offset = 0;
+				query = `?limit=${limit}&offset=${offset}`;
 				await obtenerDatos();
-			} else if (res.status === 405) {
+			} else if (res.status === 405 || res.status === 409) {
 				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
+				// Recargar datos existentes
+				await obtenerDatos();
 			} else if (res.status >= 500) {
 				mostrarMensaje('❌ Error del servidor al cargar los datos', 'danger');
 			} else {
 				mostrarMensaje('❌ Error al cargar los datos iniciales', 'danger');
 			}
 		} catch (err) {
+			console.error('Error al cargar datos iniciales:', err);
 			mostrarMensaje('❌ Error de conexión con el servidor', 'danger');
 		}
 	}
