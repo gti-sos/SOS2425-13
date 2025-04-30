@@ -121,12 +121,18 @@
 			
 			if (res.ok) {
 				mostrarMensaje('✅ Datos iniciales cargados correctamente', 'success');
-				// Forzar recarga de datos
+				// Resetear paginación y filtros
 				offset = 0;
+				filtrosAplicados = '';
 				query = `?limit=${limit}&offset=${offset}`;
+				// Forzar recarga de datos
 				await obtenerDatos();
 			} else if (res.status === 405 || res.status === 409) {
 				mostrarMensaje('⚠️ Ya existen datos en la base de datos', 'warning');
+				// Resetear paginación y filtros
+				offset = 0;
+				filtrosAplicados = '';
+				query = `?limit=${limit}&offset=${offset}`;
 				// Recargar datos existentes
 				await obtenerDatos();
 			} else if (res.status >= 500) {
