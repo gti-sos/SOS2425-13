@@ -3,6 +3,7 @@
 	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { messageStore } from '$lib/stores/messageStore';
+	import { cargarIniciales, actualizarRecurso, eliminarRecurso } from '$lib/waterSupplyActions';
 
 	interface Datos {
 		year: number;
@@ -82,14 +83,10 @@
 		setTimeout(() => (mensaje = ''), 4000);
 	}
 
-	async function cargarIniciales() {
-		try {
-			const res = await fetch(API + '/loadInitialData');
-			if (!res.ok) throw new Error();
-			mostrarMensaje('✅ Datos iniciales cargados', 'success');
+	async function cargarDatosIniciales() {
+		const success = await cargarIniciales(API);
+		if (success) {
 			await obtenerDatos();
-		} catch {
-			mostrarMensaje('⚠️ Ya existen datos iniciales', 'warning');
 		}
 	}
 
@@ -188,45 +185,21 @@
 		goto(`/water-supply-improvements/${r.year}/${encodeURIComponent(r.autonomous_community)}`);
 	}
 
-	async function actualizarRecurso() {
+	async function actualizarRecursoActual() {
 		if (!currentEdit) return mostrarMensaje('⚠️ Ningún recurso seleccionado', 'danger');
-		try {
-			const res = await fetch(
-				`${API}/${currentEdit.year}/${encodeURIComponent(currentEdit.autonomous_community)}`,
-				{
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(currentEdit)
-				}
-			);
-			if (res.ok) {
-				mostrarMensaje('✅ Recurso actualizado', 'success');
-				editMode = false;
-				obtenerDatos();
-			} else if (res.status === 409) mostrarMensaje('⚠️ Conflicto de datos', 'warning');
-			else if (res.status === 400) mostrarMensaje('⚠️ Datos inválidos', 'warning');
-			else throw new Error();
-		} catch {
-			mostrarMensaje('Error al actualizar', 'danger');
+		const success = await actualizarRecurso(API, currentEdit);
+		if (success) {
+			editMode = false;
+			obtenerDatos();
 		}
 	}
 
-	async function eliminarRecurso(r: Datos) {
-		try {
-			const res = await fetch(`${API}/${r.year}/${encodeURIComponent(r.autonomous_community)}`, {
-				method: 'DELETE'
-			});
-			if (res.ok) {
-				datos = datos.filter(
-					(d) => d.year !== r.year || d.autonomous_community !== r.autonomous_community
-				);
-				mostrarMensaje('🗑️ Recurso eliminado', 'success');
-			} else {
-				const err = await res.json();
-				throw new Error(err.error);
-			}
-		} catch (e) {
-			mostrarMensaje(e instanceof Error ? e.message : 'Error al eliminar', 'danger');
+	async function eliminarRecursoActual(r: Datos) {
+		const success = await eliminarRecurso(API, r);
+		if (success) {
+			datos = datos.filter(
+				(d) => d.year !== r.year || d.autonomous_community !== r.autonomous_community
+			);
 		}
 	}
 
@@ -249,7 +222,7 @@
 
 	<div class="section card">
 		<div class="flex">
-			<button class="btn btn-info" on:click={cargarIniciales}>Cargar datos iniciales</button>
+			<button class="btn btn-info" on:click={cargarDatosIniciales}>Cargar datos iniciales</button>
 			<button class="btn btn-danger" on:click={eliminarTodo}>Eliminar todo</button>
 		</div>
 	</div>
@@ -278,13 +251,13 @@
 	<div class="section card">
 		<h3>{editMode ? 'Editar recurso' : 'Crear nuevo recurso'}</h3>
 		<div class="flex">
-			<input type="number" placeholder="AñoC" bind:value={year} />
-			<input placeholder="Comunidad AutónomaC" bind:value={comunidad} />
-			<input type="number" step="0.01" placeholder="CantidadC (€)" bind:value={cantidad} />
-			<input type="number" placeholder="Población beneficiadaC" bind:value={poblacion} />
-			<input type="number" placeholder="ProyectosC" bind:value={proyectos} />
+			<input type="number" placeholder="Año" bind:value={year} />
+			<input placeholder="Comunidad Autónoma" bind:value={comunidad} />
+			<input type="number" step="0.01" placeholder="Cantidad (€)" bind:value={cantidad} />
+			<input type="number" placeholder="Población beneficiada" bind:value={poblacion} />
+			<input type="number" placeholder="Proyectos" bind:value={proyectos} />
 			{#if editMode}
-				<button class="btn btn-success" on:click={actualizarRecurso}>Guardar</button>
+				<button class="btn btn-success" on:click={actualizarRecursoActual}>Guardar</button>
 				<button class="btn btn-outline" on:click={cancelarEdicion}>Cancelar</button>
 			{:else}
 				<button class="btn btn-success" on:click={crear}>Añadir</button>
@@ -314,15 +287,11 @@
 						<td>{d.project_count}</td>
 						<td class="flex">
 							{#if editMode && currentEdit?.year === d.year}
-								<button class="btn btn-success btn-sm" on:click={actualizarRecurso}>Guardar</button>
+								<button class="btn btn-success btn-sm" on:click={actualizarRecursoActual}>Guardar</button>
 								<button class="btn btn-outline btn-sm" on:click={cancelarEdicion}>Cancelar</button>
 							{:else}
-								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}
-									>Editar</button
-								>
-								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecurso(d)}
-									>Eliminar</button
-								>
+								<button class="btn btn-warning btn-sm" on:click={() => editarRecurso(d)}>Editar</button>
+								<button class="btn btn-danger btn-sm" on:click={() => eliminarRecursoActual(d)}>Eliminar</button>
 							{/if}
 						</td>
 					</tr>
