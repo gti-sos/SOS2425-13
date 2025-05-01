@@ -159,14 +159,29 @@
     --font: 'Roboto', sans-serif;
   }
 
-  .container {
-    max-width: 600px;
-    padding: 1.5rem;
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    box-shadow: 0 4px 12px var(--shadow);
-    font-family: var(--font);
+  .water-supply-page {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #ffffff 0%, #c3e7f6 100%);
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    width: 100vw;
   }
+
+  .container {
+  max-width: 600px;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px var(--shadow);
+  font-family: var(--font);
+  position: absolute;  /* Posicionamiento absoluto */
+  top: 50%;  /* Mueve el contenedor a la mitad de la altura de la página */
+  left: 50%;  /* Mueve el contenedor a la mitad del ancho de la página */
+  transform: translate(-50%, -50%); /* Ajusta el contenedor para que se centre completamente */
+}
+
 
   h1 {
     color: #333;
@@ -213,8 +228,6 @@
     background: rgba(220,53,69,0.1);
     color: var(--danger);
   }
-
- 
 
   label {
     display: block;
@@ -268,37 +281,43 @@
     display: flex;
     gap: 0.5rem;
   }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
 </style>
 
-<main class="container">
-  {#if message}
-    <div class="alert alert-{c}">{message}</div>
-  {/if}
+<main class="water-supply-page">
+  <div class="container">
+    {#if message}
+      <div class="alert alert-{c}">{message}</div>
+    {/if}
 
-  {#if datosCargados}
-    <h1>Modificando recurso: <span class="highlight">{year} - {formatCommunity(autonomousCommunity)}</span></h1>
+    {#if datosCargados}
+      <h1>Modificando recurso: <span class="highlight">{year} - {formatCommunity(autonomousCommunity)}</span></h1>
 
-    <div class="form-group">
-      <label for="amount">Cantidad (€)</label>
-      <input id="amount" type="number" step="0.01" bind:value={amount} />
-    </div>
-    <div class="form-group">
-      <label for="benefitedPopulation">Población Beneficiada</label>
-      <input id="benefitedPopulation" type="number" bind:value={benefitedPopulation} />
-    </div>
-    <div class="form-group">
-      <label for="projectCount">Proyectos</label>
-      <input id="projectCount" type="number" bind:value={projectCount} />
-    </div>
-    <div class="actions">
-      <button class="btn btn-info" on:click={updateData} disabled={isLoading}>
-        {isLoading ? 'Actualizando...' : 'Actualizar'}
-      </button>
-      <button class="btn btn-danger" on:click={deleteData} disabled={isLoading}>
-        {isLoading ? 'Eliminando...' : 'Eliminar'}
-      </button>
-    </div>
-  {/if}
+      <div class="form-group">
+        <label for="amount">Cantidad (€)</label>
+        <input id="amount" type="number" step="0.01" bind:value={amount} />
+      </div>
+      <div class="form-group">
+        <label for="benefitedPopulation">Población Beneficiada</label>
+        <input id="benefitedPopulation" type="number" bind:value={benefitedPopulation} />
+      </div>
+      <div class="form-group">
+        <label for="projectCount">Proyectos</label>
+        <input id="projectCount" type="number" bind:value={projectCount} />
+      </div>
+      <div class="actions">
+        <button class="btn btn-info" on:click={updateData} disabled={isLoading}>
+          {isLoading ? 'Actualizando...' : 'Actualizar'}
+        </button>
+        <button class="btn btn-danger" on:click={deleteData} disabled={isLoading}>
+          {isLoading ? 'Eliminando...' : 'Eliminar'}
+        </button>
+      </div>
+    {/if}
 
-  <button class="btn back-btn" on:click={() => goto('/water-supply-improvements')}>Volver</button>
+    <button class="btn back-btn" on:click={() => goto('/water-supply-improvements')}>Volver</button>
+  </div>
 </main>
