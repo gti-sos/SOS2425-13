@@ -24,59 +24,141 @@
         flex-direction: column;
       }
 
-      nav {
-        background-color: #f2f2f2;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        padding: 20px 0;
+      header {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(202, 196, 196, 0.95) 100%);
+        color: #333;
+        padding: 3px 3px;
         position: sticky;
         top: 0;
         z-index: 10;
+        backdrop-filter: blur(5px);
       }
 
-      .container-nav {
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         max-width: 1200px;
         margin: 0 auto;
+        width: 100%;
+      }
+
+      .brand {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
         align-items: center;
-        gap: 20px;
+        gap: 8px;
       }
 
-      nav a {
-        text-decoration: none;
-        font-size: 1.15rem;
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 600;
+      .logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+
+      .project-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 1px;
+      }
+
+      .navbar ul {
+        list-style: none;
+        display: flex;
+        gap: 16px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .navbar li {
+        font-size: 1.1rem;
+        font-family: 'Segoe UI', sans-serif;
+      }
+
+      .navbar a {
         color: #333;
-        background-color: #e0e0e0;
-        transition: background-color 0.3s, color 0.3s;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(224, 224, 224, 0.9) 100%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.1);
       }
 
-      #inicio:hover {
-        background-color: #1a237e;
+      .navbar a:hover {
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .navbar a#inicio:hover {
+        background: linear-gradient(135deg, #303F9F 0%, #1A237E 100%);
+      }
+
+      .navbar a#about:hover {
+        background: linear-gradient(135deg, #754295 0%, #4A148C 100%);
+      }
+
+      .navbar a#forest-fires:hover {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+      }
+
+      .navbar a#national-parks:hover {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      }
+
+      .navbar a#water-supply-improvements:hover {
+        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+      }
+
+      footer {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(202, 196, 196, 0.95) 100%);
+        padding: 8px 0;
+        text-align: center;
+        font-size: 0.95rem;
+        backdrop-filter: blur(5px);
+      }
+
+      footer a {
+        color: #222;
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(224, 224, 224, 0.9) 100%);
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.95rem;
+      }
+
+      footer a:hover {
+        color: #0d47a1;
+        transform: translateY(-3px);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #0d47a1 0%, #002171 100%);
         color: white;
       }
 
-      #about:hover {
-        background-color: #424242;
-        color: white;
+      .icon {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
       }
 
-      #forest-fires:hover {
-        background-color: #d32f2f;
-        color: white;
+      footer a:hover .icon {
+        transform: scale(1.1);
       }
 
-      #national-parks:hover {
-        background-color: #2e7d32;
-        color: white;
-      }
-
-      #water-supply-improvements:hover {
-        background-color: #0288d1;
-        color: white;
+      footer span {
+        font-weight: bold;
       }
 
       main {
@@ -128,36 +210,8 @@
         border-radius: 4px;
       }
 
-      footer {
-        background-color: #f2f2f2;
-        border-top: 1px solid #ccc;
-        padding: 20px 0;
-        text-align: center;
-        font-size: 1rem;
-        margin-top: 50px;
-      }
-
-      footer a {
-        color: #222;
-        text-decoration: none;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: color 0.3s;
-      }
-
-      footer a:hover {
-        color: #0d47a1;
-      }
-
-      .icon {
-        width: 20px;
-        height: 20px;
-      }
-
       @media (max-width: 768px) {
-        .container-nav {
+        .header-row {
           flex-direction: column;
           gap: 12px;
         }
@@ -166,15 +220,23 @@
   </head>
 
   <body>
-    <nav>
-      <div class="container-nav">
-        <a id="inicio" href="/">Inicio</a>
-        <a id="about" href="/about.html">Acerca de nosotros</a>
-        <a id="forest-fires" href="/forest-fires">Incendios forestales</a>
-        <a id="national-parks" href="/national-parks">Parques naturales</a>
-        <a id="water-supply-improvements" href="/water-supply-improvements">Suministro de agua</a>
+    <header>
+      <div class="header-row">
+        <div class="brand">
+          <img src="/favicon.ico" alt="Logo" class="logo" />
+          <span class="project-title">SOS2425-13</span>
+        </div>
+        <nav class="navbar">
+          <ul>
+            <li><a href="/" id="inicio">Inicio</a></li>
+            <li><a href="/about.html" id="about">Acerca de nosotros</a></li>
+            <li><a href="/forest-fires" id="forest-fires">Incendios forestales</a></li>
+            <li><a href="/national-parks" id="national-parks">Parques naturales</a></li>
+            <li><a href="/water-supply-improvements" id="water-supply-improvements">Suministro de agua</a></li>
+          </ul>
+        </nav>
       </div>
-    </nav>
+    </header>
 
     <main>
       <h1>ℹ️ Acerca del Proyecto</h1>
@@ -205,22 +267,18 @@
       <section>
         <h2>📊 APIs desarrolladas</h2>
         <ul>
-			<li><a href="https://sos2425-13.onrender.com/api/v1/forest-fires">🔥 forest-fires</a></li>
-			<li><a href="https://sos2425-13.onrender.com/api/v2/national-parks">🌳 national-parks</a></li>
-			<li><a href="https://sos2425-13.onrender.com/api/v1/water-supply-improvements">💧 water-supply-improvements</a>
-			</li>
-		</ul>
-
-        
+          <li><a href="https://sos2425-13.onrender.com/api/v1/forest-fires">🔥 forest-fires</a></li>
+          <li><a href="https://sos2425-13.onrender.com/api/v2/national-parks">🌳 national-parks</a></li>
+          <li><a href="https://sos2425-13.onrender.com/api/v1/water-supply-improvements">💧 water-supply-improvements</a></li>
+        </ul>
       </section>
 
       <section>
         <h2>👨‍💻 Equipo SOS2425-13</h2>
         <ul>
-          <li><strong>Blanca garcía Alonso</strong> – API: <code>water-supply-improvements</code></li>
+          <li><strong>Blanca García Alonso</strong> – API: <code>water-supply-improvements</code></li>
           <li><strong>Darío López Villegas</strong> – API: <code>national-parks</code></li>
-          <li><strong>Alvaro Morillo Navajas</strong> – API: <code>forest-fires</code></li>
-          
+          <li><strong>Álvaro Morillo Navajas</strong> – API: <code>forest-fires</code></li>
         </ul>
       </section>
     </main>
@@ -228,7 +286,7 @@
     <footer>
       <p>
         <a href="https://github.com/gti-sos/SOS2425-13" target="_blank" rel="noopener noreferrer">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="icon" />
+          <img src="/github.png" alt="GitHub" class="icon" />
           Realizado por SOS2425-13 · © <span id="year"></span>
         </a>
       </p>

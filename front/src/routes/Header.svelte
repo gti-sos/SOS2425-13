@@ -1,138 +1,105 @@
 <header>
-    <div class="header-container">
-        <img src="/favicon.ico" alt="Logo" class="logo" />
-        <h1 class="project-title">SOS2425-13</h1>
+    <div class="header-row">
+        <div class="brand">
+            <img src="/favicon.ico" alt="Logo" class="logo" />
+            <span class="project-title">SOS2425-13</span>
+        </div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/" id="inicio">Inicio</a></li>
+                <li><a href="/about.html" id="about">Acerca de nosotros</a></li>
+                <li><a href="/forest-fires" id="forest-fires">Incendios forestales</a></li>
+                <li><a href="/national-parks" id="national-parks">Parques naturales</a></li>
+                <li><a href="/water-supply-improvements" id="water-supply-improvements">Suministro de agua</a></li>
+            </ul>
+        </nav>
     </div>
-    <nav class="navbar">
-        <ul>
-            <li><a href="/" id="inicio">Inicio</a></li>
-            <li><a href="/about.html" id="about">Acerca de nosotros</a></li>
-            <li><a href="/forest-fires" id="forest-fires">Incendios forestales</a></li>
-            <li><a href="/national-parks" id="national-parks">Parques naturales</a></li>
-            <li><a href="/water-supply-improvements" id="water-supply-improvements">Suministro de agua</a></li>
-        </ul>
-    </nav>
 </header>
 
 <style>
-    /* Estilos generales del encabezado */
-    header {
-        background-color: #cac4c4; /* Fondo gris claro */
-        color: #333; /* Color de texto oscuro para contraste */
-        padding: 20px 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
+header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(202, 196, 196, 0.95) 100%);
+    color: #333;
+    padding: 3px 3px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
 
-    /* Contenedor para logo y título del proyecto */
-    .header-container {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
 
-    /* Estilo para el logo */
-    .logo {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-    }
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-    /* Título del proyecto con un estilo moderno */
-    .project-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: #333; /* Texto oscuro para contraste */
-        font-family: 'Roboto', sans-serif;
-        letter-spacing: 1px;
-        margin-top: 5px;
-        text-transform: uppercase;
-    }
+.logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
 
-    /* Estilos para la barra de navegación */
-    .navbar ul {
-        list-style: none;
-        display: flex;
-        gap: 30px;
-        margin-top: 0;
-        padding: 0;
-    }
+.project-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+}
 
-    .navbar li {
-        font-size: 1.2rem;
-        font-family: 'Segoe UI', sans-serif;
-    }
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+}
 
-    /* Estilo para los enlaces de la barra de navegación */
-    .navbar a {
-        color: #333; /* Texto oscuro para los enlaces */
-        text-decoration: none;
-        font-weight: 600;
-        padding: 12px 25px;
-        border-radius: 30px;
-        background-color: #e0e0e0; /* Fondo gris claro para los botones */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-        transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-    }
+.navbar li {
+    font-size: 1.1rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+.navbar a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(224, 224, 224, 0.9) 100%);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
 
-    /* Efecto de hover para los enlaces */
-    .navbar a:hover {
-        color: white;
-        transform: translateY(-3px); /* Efecto de elevación */
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
-    }
+.navbar a:hover {
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}
 
-    /* Colores específicos para los botones cuando se seleccionan (fondo marcado) */
-    .navbar a#inicio:hover {
-        background-color: #303F9F; /* Azul oscuro para "Inicio" cuando se selecciona */
-       
-    }
+.navbar a#inicio:hover {
+    background: linear-gradient(135deg, #303F9F 0%, #1A237E 100%);
+}
+.navbar a#about:hover {
+    background: linear-gradient(135deg, #754295 0%, #4A148C 100%);
+}
+.navbar a#forest-fires:hover {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+}
+.navbar a#national-parks:hover {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+}
+.navbar a#water-supply-improvements:hover {
+    background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+}
 
-    .navbar a#about:hover {
-        background-color: #754295; /* Morado oscuro para "Acerca de nosotros" cuando se selecciona */
-   
-    }
-
-    .navbar a#forest-fires:hover {
-        background-color: #d32f2f;
-    }
-
-    .navbar a#national-parks:hover {
-        background-color: #2e7d32;
-    }
-
-    .navbar a#water-supply-improvements:hover {
-        background-color: #0288d1;
-    }
-
-    /* Estilos responsivos para dispositivos móviles */
-    @media (max-width: 768px) {
-        .navbar ul {
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header-container {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .logo {
-            margin-bottom: 10px;
-        }
-
-        .project-title {
-            font-size: 2rem;
-            text-align: center;
-        }
-    }
 </style>

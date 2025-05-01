@@ -25,18 +25,17 @@
       "andalucia": "Andalucía",
       "aragon": "Aragón",
       "asturias": "Asturias",
+      "baleares": "Baleares",
       "canarias": "Canarias",
       "cantabria": "Cantabria",
-      "castilla-la mancha": "Castilla-La Mancha",
       "castilla y leon": "Castilla y León",
-      "cataluña": "Cataluña",
-      "comunidad valenciana": "Comunidad Valenciana",
+      "castilla-la mancha": "Castilla-La Mancha",
+      "catalunia": "Cataluña",
+      "valencia": "Comunidad Valenciana",
       "extremadura": "Extremadura",
       "galicia": "Galicia",
-      "la rioja": "La Rioja",
       "madrid": "Madrid",
       "murcia": "Murcia",
-      "navarra": "Navarra",
       "pais vasco": "País Vasco"
     };
     const normalized = input
@@ -60,10 +59,10 @@
   async function cargarDatos() {
     try {
       const res = await fetch(
-        `${API_BASE}/${year}/${formatCommunity(autonomousCommunity)}`
+        `${API_BASE}/${year}/${autonomousCommunity}`
       );
       if (!res.ok) {
-        message = `No existe dato para ${year} - ${autonomousCommunity}`;
+        message = `No existe dato para ${year} - ${formatCommunity(autonomousCommunity)}`;
         c = 'danger';
         datosCargados = false;
         return;
@@ -89,7 +88,7 @@
 
     try {
       const res = await fetch(
-        `${API_BASE}/${year}/${encodeURIComponent(autonomousCommunity)}`,
+        `${API_BASE}/${year}/${autonomousCommunity}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -122,7 +121,7 @@
     isLoading = true;
     try {
       const res = await fetch(
-        `${API_BASE}/${year}/${encodeURIComponent(autonomousCommunity)}`,
+        `${API_BASE}/${year}/${autonomousCommunity}`,
         { method: 'DELETE' }
       );
       if (res.ok) {
@@ -162,7 +161,6 @@
 
   .container {
     max-width: 600px;
-    margin: 2rem auto;
     padding: 1.5rem;
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -171,9 +169,28 @@
   }
 
   h1 {
-    color: var(--primary);
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: normal;
+  }
+
+  .title-text {
+    color: #5f6368;
+    font-weight: normal;
+  }
+
+  .highlight {
+    color: #000;
+    font-weight: bold;
+  }
+
+  .highlight.year {
+    font-size: 1.6rem;
+  }
+
+  .highlight.community {
+    font-size: 1.6rem;
   }
 
   .alert {
@@ -197,9 +214,7 @@
     color: var(--danger);
   }
 
-  .form-group {
-    margin-bottom: 1rem;
-  }
+ 
 
   label {
     display: block;
@@ -261,7 +276,7 @@
   {/if}
 
   {#if datosCargados}
-    <h1>Está modificando el recurso con año {year} y CCAA {formatCommunity(autonomousCommunity)}</h1>
+    <h1>Modificando recurso: <span class="highlight">{year} - {formatCommunity(autonomousCommunity)}</span></h1>
 
     <div class="form-group">
       <label for="amount">Cantidad (€)</label>
