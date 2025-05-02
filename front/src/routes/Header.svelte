@@ -7,6 +7,7 @@
         <nav class="navbar">
             <ul>
                 <li><a href="/" id="inicio">Inicio</a></li>
+<a id="about" href="/about.html">Acerca de</a> <!-- Enlace al archivo estático 'about.html' -->
                 <li><a href="/forest-fires" id="forest-fires">Incendios forestales</a></li>
                 <li><a href="/national-parks" id="national-parks">Parques naturales</a></li>
                 <li><a href="/water-supply-improvements" id="water-supply-improvements">Suministro de agua</a></li>
