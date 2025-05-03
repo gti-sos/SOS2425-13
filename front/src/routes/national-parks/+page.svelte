@@ -958,10 +958,11 @@
 	});
 </script>
 
+
 <svelte:head>
 	<title>Parques Nacionales</title>
 </svelte:head>
-
+<div class= container>
 <h2 style="text-align: center; margin-top: 1rem; margin-bottom: 1rem;">
 	Parques Nacionales de España
 </h2>
@@ -1425,6 +1426,8 @@
 	</div>
 {/if}
 
+</div>
+
 <!-- Modal para confirmar eliminación individual -->
 <Modal isOpen={deleteModalOpen} toggle={() => (deleteModalOpen = !deleteModalOpen)}>
 	<ModalHeader toggle={() => (deleteModalOpen = !deleteModalOpen)}>
@@ -1461,3 +1464,18 @@
         </Button>
     </ModalFooter>
 </Modal>
+
+<style>
+	.container {
+		background: rgba(255, 255, 255, 0.95);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		border-radius: 16px;
+		margin: 2rem auto;
+		max-width: 1100px;
+		width: 95%;
+		padding: 2rem 2.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+</style>

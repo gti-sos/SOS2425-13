@@ -32,7 +32,7 @@
 	}
 </script>
 
-
+<div class="about">
 	<main>
 		<div>
 			<h2>Descripción del proyecto</h2>
@@ -173,23 +173,19 @@
 			</div>
 		</div>
 	</main>
-
+</div>
 
 <style>
-	
-	main {
-		margin: 20px;
-		color: #000;
-	}
-	h1,
-	h2,
-	p,
-	li,
-	th,
-	td,
-	button {
-		color: #000;
-	}
+
+
+  
+
+  main {
+    margin: 20px;
+    color: #000;
+  }
+
+ 
 	h2 {
 		margin: 75px 0;
 		font-size: 24px;

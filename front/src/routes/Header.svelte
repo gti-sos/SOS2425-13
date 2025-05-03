@@ -7,7 +7,7 @@
         <nav class="navbar">
             <ul>
                 <li><a href="/" id="inicio">Inicio</a></li>
-<a id="about" href="/about.html">Acerca de</a> <!-- Enlace al archivo estático 'about.html' -->
+                <li><a href="/about" id="about">Acerca de</a></li>
                 <li><a href="/forest-fires" id="forest-fires">Incendios forestales</a></li>
                 <li><a href="/national-parks" id="national-parks">Parques naturales</a></li>
                 <li><a href="/water-supply-improvements" id="water-supply-improvements">Suministro de agua</a></li>
@@ -87,7 +87,7 @@ header {
 }
 
 .navbar a#inicio:hover {
-    background: linear-gradient(135deg, #303F9F 0%, #1A237E 100%);
+    background: linear-gradient(135deg, #a79d18 0%, #a79d18 100%);
 }
 .navbar a#about:hover {
     background: linear-gradient(135deg, #754295 0%, #4A148C 100%);
