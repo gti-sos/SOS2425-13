@@ -77,7 +77,6 @@ function loadBackend(app) {
 
 
     // GET con filtros (from, to y otros campos)
-    ///GET a /water-supply-improvements con filtros, rangos de años y paginación
     app.get(BASE_API + "/water-supply-improvements", (req, res) => {
         console.log("New GET to /water-supply-improvements");
 
@@ -125,36 +124,18 @@ function loadBackend(app) {
 
         dbQuery.exec((err, docs) => {
             if (err) {
-                return res.status(500).send({ error: "Error al consultar la base de datos" });
+              return res.status(500).json({ error: "Error al consultar la base de datos" });
             }
-
-            // Verificar si no hay datos y se usaron filtros de fecha
-            const hasDateFilters = req.query.from || req.query.to;
-            if (docs.length === 0 && hasDateFilters) {
-                return res.status(200).send({
-                    data: []
-                });
-            }
-
-            // Verificar si no hay datos y no se usaron parámetros de consulta (excepto limit y offset)
-            const hasQueryParams = Object.keys(req.query)
-                .filter(key => !['limit', 'offset'].includes(key)).length > 0;
-            if (docs.length === 0 && !hasQueryParams) {
-                return res.status(200).send({
-                    
-                    data: []
-                });
-            }
-
-            // Si hay datos, transformarlos para eliminar el campo _id
+          
+            // transforma _id→rest y genera siempre un array
             const transformedDocs = docs.map(doc => {
-                const { _id, ...rest } = doc;
-                return rest;
+              const { _id, ...rest } = doc;
+              return rest;
             });
-
-            // Devolver los datos transformados
-            return res.status(200).send(transformedDocs);
-        });
+          
+            // y devuélvelo SÍEMPRE como array
+            return res.status(200).json(transformedDocs);
+          });
     });
 
 
