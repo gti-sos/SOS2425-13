@@ -2,7 +2,7 @@
 	import Header from "./Header.svelte";
 	import Footer from "./Footer.svelte";
 	import { page } from '$app/stores';
-	import { isAbsolute } from "path";
+
   
 	// Computamos la clase de fondo en base a la ruta
 	$: bgClass = (() => {
@@ -42,10 +42,7 @@
 	.content {
 	  flex: 1;
 	}
-	footer {
-	  padding: 1rem;
-	  text-align: center;
-	}
+
   
 	/* CLASES DE FONDO POR PÁGINA */
 	.water-supply-page {

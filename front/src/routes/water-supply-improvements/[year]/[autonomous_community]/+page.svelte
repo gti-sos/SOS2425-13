@@ -162,7 +162,7 @@
   .water-supply-page {
     display: flex;
     flex-direction: column;
-    background: linear-gradient(135deg, #ffffff 0%, #c3e7f6 100%);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;

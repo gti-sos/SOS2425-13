@@ -195,57 +195,58 @@
 	// Crear un nuevo recurso
 
 	async function crear() {
-		// Validar que todos los campos necesarios estén completos
-		if (!year || !comunidad || !cantidad || !poblacion || !proyectos) {
-			return mostrarMensaje('⚠️ Todos los campos son obligatorios', 'danger');
-		}
+    // Validar que todos los campos necesarios estén completos
+    if (!year || !comunidad || !cantidad || !poblacion || !proyectos) {
+        return mostrarMensaje('⚠️ Todos los campos son obligatorios', 'danger');
+    }
 
-		try {
-			const nuevo: Datos = {
-				year: +year,
-				autonomous_community: normalizeCommunity(comunidad), // Guardar en formato original (sin mayúsculas ni tildes)
-				amount: +cantidad,
-				benefited_population: +poblacion,
-				project_count: +proyectos
-			};
+    try {
+        const nuevo: Datos = {
+            year: +year,
+            autonomous_community: normalizeCommunity(comunidad), // Guardar en formato original (sin mayúsculas ni tildes)
+            amount: +cantidad,
+            benefited_population: +poblacion,
+            project_count: +proyectos
+        };
 
-			// Agregar el nuevo recurso a los datos localmente (para mostrarlo de inmediato en la tabla)
-			datos = [
-				{ ...nuevo, autonomous_community: formatCommunity(nuevo.autonomous_community) },
-				...datos
-			];
+        // Agregar el nuevo recurso a los datos localmente (para mostrarlo de inmediato en la tabla)
+        datos = [
+            { ...nuevo, autonomous_community: formatCommunity(nuevo.autonomous_community) },
+            ...datos
+        ];
 
-			// Limpiar el formulario después de agregar el recurso
-			limpiarFormulario();
+        // Limpiar el formulario después de agregar el recurso
+        limpiarFormulario();
 
-			// Realizar la solicitud al backend para persistir los datos
-			const res = await fetch(API, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(nuevo)
-			});
+        // Realizar la solicitud al backend para persistir los datos
+        const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevo)
+        });
 
-			if (res.status === 201) {
-				mostrarMensaje('✅ Recurso creado', 'success');
+        if (res.status === 201) {
+            mostrarMensaje('✅ Recurso creado', 'success');
 
-				// Recargar los datos desde la API para asegurar que la tabla tenga los datos más actualizados
-				await obtenerDatos(); // Recargar los datos después de crear el recurso
-			} else if (res.status === 409) {
-				mostrarMensaje('⚠️ Recurso ya existe', 'warning');
-				// Eliminar el recurso localmente si el servidor devuelve un conflicto
-				datos = datos.filter(
-					(d) => d.year !== nuevo.year || d.autonomous_community !== nuevo.autonomous_community
-				);
-			} else if (res.status === 400) {
-				mostrarMensaje('⚠️ Campos incompletos', 'warning');
-			} else {
-				const err = await res.json();
-				throw new Error(err.error);
-			}
-		} catch (e) {
-			mostrarMensaje(e instanceof Error ? e.message : 'Error al crear', 'danger');
-		}
-	}
+            // Recargar los datos desde la API para asegurar que la tabla tenga los datos más actualizados
+            await obtenerDatos(); // Recargar los datos después de crear el recurso
+        } else if (res.status === 409) {
+            mostrarMensaje('⚠️ Recurso ya existe', 'warning');
+            // Eliminar el recurso localmente si el servidor devuelve un conflicto
+            datos = datos.filter(
+                (d) => d.year !== nuevo.year || d.autonomous_community !== nuevo.autonomous_community
+            );
+        } else if (res.status === 400) {
+            mostrarMensaje('⚠️ Campos incompletos', 'warning');
+        } else {
+            const err = await res.json();
+            throw new Error(err.error);
+        }
+    } catch (e) {
+        mostrarMensaje(e instanceof Error ? e.message : 'Error al crear', 'danger');
+    }
+}
+
 
 	// Eliminar todos los recursos
 
@@ -643,7 +644,6 @@
 </div>
 
 <style>
-	
 	.water-supply-page {
 		display: flex;
 		flex-direction: column;

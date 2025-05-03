@@ -131,9 +131,8 @@ function loadBackend(app) {
             // Verificar si no hay datos y se usaron filtros de fecha
             const hasDateFilters = req.query.from || req.query.to;
             if (docs.length === 0 && hasDateFilters) {
-                return res.status(404).send({
-                    error: "No se encontraron datos para el rango de fechas especificado",
-                    message: "Asegúrate de que las fechas estén dentro del rango de los datos disponibles",
+                return res.status(200).send({
+                    
                     data: []
                 });
             }
