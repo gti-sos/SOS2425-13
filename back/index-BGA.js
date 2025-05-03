@@ -132,7 +132,6 @@ function loadBackend(app) {
             const hasDateFilters = req.query.from || req.query.to;
             if (docs.length === 0 && hasDateFilters) {
                 return res.status(200).send({
-                    
                     data: []
                 });
             }
@@ -141,9 +140,8 @@ function loadBackend(app) {
             const hasQueryParams = Object.keys(req.query)
                 .filter(key => !['limit', 'offset'].includes(key)).length > 0;
             if (docs.length === 0 && !hasQueryParams) {
-                return res.status(404).send({
-                    error: "No hay datos que mostrar",
-                    message: "Utiliza GET /api/v1/water-supply-improvements/loadInitialData para cargar datos iniciales",
+                return res.status(200).send({
+                    
                     data: []
                 });
             }
