@@ -8,7 +8,7 @@ const config = {
 			directives: {
 				'script-src': ['self'], // Eliminamos 'unsafe-inline' para mayor seguridad
 				'default-src': ['self'],
-				'style-src': ['self', 'nonce-abc123', 'unsafe-hashes', 'unsafe-inline', 'https://cdn.jsdelivr.net'], // Evitamos 'unsafe-inline'
+				'style-src': ['self', 'unsafe-inline', 'https://cdn.jsdelivr.net'], // Evitamos 'unsafe-inline'
 				'img-src': ['self', 'data:', 'https:'],
 				'connect-src': ['self', 'https://sos2425-13.onrender.com', 'http://localhost:16078']
 			}
