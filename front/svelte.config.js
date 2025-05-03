@@ -6,9 +6,9 @@ const config = {
 		csp: {
 			mode: 'auto',
 			directives: {
-				'script-src': ['self', 'unsafe-inline'],
+				'script-src': ['self'], // Eliminamos 'unsafe-inline' para mayor seguridad
 				'default-src': ['self'],
-				'style-src': ['self', 'unsafe-inline', 'https://cdn.jsdelivr.net'], // Agrega el CDN de Bootstrap
+				'style-src': ['self', 'https://cdn.jsdelivr.net'], // Evitamos 'unsafe-inline'
 				'img-src': ['self', 'data:', 'https:'],
 				'connect-src': ['self', 'https://sos2425-13.onrender.com', 'http://localhost:16078']
 			}
