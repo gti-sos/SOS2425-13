@@ -129,36 +129,37 @@
 			console.error('Error al verificar datos:', error);
 		}
 	}
-
-	// Obtener los datos de la API
-	async function obtenerDatos() {
-		try {
-			const res = await fetch(API + query);
-			if (!res.ok) {
-				const err = await res.json();
-				throw new Error(err.error || 'Error al obtener datos');
-			}
-
-			const data = await res.json(); // Obtener la respuesta
-			if (data.length === 0) {
-				// Si no hay datos, vaciar la tabla y mostrar mensaje
-				datos = []; // Limpiar los datos de la tabla
-				showTable = false; // Ocultar la tabla
-				mostrarMensaje('⚠️ No se encontraron datos que coincidan con los filtros', 'danger');
-			} else {
-				// Si se encuentran datos, asignarlos correctamente
-				datos = data.map((d: Datos) => ({
-					...d,
-					original_autonomous_community: d.autonomous_community, // Guardamos el valor original
-					autonomous_community: formatCommunity(d.autonomous_community) // Mostramos el valor con formato
-				}));
-				showTable = true; // Mostrar la tabla
-			}
-		} catch (err) {
-			mensaje = err instanceof Error ? err.message : 'Error desconocido';
-			tipoMensaje = 'danger';
+// Obtener los datos de la API
+async function obtenerDatos() {
+	try {
+		const res = await fetch(API + query);
+		if (!res.ok) {
+			const err = await res.json();
+			throw new Error(err.error || 'Error al obtener datos');
 		}
+
+		const data: any = await res.json(); // Obtener la respuesta cruda
+		if (!Array.isArray(data) || data.length === 0) {
+			datos = [];
+			// No ocultamos la tabla, solo avisamos in situ
+			mostrarMensaje('⚠️ No hay datos en esta página', 'warning');
+		} else {
+			// mapeamos cada objeto JSON a tu interfaz Datos y formateamos la comunidad
+			datos = data.map((d: Datos) => ({
+				...d,
+				original_autonomous_community: d.autonomous_community,
+				autonomous_community: formatCommunity(d.autonomous_community)
+			}));
+		}
+
+		datosIniciales = true; // habilita la renderización de la tabla/paginación
+	} catch (err: unknown) {
+		// mostramos el error capturado
+		mensaje = err instanceof Error ? err.message : 'Error desconocido';
+		tipoMensaje = 'danger';
 	}
+}
+
 
 	// Mostrar mensajes de error o éxito
 	function mostrarMensaje(texto: string, tipo: typeof tipoMensaje = 'info') {
@@ -247,20 +248,27 @@
 		}
 	}
 
-	async function eliminarTodo() {
-		try {
-			const res = await fetch(API, { method: 'DELETE' });
-			if (!res.ok) throw new Error((await res.json()).error);
-			datos = [];
-			showTable = false;
-			limpiarFiltros();
-			mostrarMensaje('🗑️ Todos los datos eliminados', 'success');
-			// ¡Ojo! aquí NO volvemos a hacer obtenerDatos()
-		} catch (e: any) {
-			mostrarMensaje(e.message ?? 'Error al eliminar', 'danger');
-		}
-	}
+	// En eliminarTodo ya NO llamamos a obtenerDatos() ni a limpiarFiltros()
+//    sino sólo a resetFiltros + tu mensaje de éxito
+async function eliminarTodo() {
+  try {
+    const res = await fetch(API, { method: 'DELETE' });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error);
+    }
 
+    datos = [];
+    datosIniciales = false;
+    showTable = false;
+
+    resetFiltros();                        // solo resetea variables, sin fetch
+    mostrarMensaje('🗑️ Todos los datos eliminados', 'success');
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Error al eliminar';
+    mostrarMensaje(msg, 'danger');
+  }
+}
 	// Aplicar paginación
 	function aplicarPaginacion() {
 		query = `?limit=${limit}&offset=${offset}${filtrosAplicados}`;
@@ -355,8 +363,7 @@
 		showDeleteModal = true;
 	}
 
-	// Función para limpiar todos los filtros
-	function limpiarFiltros() {
+	function resetFiltros() {
 		filtrosAplicados = '';
 		busquedaYear = '';
 		busquedaComunidad = '';
@@ -368,9 +375,14 @@
 		offset = 0;
 		tipoFiltro = null;
 		aplicarPaginacion();
-		obtenerDatos();
-		mostrarMensaje('🧹 Filtros eliminados', 'info');
 	}
+	
+//Refactorizamos limpiarFiltros para la UX “normal”
+async function limpiarFiltros() {
+  resetFiltros();
+  await obtenerDatos();
+  mostrarMensaje('🧹 Filtros eliminados', 'info');
+}
 	// Manejador para el botón de búsqueda con 'Enter'
 	function handleEnterPressSearch(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
@@ -416,7 +428,7 @@
 			<button class="btn btn-danger" on:click={confirmarEliminarTodo}>Eliminar todo</button>
 		</div>
 
-		{#if showTable}
+		{#if datosIniciales}
 			{#if filtrosAplicados}
 				<div class="clear-filters-bar">
 					<button
@@ -461,8 +473,8 @@
 
 			<div class="table-actions">
 				<div class="pagination-controls">
-					<button class="btn btn-outline" on:click={paginaAnterior}>Anterior</button>
-					<button class="btn btn-outline" on:click={siguientePagina}>Siguiente</button>
+					<button class="btn btn-outline" on:click={paginaAnterior} disabled={offset === 0}>Anterior</button>
+					<button class="btn btn-outline" on:click={siguientePagina} disabled={datos.length < limit}>Siguiente</button>
 				</div>
 				<div class="items-selector">
 					<select
