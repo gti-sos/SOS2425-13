@@ -168,7 +168,7 @@
 			<!-- Informe de Horas -->
 			<div class="interactive-box">
 				<a href="/analytics" style="display:block; width:100%;">
-					<button>Informe de Horas</button>
+					<button>Análisis</button>
 				</a>
 			</div>
 		</div>
