@@ -30,7 +30,7 @@
       "cantabria": "Cantabria",
       "castilla y leon": "Castilla y León",
       "castilla-la mancha": "Castilla-La Mancha",
-      "catalunia": "Cataluña",
+      "cataluña": "Cataluña",
       "valencia": "Comunidad Valenciana",
       "extremadura": "Extremadura",
       "galicia": "Galicia",

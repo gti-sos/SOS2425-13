@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Highcharts from 'highcharts';
-	import 'highcharts/highcharts-more'; // carga side‑effect el módulo bubble
+	import { onMount, tick } from 'svelte';
+	import * as Highcharts from 'highcharts';
 	import Chart from 'chart.js/auto';
+	import type { Chart as HCChart, Options as HCOptions, SeriesBubbleOptions } from 'highcharts';
   
 	interface DataItem {
 	  autonomous_community: string;
@@ -16,15 +16,15 @@
 	let years: number[] = [];
 	let selectedYear: number;
   
+	let bubbleEl: HTMLDivElement;
 	let chartContainer: HTMLCanvasElement;
-	let pieChartInstance: Chart;
-	let bubbleChartInstance: Highcharts.Chart;
   
-	// Títulos dinámicos
+	let pieChartInstance: Chart;
+	let bubbleChartInstance: HCChart;
+  
 	const bubbleTitle = 'Análisis Tridimensional: Fondos por Año y Población';
 	$: pieTitle = `Distribución de fondos ${selectedYear}`;
   
-	// Paleta de colores para comunidades
 	const colorPalette = [
 	  '#7cb5ec', '#434348', '#90ed7d', '#f7a35c',
 	  '#8085e9', '#f15c80', '#e4d354', '#84e1d7',
@@ -42,29 +42,22 @@
 	  selectedYear = years[0];
 	}
   
-	async function initCharts() {
+	function initCharts() {
 	  const communities = Array.from(new Set(data.map(d => d.autonomous_community)));
   
-	  // --- Bubble chart con serie por comunidad para mostrar leyenda ---
-	  const bubbleSeries = communities.map((comm, idx) => {
-		const seriesData = data
+	  const bubbleSeries: SeriesBubbleOptions[] = communities.map((comm, idx) => ({
+		type: 'bubble',
+		name: comm,
+		data: data
 		  .filter(d => d.autonomous_community === comm)
-		  .map(d => ({ x: d.year, y: d.amount, z: d.benefited_population }));
-		return {
-		  type: 'bubble',
-		  name: comm,
-		  data: seriesData,
-		  color: colorPalette[idx % colorPalette.length]
-		};
-	  });
+		  .map(d => ({ x: d.year, y: d.amount, z: d.benefited_population })),
+		color: colorPalette[idx % colorPalette.length]
+	  }));
   
-	  bubbleChartInstance = Highcharts.chart('highcharts-bubble', {
-		chart: { type: 'bubble' },
+	  const bubbleOpts: HCOptions = {
+		chart: { renderTo: bubbleEl, type: 'bubble' },
 		title: { text: bubbleTitle },
-		xAxis: {
-		  title: { text: 'Año' },
-		  tickPositions: years
-		},
+		xAxis: { title: { text: 'Año' }, tickPositions: years },
 		yAxis: { title: { text: 'Fondos (€)' } },
 		tooltip: {
 		  headerFormat: '',
@@ -74,38 +67,28 @@
 			'Fondos: {point.y} €<br>' +
 			'Población: {point.z}'
 		},
-		legend: {
-		  enabled: true,
-		  align: 'center',
-		  verticalAlign: 'bottom'
-		},
+		legend: { enabled: true, align: 'center', verticalAlign: 'bottom' },
 		series: bubbleSeries
-	  });
+	  };
   
-	  // --- Pie chart inicial con colores y leyenda ---
+	  bubbleChartInstance = new Highcharts.Chart(bubbleOpts);
+  
 	  const initial = data.filter(d => d.year === selectedYear);
 	  const pieColors = initial.map(d => {
 		const idx = communities.indexOf(d.autonomous_community);
 		return colorPalette[idx % colorPalette.length];
 	  });
+  
 	  pieChartInstance = new Chart(chartContainer, {
 		type: 'pie',
 		data: {
 		  labels: initial.map(d => d.autonomous_community),
-		  datasets: [{
-			data: initial.map(d => d.amount),
-			backgroundColor: pieColors
-		  }]
+		  datasets: [{ data: initial.map(d => d.amount), backgroundColor: pieColors }]
 		},
-		options: {
-		  plugins: {
-			legend: { display: true, position: 'bottom' }
-		  }
-		}
+		options: { plugins: { legend: { display: true, position: 'bottom' } } }
 	  });
 	}
   
-	// Actualiza solo el pie chart al cambiar año
 	$: if (pieChartInstance && data.length) {
 	  const filtered = data.filter(d => d.year === selectedYear);
 	  const communities = Array.from(new Set(data.map(di => di.autonomous_community)));
@@ -120,32 +103,49 @@
 	}
   
 	onMount(async () => {
+	  // Carga highcharts-more y aplica el módulo
+	  const moreModule = await import('highcharts/highcharts-more');
+	  const HighchartsMoreFn =
+		typeof moreModule === 'function' ? moreModule :
+		typeof moreModule.default === 'function' ? moreModule.default :
+		typeof (moreModule as any).HighchartsMore === 'function' ? (moreModule as any).HighchartsMore :
+		null;
+	  HighchartsMoreFn?.(Highcharts);
+  
+	  // Fetch y render
 	  await fetchData();
-	  await initCharts();
+	  await tick();
+	  initCharts();
 	});
   </script>
   
   <main>
 	<h2>Visualizaciones de la Gestión de Recursos de Abastecimiento de Agua</h2>
   
-	<!-- Botones de integración -->
 	<div class="button-group">
-	  <a href="/integraciones/watter-supply-improvements/G10-accidents-stats"><button>G10-accidents-stats</button></a>
-	  <a href="/integraciones/watter-supply-improvements/G12-Annual-retributions"><button>G12-Annual-retributions</button></a>
-	  <a href="/integraciones/watter-supply-improvements/G14-employment-data"><button>G14-employment-data</button></a>
-	  <a href="/integraciones/watter-supply-improvements/G20-traffic-accidents"><button>G20-traffic-accidents</button></a>
-	  <a href="/integraciones/watter-supply-improvements/G21-cultural-event"><button>G21-cultural-event</button></a>
+	  <a href="/integraciones/watter-supply-improvements/G10-accidents-stats">
+		<button>G10-accidents-stats</button>
+	  </a>
+	  <a href="/integraciones/watter-supply-improvements/G12-Annual-retributions">
+		<button>G12-Annual-retributions</button>
+	  </a>
+	  <a href="/integraciones/watter-supply-improvements/G14-employment-data">
+		<button>G14-employment-data</button>
+	  </a>
+	  <a href="/integraciones/watter-supply-improvements/G20-traffic-accidents">
+		<button>G20-traffic-accidents</button>
+	  </a>
+	  <a href="/integraciones/watter-supply-improvements/G21-cultural-event">
+		<button>G21-cultural-event</button>
+	  </a>
 	</div>
   
 	{#if data.length}
 	  <div class="chart-wrapper">
-		<!-- Bubble chart -->
 		<div class="chart-block">
-		  <div class="chart-title">{bubbleTitle}</div>
-		  <div id="highcharts-bubble" class="chart-box"></div>
+		  <div class="chart-title"></div>
+		  <div bind:this={bubbleEl} class="chart-box"></div>
 		</div>
-  
-		<!-- Pie chart + filtro -->
 		<div class="chart-block">
 		  <div class="chart-title">{pieTitle}</div>
 		  <div class="controls">
@@ -167,13 +167,10 @@
   </main>
   
   <style>
-	/* Título principal centrado con margen */
 	main h2 {
 	  text-align: center;
 	  margin: 2rem 0;
 	}
-  
-	/* Botones */
 	.button-group {
 	  display: flex;
 	  justify-content: center;
@@ -192,8 +189,6 @@
 	.button-group button:hover {
 	  background-color: #9bb37c;
 	}
-  
-	/* Grid */
 	.chart-wrapper {
 	  display: grid;
 	  grid-template-columns: 1fr 1fr;
@@ -201,30 +196,24 @@
 	  max-width: 1000px;
 	  margin: 0 auto;
 	}
-  
-	/* Bloques de gráfico */
 	.chart-block {
 	  display: flex;
 	  flex-direction: column;
 	  align-items: center;
 	}
-  
 	.chart-title {
 	  font-weight: bold;
 	  text-align: center;
 	  margin-bottom: 1rem;
 	}
-  
 	.controls {
 	  margin-bottom: 1rem;
 	  text-align: center;
 	}
-  
 	select {
 	  font-size: 1rem;
 	  padding: 0.3rem;
 	}
-  
 	.chart-box {
 	  width: 100%;
 	  height: 400px;
