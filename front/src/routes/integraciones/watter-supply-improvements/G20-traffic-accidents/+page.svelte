@@ -38,7 +38,7 @@
     // Función para obtener los datos de las APIs
     async function fetchAll() {
       const [trafficRes, waterRes] = await Promise.all([
-        fetch('/api/v1/traffic-accidents'),
+        fetch('https://sos2425-20.onrender.com/api/v1/traffic-accidents'),
         fetch('/api/v1/water-supply-improvements')
       ]);
   
