@@ -2,30 +2,26 @@
     import { onMount } from 'svelte';
     import Chart from 'chart.js/auto';
   
-    interface Traffic {
-      year: number;
-      autonomous_community: string;
-      vehicles_without_mot: number;
-    }
-  
     interface Water {
       year: number;
       autonomous_community: string;
       project_count: number;
     }
   
-    let trafficData: Traffic[] = [];
+    interface Traffic {
+      year: number;
+      autonomous_community: string;
+      vehicles_without_mot: number;
+    }
+  
     let waterData: Water[] = [];
+    let trafficData: Traffic[] = [];
     let communities: string[] = [];
   
     let chart: Chart;
     let canvasEl: HTMLCanvasElement;
   
-    // Fechas predeterminadas para el rango
-    let startDate: string = '2022-01-01';
-    let endDate: string = '2023-12-31';
-  
-    // Normalización de nombres para asegurar consistencia
+    // Normalización de nombres
     function normalizeName(s: string) {
       return s
         .trim()
@@ -35,50 +31,54 @@
         .replace(/ñ/g, 'n');
     }
   
-    // Función para obtener los datos de las APIs
+    // Función para cargar los datos de ambas APIs
     async function fetchAll() {
-      const [trafficRes, waterRes] = await Promise.all([
-        fetch('https://sos2425-20.onrender.com/api/v1/traffic-accidents'),
-        fetch('/api/v1/water-supply-improvements')
+      const [waterRes, trafficRes] = await Promise.all([
+        fetch('/api/v1/water-supply-improvements'),
+        fetch('https://sos2425-20.onrender.com/api/v1/traffic-accidents')
       ]);
   
-      const traffic = await trafficRes.json() as Traffic[];
-      const water = await waterRes.json() as Water[];
+      const waterJson = await waterRes.json();
+      const trafficJson = await trafficRes.json();
   
-      // Normalizar los datos y preparar las comunidades
-      trafficData = traffic.map(t => ({
-        ...t,
-        autonomous_community: normalizeName(t.autonomous_community)
-      }));
-  
-      waterData = water.map(w => ({
+      // Normalizamos los datos
+      waterData = waterJson.map((w: Water) => ({
         ...w,
         autonomous_community: normalizeName(w.autonomous_community)
       }));
   
-      // Identificar todas las comunidades autónomas
+      trafficData = trafficJson.map((t: Traffic) => ({
+        ...t,
+        autonomous_community: normalizeName(t.autonomous_community)
+      }));
+  
       const commSet = new Set<string>();
-      trafficData.forEach(t => commSet.add(t.autonomous_community));
       waterData.forEach(w => commSet.add(w.autonomous_community));
+      trafficData.forEach(t => commSet.add(t.autonomous_community));
+  
       communities = Array.from(commSet).sort();
     }
   
-    // Inicializar el gráfico
+    // Inicializa el gráfico de líneas
     function initChart() {
       chart = new Chart(canvasEl, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: communities,
           datasets: [
             {
               label: 'Proyectos de Agua',
               backgroundColor: '#7cb5ec',
-              data: []
+              borderColor: '#7cb5ec',
+              data: [],
+              fill: false
             },
             {
               label: 'Vehículos sin MOT',
               backgroundColor: '#f15c80',
-              data: []
+              borderColor: '#f15c80',
+              data: [],
+              fill: false
             }
           ]
         },
@@ -109,11 +109,11 @@
       });
     }
   
-    // Actualizar el gráfico
+    // Actualiza el gráfico con los datos sumados por comunidad
     function updateChart() {
       const waterTotals = communities.map(c =>
         waterData.reduce((sum, w) => {
-          if (w.autonomous_community === c && w.year >= parseInt(startDate.split('-')[0]) && w.year <= parseInt(endDate.split('-')[0])) {
+          if (w.autonomous_community === c) {
             return sum + w.project_count;
           }
           return sum;
@@ -122,7 +122,7 @@
   
       const vehicleTotals = communities.map(c =>
         trafficData.reduce((sum, t) => {
-          if (t.autonomous_community === c && t.year >= parseInt(startDate.split('-')[0]) && t.year <= parseInt(endDate.split('-')[0])) {
+          if (t.autonomous_community === c) {
             return sum + t.vehicles_without_mot;
           }
           return sum;
@@ -150,21 +150,7 @@
       style="display:block; margin:0 auto; width:75%; height:350px;"
     ></canvas>
   
-   
-
   
-    <!-- Selección de Rango de Fechas -->
-    <div style="text-align:center; margin-top: 1rem;">
-      <label>Desde:
-        <input type="date" bind:value={startDate} />
-      </label>
-      <label>Hasta:
-        <input type="date" bind:value={endDate} />
-      </label>
-      <button on:click={updateChart} style="padding: 0.5rem 1rem; background-color: #a8c686; border: none; border-radius: 8px; cursor: pointer;">
-        Actualizar Gráfico
-      </button>
-    </div>
   </main>
   
   <style>
