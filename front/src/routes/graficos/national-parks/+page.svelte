@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import * as Highcharts from 'highcharts';
   import { dev } from '$app/environment';
 
@@ -15,14 +15,12 @@
   }
 
   let parks = [];
-  let treemapEl;
-  let treemapChart;
+  let chartContainer;
   
   const colorPalette = [
     '#7cb5ec', '#434348', '#90ed7d', '#f7a35c',
     '#8085e9', '#f15c80', '#e4d354', '#84e1d7',
-    '#8d4653', '#91e8e1', '#2b908f', '#f45b5b',
-    '#91e8e1', '#4572A7', '#AA4643', '#89A54E'
+    '#8d4653', '#91e8e1', '#2b908f', '#f45b5b'
   ];
   
   async function fetchData() {
@@ -39,7 +37,7 @@
     }
   }
   
-  function initTreemap() {
+  function initChart() {
     if (!parks || parks.length === 0) {
       console.error('No hay datos para mostrar');
       return;
@@ -54,132 +52,117 @@
       communitiesMap[park.autonomous_community].push(park);
     });
     
-    // Crear datos para el treemap
-    const treemapData = Object.entries(communitiesMap).map(([community, parksInCommunity], idx) => {
+    // Preparar datos para el gráfico
+    const communities = Object.keys(communitiesMap);
+    const series = [];
+    
+    // Serie para área inicial
+    const initialAreaData = communities.map(community => {
+      const parksInCommunity = communitiesMap[community];
       return {
-        id: `id_${community.replace(/\s+/g, '_')}`,
         name: community,
-        color: colorPalette[idx % colorPalette.length],
-        children: parksInCommunity.map(park => ({
-          name: park.national_park,
-          value: park.current_area, // Tamaño basado en área actual
-          colorValue: park.declaration_date, // Color basado en año de declaración
-          declaration_date: park.declaration_date,
-          initial_area: park.initial_area,
-          current_area: park.current_area,
-          growth: ((park.current_area - park.initial_area) / park.initial_area * 100).toFixed(1)
+        y: parksInCommunity.reduce((sum, park) => sum + park.initial_area, 0),
+        color: colorPalette[communities.indexOf(community) % colorPalette.length],
+        parksCount: parksInCommunity.length,
+        parks: parksInCommunity.map(p => ({
+          name: p.national_park,
+          year: p.declaration_date,
+          initial: p.initial_area,
+          current: p.current_area
         }))
       };
     });
     
-    // Configuración mejorada del treemap
-    const treemapOptions = {
+    // Serie para área actual
+    const currentAreaData = communities.map(community => {
+      const parksInCommunity = communitiesMap[community];
+      return {
+        name: community,
+        y: parksInCommunity.reduce((sum, park) => sum + park.current_area, 0),
+        color: colorPalette[communities.indexOf(community) % colorPalette.length],
+        parksCount: parksInCommunity.length,
+        parks: parksInCommunity.map(p => ({
+          name: p.national_park,
+          year: p.declaration_date,
+          initial: p.initial_area,
+          current: p.current_area
+        }))
+      };
+    });
+    
+    // Crear gráfico de columnas
+    Highcharts.chart(chartContainer, {
       chart: {
-        type: 'treemap',
-        renderTo: treemapEl,
-        height: 700 // Más altura para el único gráfico
+        type: 'column',
+        height: 700
       },
       title: {
-        text: 'Distribución de Parques Nacionales por Comunidad Autónoma'
+        text: 'Áreas de Parques Nacionales por Comunidad Autónoma'
       },
       subtitle: {
-        text: 'Tamaño: Área Actual (ha) | Color: Antigüedad (años más claros = más recientes)'
+        text: 'Comparativa entre áreas iniciales y actuales'
       },
-      colorAxis: {
-        minColor: '#EEEEFF',
-        maxColor: '#000077',
-        reversed: true
+      xAxis: {
+        categories: communities,
+        crosshair: true,
+        labels: {
+          rotation: -45,
+          style: {
+            fontSize: '12px'
+          }
+        }
       },
-      legend: {
-        align: 'right',
-        layout: 'vertical',
-        verticalAlign: 'middle'
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Área (hectáreas)'
+        }
       },
       tooltip: {
         useHTML: true,
         formatter: function() {
           const point = this.point;
-          if (point.isLeaf) {
-            const growthText = point.growth > 0 
-              ? `<span style="color:green">+${point.growth}%</span>` 
-              : (point.growth < 0 
-                ? `<span style="color:red">${point.growth}%</span>` 
-                : `<span>0%</span>`);
-            
-            return `<div style="max-width:250px">
-              <h4 style="margin:0">${point.name}</h4>
-              <hr style="margin:3px 0"/>
-              <b>Año de declaración:</b> ${point.declaration_date}<br/>
-              <b>Área inicial:</b> ${Highcharts.numberFormat(point.initial_area, 0)} ha<br/>
-              <b>Área actual:</b> ${Highcharts.numberFormat(point.current_area, 0)} ha<br/>
-              <b>Cambio:</b> ${growthText}
-            </div>`;
-          } else {
-            return `<b>${point.name}</b><br>
-              <b>Número de parques:</b> ${point.children.length}<br>
-              <b>Área total:</b> ${Highcharts.numberFormat(point.value, 0)} ha`;
-          }
+          const seriesName = this.series.name;
+          let tooltip = `<div style="max-width:300px">
+            <h4 style="margin:0">${point.name}</h4>
+            <hr style="margin:3px 0"/>
+            <b>${seriesName}:</b> ${Highcharts.numberFormat(point.y, 0)} ha<br/>
+            <b>Número de parques:</b> ${point.parksCount}<br/><br/>
+            <b>Parques en esta comunidad:</b><br/>`;
+          
+          point.parks.forEach(park => {
+            tooltip += `• ${park.name} (${park.year}): ${Highcharts.numberFormat(seriesName === 'Área Inicial' ? park.initial : park.current, 0)} ha<br/>`;
+          });
+          
+          tooltip += '</div>';
+          return tooltip;
+        }
+      },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0,
+          grouping: true
         }
       },
       series: [{
-        type: 'treemap',
-        layoutAlgorithm: 'squarified',
-        allowTraversingTree: true, // Permite navegar dentro del árbol
-        data: treemapData,
-        levels: [{
-          level: 1,
-          borderWidth: 3,
-          dataLabels: {
-            enabled: true,
-            style: {
-              fontSize: '16px',
-              fontWeight: 'bold',
-              textOutline: '1px contrast'
-            }
-          }
-        }, {
-          level: 2,
-          borderWidth: 1,
-          dataLabels: {
-            enabled: true,
-            style: {
-              fontSize: '12px',
-              textOutline: '1px contrast'
-            }
-          }
-        }]
+        name: 'Área Inicial',
+        data: initialAreaData
+      }, {
+        name: 'Área Actual',
+        data: currentAreaData
       }]
-    };
-    
-    treemapChart = new Highcharts.Chart(treemapOptions);
+    });
   }
   
   onMount(async () => {
-    try {
-      // Cargar módulo treemap
-      const treemapModule = await import('highcharts/modules/treemap');
-      if (treemapModule.default) {
-        treemapModule.default(Highcharts);
-      } else {
-        console.error('No se pudo cargar el módulo treemap');
-      }
-      
-      // Cargar módulo exporting para exportar gráficos
-      const exportingModule = await import('highcharts/modules/exporting');
-      if (exportingModule.default) {
-        exportingModule.default(Highcharts);
-      } else {
-        console.error('No se pudo cargar el módulo exporting');
-      }
-    } catch (error) {
-      console.error('Error al cargar módulos de Highcharts:', error);
-    }
-    
     await fetchData();
-    await tick();
     
     if (parks.length) {
-      initTreemap();
+      setTimeout(() => {
+        console.log("Inicializando gráfico...");
+        initChart();
+      }, 100);
     }
   });
 </script>
@@ -193,11 +176,11 @@
     </a>
   </div>
   
-  {#if parks.length}
-    <div class="chart-container">
-      <div bind:this={treemapEl} class="chart-box"></div>
-    </div>
-  {:else}
+  <div class="chart-container">
+    <div bind:this={chartContainer} class="chart-box"></div>
+  </div>
+  
+  {#if parks.length === 0}
     <p class="loading">Cargando datos de parques nacionales...</p>
   {/if}
 </main>
