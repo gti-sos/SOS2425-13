@@ -126,8 +126,8 @@
 	  <a href="/integraciones/watter-supply-improvements/G10-accidents-stats">
 		<button>G10-accidents-stats</button>
 	  </a>
-	  <a href="/integraciones/watter-supply-improvements/G12-Annual-retributions">
-		<button>G12-Annual-retributions</button>
+	  <a href="/integraciones/watter-supply-improvements/G12-annual-retributions">
+		<button>G12-annual-retributions</button>
 	  </a>
 	  <a href="/integraciones/watter-supply-improvements/G14-employment-data">
 		<button>G14-employment-data</button>
