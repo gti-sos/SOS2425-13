@@ -10,10 +10,10 @@
 		DropdownToggle,
 		DropdownMenu,
 		DropdownItem,
-		Modal, // Añadir esto
-		ModalHeader, // Añadir esto
-		ModalBody, // Añadir esto
-		ModalFooter // Añadir esto
+		Modal, 
+		ModalHeader, 
+		ModalBody, 
+		ModalFooter 
 	} from '@sveltestrap/sveltestrap';
 	import { dev } from '$app/environment'; // Importing the dev variable to check the environment
 	import { page } from '$app/stores';
@@ -384,7 +384,7 @@
 	}
 	/* ----------------------------------------------------------- */
 
-	/* ------------------ LIMPIAR LOS CAMPOS DE LA BÚSQUEDAS Y EL FILTRADO ------------------------- */
+	/* ------------------ LIMPIAR LOS CAMPOS DE LAS BÚSQUEDAS Y EL FILTRADO ------------------------- */
 	function clearSearchForm() {
 		// Resetear todos los campos de búsqueda
 		searchParams = {
