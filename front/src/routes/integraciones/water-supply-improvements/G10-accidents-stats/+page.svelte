@@ -136,7 +136,7 @@
   <main>
 	<h2 style="text-align:center;">Población Beneficiada vs Accident IDs por Comunidad</h2>
 	<div bind:this={chartDiv} style="width:80%; height:400px; margin:20px auto;"></div>
-	<button on:click={() => window.location.href = '/integrations'}
+	<button on:click={() => window.location.href = '/graficos/water-supply-improvements'}
 	  style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; cursor:pointer;">
 	  Volver
 	</button>

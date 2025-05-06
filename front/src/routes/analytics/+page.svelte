@@ -37,34 +37,88 @@
 	let canvasEl: HTMLCanvasElement;
 
 	async function fetchAll() {
-		const [fRes, wRes, pRes] = await Promise.all([
-			fetch('/api/v1/forest-fires'),
-			fetch('/api/v1/water-supply-improvements'),
-			fetch('/api/v2/national-parks')
-		]);
+		try {
+			const [fRes, wRes, pRes] = await Promise.all([
+				fetch('/api/v1/forest-fires'),
+				fetch('/api/v1/water-supply-improvements'),
+				fetch('/api/v2/national-parks')
+			]);
 
-		const fireData = (await fRes.json()) as Fire[];
-		const waterData = (await wRes.json()) as Water[];
-		const parkData = (await pRes.json()) as Park[];
+			// Verificar las respuestas
+			if (!fRes.ok) {
+				console.error('Error al cargar incendios forestales:', await fRes.text());
+				return;
+			}
+			if (!wRes.ok) {
+				console.error('Error al cargar mejoras de suministro de agua:', await wRes.text());
+				return;
+			}
+			if (!pRes.ok) {
+				console.error('Error al cargar parques nacionales:', await pRes.text());
+				return;
+			}
 
-		fires = fireData.map((f) => ({
-			...f,
-			autonomous_community: normalizeName(f.autonomous_community)
-		}));
-		waters = waterData.map((w) => ({
-			...w,
-			autonomous_community: normalizeName(w.autonomous_community)
-		}));
-		parks = parkData.map((p) => ({
-			...p,
-			autonomous_community: normalizeName(p.autonomous_community)
-		}));
+			// Procesar respuestas JSON
+			let fireData = await fRes.json();
+			let waterData = await wRes.json();
+			let parkData = await pRes.json();
 
-		const commSet = new Set<string>();
-		fires.forEach((f) => commSet.add(f.autonomous_community));
-		waters.forEach((w) => commSet.add(w.autonomous_community));
-		parks.forEach((p) => commSet.add(p.autonomous_community));
-		communities = Array.from(commSet).sort();
+			// Verificar que los datos sean arrays
+			console.log('Datos de incendios:', fireData);
+			console.log('Datos de agua:', waterData);
+			console.log('Datos de parques:', parkData);
+
+			// Comprobar si los datos están dentro de una propiedad (común en algunas APIs)
+			if (fireData && !Array.isArray(fireData) && fireData.data) {
+				fireData = fireData.data;
+			}
+			if (waterData && !Array.isArray(waterData) && waterData.data) {
+				waterData = waterData.data;
+			}
+			if (parkData && !Array.isArray(parkData) && parkData.data) {
+				parkData = parkData.data;
+			}
+
+			// Verificar de nuevo que son arrays antes de usar map
+			if (!Array.isArray(fireData)) {
+				console.error('Datos de incendios no es un array:', fireData);
+				fireData = [];
+			}
+			if (!Array.isArray(waterData)) {
+				console.error('Datos de agua no es un array:', waterData);
+				waterData = [];
+			}
+			if (!Array.isArray(parkData)) {
+				console.error('Datos de parques no es un array:', parkData);
+				parkData = [];
+			}
+
+			// Ahora procesamos los datos con seguridad
+			//@ts-ignore
+			fires = fireData.map((f) => ({
+				...f,
+				autonomous_community: normalizeName(f.autonomous_community)
+			}));
+			//@ts-ignore
+			waters = waterData.map((w) => ({
+				...w,
+				autonomous_community: normalizeName(w.autonomous_community)
+			}));
+			//@ts-ignore
+			parks = parkData.map((p) => ({
+				...p,
+				autonomous_community: normalizeName(p.autonomous_community)
+			}));
+
+			// Resto del código original
+			const commSet = new Set<string>();
+			fires.forEach((f) => commSet.add(f.autonomous_community));
+			waters.forEach((w) => commSet.add(w.autonomous_community));
+			parks.forEach((p) => commSet.add(p.autonomous_community));
+			communities = Array.from(commSet).sort();
+		} catch (error) {
+			console.error('Error al cargar datos:', error);
+		}
 	}
 
 	function initChart() {
@@ -157,7 +211,7 @@
 	
 	<!-- Botones para las secciones de gráficos -->
 	<div style="text-align:center; margin-top: 2rem;">
-		<a href="/graficos/watter-supply-improvements" style="text-decoration: none;">
+		<a href="/graficos/water-supply-improvements" style="text-decoration: none;">
 			<button
 				style="padding: 0.5rem 1rem; margin: 10px; background-color: #a8c686; border: none; border-radius: 8px; cursor: pointer;"
 			>

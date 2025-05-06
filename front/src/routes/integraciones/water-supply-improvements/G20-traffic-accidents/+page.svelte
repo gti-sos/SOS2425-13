@@ -147,7 +147,7 @@
         </div>
       <h2 style="text-align:center;">Proyectos de Agua vs Vehículos sin MOT</h2>
       <canvas bind:this={canvasEl} style="display:block; margin:20px auto; width:75%; height:400px;"></canvas>
-      <button on:click={() => window.location.href = '/graficos/watter-supply-improvements'} style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; font-size:14px; cursor:pointer;">
+      <button on:click={() => window.location.href = '/graficos/water-supply-improvements'} style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; font-size:14px; cursor:pointer;">
         Volver
       </button>
     </main>

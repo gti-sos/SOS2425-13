@@ -123,19 +123,19 @@
 	<h2>Visualizaciones de la Gestión de Recursos de Abastecimiento de Agua</h2>
   
 	<div class="button-group">
-	  <a href="/integraciones/watter-supply-improvements/G10-accidents-stats">
+	  <a href="/integraciones/water-supply-improvements/G10-accidents-stats">
 		<button>G10-accidents-stats</button>
 	  </a>
-	  <a href="/integraciones/watter-supply-improvements/G12-annual-retributions">
+	  <a href="/integraciones/water-supply-improvements/G12-annual-retributions">
 		<button>G12-annual-retributions</button>
 	  </a>
-	  <a href="/integraciones/watter-supply-improvements/G14-employment-data">
+	  <a href="/integraciones/water-supply-improvements/G14-employment-data">
 		<button>G14-employment-data</button>
 	  </a>
-	  <a href="/integraciones/watter-supply-improvements/G20-traffic-accidents">
+	  <a href="/integraciones/water-supply-improvements/G20-traffic-accidents">
 		<button>G20-traffic-accidents</button>
 	  </a>
-	  <a href="/integraciones/watter-supply-improvements/G21-cultural-event">
+	  <a href="/integraciones/water-supply-improvements/G21-cultural-event">
 		<button>G21-cultural-event</button>
 	  </a>
 	</div>
