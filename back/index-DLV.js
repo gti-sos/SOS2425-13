@@ -66,6 +66,22 @@ function loadBackend(app) {
         request(targetUrl).pipe(res);
     });
 
+    // Endpoint proxy para la API de subvenciones DANA del Grupo 18
+    app.use(`${BASE_API}/proxy/dana-grants-subsidies-stats`, (req, res) => {
+        const targetUrl = 'https://sos2425-18.onrender.com/api/v2/dana-grants-subsidies-stats' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API de cambios de propiedad del Grupo 19
+    app.use(`${BASE_API}/proxy/ownerships-changes-stats`, (req, res) => {
+        const targetUrl = 'https://sos2425-19.onrender.com/api/v2/ownerships-changes-stats' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
 
     //DOCUMENTACIÓN DE POSTMAN
     app.get(BASE_API + "/national-parks/docs", (request, response) => {

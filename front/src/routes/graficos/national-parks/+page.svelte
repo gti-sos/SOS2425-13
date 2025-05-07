@@ -504,8 +504,8 @@
 		  <button>G14-education-data</button>
 		  
 		</a>
-		<a href="/integrations/national-parks/G18-dana-grants-subsides-stats">
-		  <button>G18-dana-grants-subsides-stats</button>
+		<a href="/integrations/national-parks/G18-dana-grants-subsidies-stats">
+		  <button>G18-dana-grants-subsidies-stats</button>
 		</a>
 		<a href="/integrations/national-parks/G19-ownerships-changes-stats">
 		  <button>G19-ownerships-changes-stats</button>
