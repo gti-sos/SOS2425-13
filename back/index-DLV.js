@@ -1,4 +1,6 @@
 import dataStore from '@seald-io/nedb';
+import request from 'request';
+
 let db = new dataStore();
 const BASE_API = "/api/v2";
 
@@ -40,6 +42,19 @@ const datosIniciales = [
 
 function loadBackend(app) {
 
+    // PROXIES DE COMPAÑEROS DE SOS
+    var paths = 'https://sos2425-11.onrender.com/api/v1/social-pension-payrolls';
+    var apiServerHost = "";
+    app.use(paths, (req, res) => {
+        var targetUrl = apiServerHost + req.url;
+        console.log('piped: ' + req.url);
+
+        // Usa pipe para transmitir la solicitud y la respuesta
+        req.pipe(request(targetUrl)).pipe(res);
+    });
+
+
+    //DOCUMENTACIÓN DE POSTMAN
     app.get(BASE_API + "/national-parks/docs", (request, response) => {
         response.redirect("https://documenter.getpostman.com/view/14944672/2sB2cUBNyt");
 

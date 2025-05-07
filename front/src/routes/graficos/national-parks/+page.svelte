@@ -471,13 +471,27 @@
 </script>
 
 <main>
-	<h2>Visualización de Parques Nacionales de España</h2>
+	<h2>Visualización de los Parques Nacionales de España</h2>
 
 	<div class="button-group">
-		<a href="/national-parks">
-			<button>Volver a Parques Nacionales</button>
+		<a href="/integrations/national-parks/G11-social-pension-payrolls">
+		  <button>G11-social-pension-payrolls</button>
+		 
 		</a>
-	</div>
+		<a href="/integrations/national-parks/G12-annual-consumptions">
+		  <button>G12-annual-consumptions</button>
+		</a>
+		<a href="/integrations/national-parks/G14-education-data">
+		  <button>G14-education-data</button>
+		  
+		</a>
+		<a href="/integrations/national-parks/G18-dana-grants-subsides-stats">
+		  <button>G18-dana-grants-subsides-stats</button>
+		</a>
+		<a href="/integrations/national-parks/G19-ownerships-changes-stats">
+		  <button>G19-ownerships-changes-stats</button>
+		</a>
+	  </div>
 
 	<div class="chart-container">
 		<div bind:this={chartContainer} class="chart-box"></div>
@@ -506,25 +520,22 @@
 	}
 
 	.button-group {
-		display: flex;
-		justify-content: center;
-		gap: 1rem;
-		margin-bottom: 2rem;
+	  display: flex;
+	  justify-content: center;
+	  gap: 1rem;
+	  margin-bottom: 2rem;
 	}
-
 	.button-group button {
-		padding: 0.5rem 1rem;
-		font-size: 1rem;
-		cursor: pointer;
-		border: none;
-		border-radius: 4px;
-		background-color: #a8c686;
-		color: #000;
-		transition: background-color 0.3s;
+	  padding: 0.5rem 1rem;
+	  font-size: 1rem;
+	  cursor: pointer;
+	  border: none;
+	  border-radius: 4px;
+	  background-color: #a8c686;
+	  color: #000;
 	}
-
 	.button-group button:hover {
-		background-color: #8ab061;
+	  background-color: #9bb37c;
 	}
 
 	.chart-container,

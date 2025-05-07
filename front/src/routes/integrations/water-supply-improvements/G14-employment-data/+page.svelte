@@ -141,25 +141,25 @@
   
   <main>
     <div style="text-align:center; margin-bottom:30px; margin-top:30px;">
-      <a href="/integraciones/watter-supply-improvements/G10-accidents-stats"
+      <a href="/integrations/water-supply-improvements/G10-accidents-stats"
         ><button
           style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
           >G10-accidents-stats</button
         ></a
       >
-      <a href="/integraciones/watter-supply-improvements/G12-annual-retributions"
+      <a href="/integrations/water-supply-improvements/G12-annual-retributions"
         ><button
           style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
           >G12-annual-retributions</button
         ></a
       >
-      <a href="/integraciones/watter-supply-improvements/G20-traffic-accidents"
+      <a href="/integrations/water-supply-improvements/G20-traffic-accidents"
         ><button
           style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
           >G20-traffic-accidents</button
         ></a
       >
-      <a href="/integraciones/watter-supply-improvements/G21-cultural-event"
+      <a href="/integrations/water-supply-improvements/G21-cultural-event"
         ><button
           style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
           >G21-cultural-event</button
