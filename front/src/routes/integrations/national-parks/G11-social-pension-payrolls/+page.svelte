@@ -8,7 +8,9 @@
 	const PARKS_API = dev
 		? 'http://localhost:16078/api/v2/national-parks'
 		: 'https://sos2425-13.onrender.com/api/v2/national-parks';
-	const PENSIONS_API = 'https://sos2425-11.onrender.com/api/v1/social-pension-payrolls';
+	const PENSIONS_API = dev
+		? 'http://localhost:16078/api/v2/proxy/social-pension-payrolls'
+		: 'https://sos2425-13.onrender.com/api/v2/proxy/social-pension-payrolls';
 
 	// Variables para almacenar los datos
 	let parksData = [];
@@ -48,53 +50,102 @@
 
 	// Función para procesar y combinar los datos
 	function processCombinedData() {
-		// Agrupar datos de parques por comunidad autónoma
+		// Normalizar nombres de comunidades para facilitar coincidencias
+		function normalizeCommunity(name) {
+			const normalizeMap = {
+				// Mapeo para normalizar nombres
+				'baleares': 'islas baleares',
+				'islas baleares': 'islas baleares',
+				'madrid, castilla y león': 'madrid y castilla y león',
+				'asturias, cantabria, castilla y león': 'asturias, cantabria y castilla y león'
+			};
+			
+			const lowercase = name.toLowerCase();
+			return normalizeMap[lowercase] || lowercase;
+		}
+
+		// Agrupar datos de parques por comunidad autónoma normalizada
 		const parksByCommunity = {};
-		parksData.forEach((park) => {
-			const community = park.autonomous_community;
+		parksData.forEach(park => {
+			const community = normalizeCommunity(park.autonomous_community);
+			
 			if (!parksByCommunity[community]) {
 				parksByCommunity[community] = {
 					totalArea: 0,
-					count: 0
+					count: 0,
+					displayName: park.autonomous_community // Mantener nombre original para mostrar
 				};
 			}
 			parksByCommunity[community].totalArea += park.current_area || 0;
 			parksByCommunity[community].count += 1;
 		});
 
-		// Agrupar datos de pensiones por comunidad autónoma
+		// Agrupar datos de pensiones por comunidad autónoma normalizada
 		const pensionsByCommunity = {};
-		pensionsData.forEach((pension) => {
-			const community = pension.autonomous_community;
+		pensionsData.forEach(pension => {
+			// Usar "place" en lugar de "autonomous_community"
+			const community = normalizeCommunity(pension.place);
+			
 			if (!pensionsByCommunity[community]) {
 				pensionsByCommunity[community] = {
 					totalAmount: 0,
-					beneficiaries: 0
+					beneficiaries: 0,
+					displayName: pension.place // Mantener nombre original para mostrar
 				};
 			}
-			pensionsByCommunity[community].totalAmount += pension.total_payroll_amount || 0;
-			pensionsByCommunity[community].beneficiaries += pension.beneficiaries || 0;
+			
+			// Sumar retirement_amount + disability_amount en lugar de total_payroll_amount
+			const pensionAmount = (pension.retirement_amount || 0) + (pension.disability_amount || 0);
+			pensionsByCommunity[community].totalAmount += pensionAmount;
+			
+			// Sumar retirement_number + disability_number en lugar de beneficiaries
+			const beneficiariesCount = (pension.retirement_number || 0) + (pension.disability_number || 0);
+			pensionsByCommunity[community].beneficiaries += beneficiariesCount;
 		});
+
+		// Depuración para ver qué comunidades tenemos
+		console.log('Comunidades en parques:', Object.keys(parksByCommunity));
+		console.log('Comunidades en pensiones:', Object.keys(pensionsByCommunity));
 
 		// Encontrar comunidades que aparecen en ambos conjuntos de datos
 		const commonCommunities = Object.keys(parksByCommunity).filter(
-			(community) => pensionsByCommunity[community]
+			community => pensionsByCommunity[community]
 		);
+		
+		console.log('Comunidades comunes:', commonCommunities);
+		
+		// Si no hay comunidades comunes, usar algunas para demostración
+		let categoriesToUse = commonCommunities;
+		if (commonCommunities.length === 0) {
+			// Usar solo las comunidades de parques y mostrar valores cero para pensiones
+			categoriesToUse = Object.keys(parksByCommunity);
+			console.log('No hay comunidades comunes, usando solo comunidades de parques');
+		}
 
-		// Preparar datos para el gráfico
-		const categories = commonCommunities;
-		const parksAreaSeries = commonCommunities.map(
-			(community) => parksByCommunity[community].totalArea / 1000
-		); // Convertir a miles de hectáreas
+		// Encontrar valores máximos para normalización
+		const maxParksArea = Math.max(...categoriesToUse.map(community => 
+			parksByCommunity[community].totalArea));
+		const maxPensionAmount = Math.max(...categoriesToUse.map(community => 
+			(pensionsByCommunity[community]?.totalAmount || 0)));
 
-		const pensionAmountSeries = commonCommunities.map(
-			(community) => pensionsByCommunity[community].totalAmount / 1000000
-		); // Convertir a millones de euros
-
+		// Preparar datos normalizados para el gráfico (escala 0-100)
+		const categories = categoriesToUse.map(community => 
+			parksByCommunity[community].displayName);
+			
+		const parksAreaSeries = categoriesToUse.map(community => 
+			(parksByCommunity[community].totalArea / maxParksArea) * 100);
+		
+		const pensionAmountSeries = categoriesToUse.map(community => 
+			((pensionsByCommunity[community]?.totalAmount || 0) / maxPensionAmount) * 100);
+		
 		return {
 			categories,
 			parksAreaSeries,
-			pensionAmountSeries
+			pensionAmountSeries,
+			// Devolver también los valores originales para el tooltip
+			originalParksData: categoriesToUse.map(community => parksByCommunity[community].totalArea / 1000),
+			originalPensionsData: categoriesToUse.map(community => 
+				(pensionsByCommunity[community]?.totalAmount || 0) / 1000000)
 		};
 	}
 
@@ -105,7 +156,7 @@
 			return;
 		}
 
-		const { categories, parksAreaSeries, pensionAmountSeries } = processCombinedData();
+		const { categories, parksAreaSeries, pensionAmountSeries, originalParksData, originalPensionsData } = processCombinedData();
 
 		// Configuración del gráfico
 		const options = {
@@ -130,7 +181,11 @@
 				}
 			},
 			title: {
-				text: 'Relación entre Parques Nacionales y Pensiones Sociales por Comunidad Autónoma',
+				text: 'Relación entre Parques Nacionales y Pensiones Sociales',
+				align: 'center'
+			},
+			subtitle: {
+				text: '(Valores normalizados para mejor visualización)',
 				align: 'center'
 			},
 			stroke: {
@@ -154,7 +209,15 @@
 				}
 			},
 			yaxis: {
-				show: false
+				show: true,
+				tickAmount: 5,
+				min: 0,
+				max: 100,
+				labels: {
+					formatter: function(val) {
+						return val + '%'; // Mostrar como porcentaje
+					}
+				}
 			},
 			colors: ['#2E7D32', '#D32F2F'],
 			legend: {
@@ -168,11 +231,12 @@
 			},
 			tooltip: {
 				y: {
-					formatter: function (val, { seriesIndex, dataPointIndex }) {
+					formatter: function(val, { seriesIndex, dataPointIndex }) {
+						// Mostrar el valor original en lugar del normalizado
 						if (seriesIndex === 0) {
-							return val.toFixed(2) + ' miles de ha';
+							return originalParksData[dataPointIndex].toFixed(2) + ' miles de ha';
 						} else {
-							return val.toFixed(2) + ' millones €';
+							return originalPensionsData[dataPointIndex].toFixed(2) + ' millones €';
 						}
 					}
 				}
@@ -187,6 +251,15 @@
 		// Crear y renderizar el gráfico
 		chartInstance = new ApexCharts(chartContainer, options);
 		chartInstance.render();
+
+		console.log('Inicializando gráfico con datos procesados:', { categories, parksAreaSeries, pensionAmountSeries });
+
+		// Si los datos son insuficientes, mostrar un mensaje
+		if (categories.length === 0 || !parksAreaSeries.length || !pensionAmountSeries.length) {
+			console.error('Datos insuficientes para crear el gráfico');
+			chartContainer.innerHTML = '<div class="error-message">No hay suficientes datos comunes para crear el gráfico</div>';
+			return;
+		}
 	}
 
 	// Inicializar todo al montar el componente
@@ -212,11 +285,8 @@
 	<h2>Integración: Parques Nacionales y Pensiones Sociales</h2>
 
 	<div class="button-group">
-		<a href="/national-parks">
+		<a href="/graficos/national-parks">
 			<button>Volver a Parques Nacionales</button>
-		</a>
-		<a href="/integrations/national-parks">
-			<button>Ver otras integraciones</button>
 		</a>
 	</div>
 

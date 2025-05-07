@@ -42,15 +42,28 @@ const datosIniciales = [
 
 function loadBackend(app) {
 
-    // PROXIES DE COMPAÑEROS DE SOS
-    var paths = 'https://sos2425-11.onrender.com/api/v1/social-pension-payrolls';
-    var apiServerHost = "";
-    app.use(paths, (req, res) => {
-        var targetUrl = apiServerHost + req.url;
-        console.log('piped: ' + req.url);
+    // Endpoint proxy para la API de pensiones sociales del Grupo 11
+    app.use(`${BASE_API}/proxy/social-pension-payrolls`, (req, res) => {
+        const targetUrl = 'https://sos2425-11.onrender.com/api/v1/social-pension-payrolls' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
 
-        // Usa pipe para transmitir la solicitud y la respuesta
-        req.pipe(request(targetUrl)).pipe(res);
+    // Endpoint proxy para la API de consumos anuales del Grupo 12
+    app.use(`${BASE_API}/proxy/annual-consumptions`, (req, res) => {
+        const targetUrl = 'https://sos2425-12.onrender.com/api/v1/annual-consumptions' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API de datos educativos del Grupo 14
+    app.use(`${BASE_API}/proxy/education-data`, (req, res) => {
+        const targetUrl = 'https://sos2425-14.onrender.com/api/v1/education-data' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
     });
 
 

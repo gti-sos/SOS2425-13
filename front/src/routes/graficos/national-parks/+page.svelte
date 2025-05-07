@@ -272,21 +272,37 @@
 			},
 			dataLabels: {
 				enabled: true,
-				formatter: function (val, opts) {
+				enabledOnSeries: undefined, // Activar en todas las series
+				formatter: function(val, opts) {
 					const data = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
-					// Limitar a 15 caracteres para evitar nombres muy largos
-					return data.name.length > 15 ? data.name.substring(0, 15) + '...' : data.name;
+					return data.name;
 				},
+				textAnchor: 'middle',
+				distributed: false, // Cambiar a false para manejo uniforme
+				offsetX: 0,
+				offsetY: -15,
 				style: {
 					fontSize: '11px',
+					fontWeight: 'normal',
+					colors: undefined, // Usar color automático para mejor contraste
 					fontFamily: 'Arial, sans-serif',
-					colors: ['#333']
 				},
-				// Quitar el fondo gris
 				background: {
-					enabled: false
+					enabled: true,
+					foreColor: '#333',
+					padding: 4,
+					borderRadius: 2,
+					borderWidth: 1,
+					borderColor: '#FFF',
+					opacity: 0.8, // Mayor opacidad para mejor visibilidad
+					dropShadow: {
+						enabled: true,
+						top: 1,
+						left: 1,
+						blur: 1,
+						opacity: 0.2
+					}
 				},
-				// Quitar efectos que causan problemas
 				dropShadow: {
 					enabled: false
 				}
@@ -339,8 +355,8 @@
 					}
 				},
 				type: 'numeric',
-				min: minYear - (yearRange > 20 ? 0 : 5), // Añadir margen si el rango es pequeño
-				max: maxYear + (yearRange > 20 ? 0 : 5),
+				min: minYear - (yearRange > 20 ? 5 : 10), // Aumentar margen
+				max: maxYear + (yearRange > 20 ? 10 : 15), // Aumentar margen especialmente a la derecha
 				tickAmount: Math.min(10, yearRange + 1), // No más de 10 marcas
 				labels: {
 					formatter: function (val) {
@@ -370,6 +386,9 @@
 					}
 				},
 				min: 0,
+				max: function(max) {
+					return max * 1.15; // Añadir 15% de margen superior
+				},
 				labels: {
 					formatter: function (val) {
 						return val.toLocaleString();
