@@ -1,5 +1,6 @@
-import dataStore from "@seald-io/nedb";
+import dataStore from '@seald-io/nedb';
 import request from 'request';
+import axios from 'axios';
 import 'dotenv/config';
 
 let db = new dataStore();
@@ -62,41 +63,53 @@ function loadBackend(app) {
     app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
-
-
-    // externa
-    // Endpoint proxy para historial de precipitación (Visual Crossing)
-    app.use(`${BASE_API}/proxy/precipitation-history`, (req, res) => {
-        // Base URL de la API de Visual Crossing
-        const baseUrl = 'https://visual-crossing-weather.p.rapidapi.com/history';
-
-        // Conservamos toda la query (p. ej. "?location=Spain&start=2015-01-01&end=2015-12-31")
-        const targetPath = req.url;
-        const targetUrl = `${baseUrl}${targetPath}`;
-
-        console.log('Proxy request to Visual Crossing API:', targetUrl);
-
-        // Recuperamos la API Key de RapidAPI desde las variables de entorno
-        const apiKey = process.env.RAPIDAPI_KEY;
-        if (!apiKey) {
-            console.error('Error: RAPIDAPI_KEY no encontrada en las variables de entorno');
-            return res.status(500).send('Error de configuración: API key no disponible');
+    
+    app.get(`${BASE_API}/proxy/precipitation-history`, async (req, res) => {
+        const { location, start, end } = req.query;
+        if (!location || !start || !end) {
+          return res
+            .status(400)
+            .json({ error: "Los parámetros 'location', 'start' y 'end' son obligatorios" });
         }
-
-        // Configuramos la petición incluyendo las cabeceras de RapidAPI
-        const requestOptions = {
-            url: targetUrl,
-            json: true,
-            headers: {
-                'BGA-API-Key': apiKey,
-                
+      
+        try {
+          const { data } = await axios.get(
+            `https://${process.env.WTH_API_HOST}/history`,
+            {
+              params: {
+                location,                               // p.ej. "Spain"
+                startDateTime: `${start}T00:00:00`,     // "2015-01-01T00:00:00"
+                endDateTime:   `${end}T23:59:59`,       // "2015-12-31T23:59:59"
+                aggregateHours: 24,                     // datos diarios
+                unitGroup: 'metric',                    // precipitación en mm
+                contentType: 'json'
+              },
+              headers: {
+                'X-RapidAPI-Key': process.env.WTH_API_KEY,
+                'X-RapidAPI-Host': process.env.WTH_API_HOST
+              }
             }
-        };
-
-        // Reenviamos la petición a Visual Crossing y pipeamos la respuesta
-        request(requestOptions).pipe(res);
-    });
-
+          );
+      
+          // Extraemos la lista de días con fecha y precipitación
+          const days = data.locations?.[location]?.values.map(({ datetimeStr, precip }) => ({
+            date:          datetimeStr,
+            precipitation: precip
+          })) ?? [];
+      
+          return res.json({ days });
+      
+        } catch (error) {
+          console.error(
+            'Error al obtener historial de precipitación:',
+            error.response?.status,
+            error.response?.data || error.message
+          );
+          const status  = error.response?.status || 500;
+          const payload = error.response?.data   || { error: error.message };
+          return res.status(status).json(payload);
+        }
+      });
 
 
 
