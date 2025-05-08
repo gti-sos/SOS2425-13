@@ -411,30 +411,34 @@
 	.button-group {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 20px;
+		margin-bottom: 25px;
 	}
 
 	.button-group button {
-		margin: 0 10px;
-		padding: 8px 12px;
-		background-color: #a8c686;
-		color: #000;
+		padding: 10px 18px;
+		background-color: #3a9647;
+		color: white;
 		border: none;
-		border-radius: 4px;
+		border-radius: 5px;
 		cursor: pointer;
-		transition: background-color 0.3s;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	}
 
 	.button-group button:hover {
-		background-color: #8ab061;
+		background-color: #2e7639;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 	}
 
 	.explanation {
-		background-color: #f9f9f9;
-		padding: 15px;
-		border-radius: 8px;
-		margin-bottom: 20px;
-		text-align: center;
+		background-color: #f7fbf7;
+		padding: 20px;
+		border-radius: 10px;
+		border-left: 5px solid #3a9647;
+		margin-bottom: 30px;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 	}
 
 	.chart-container {

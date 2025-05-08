@@ -113,9 +113,9 @@
 			// Extraer la comunidad autónoma
 			const community = edu.autonomous_community || '';
 			if (!community || community.toLowerCase() === 'total') return; // Ignorar totales
-			
+
 			const normalizedCommunity = normalizeCommunity(community);
-			
+
 			if (!educationByCommunity[normalizedCommunity]) {
 				educationByCommunity[normalizedCommunity] = {
 					totalHigherGrade: 0,
@@ -125,17 +125,23 @@
 					displayName: community
 				};
 			}
-			
+
 			// Usar higher_grade como indicador de graduación y middle_grade para complementar
 			const higherGradeValue = parseFloat(edu.higher_grade || 0);
 			const middleGradeValue = parseFloat(edu.middle_grade || 0);
-			
-			console.log(`Comunidad: ${community}, Higher Grade: ${higherGradeValue}, Middle Grade: ${middleGradeValue}`);
-			
-			educationByCommunity[normalizedCommunity].totalHigherGrade += isNaN(higherGradeValue) ? 0 : higherGradeValue;
-			educationByCommunity[normalizedCommunity].totalMiddleGrade += isNaN(middleGradeValue) ? 0 : middleGradeValue;
+
+			console.log(
+				`Comunidad: ${community}, Higher Grade: ${higherGradeValue}, Middle Grade: ${middleGradeValue}`
+			);
+
+			educationByCommunity[normalizedCommunity].totalHigherGrade += isNaN(higherGradeValue)
+				? 0
+				: higherGradeValue;
+			educationByCommunity[normalizedCommunity].totalMiddleGrade += isNaN(middleGradeValue)
+				? 0
+				: middleGradeValue;
 			educationByCommunity[normalizedCommunity].count += 1;
-			
+
 			// Guardar por año
 			const year = edu.year || 2020;
 			if (!educationByCommunity[normalizedCommunity].yearData[year]) {
@@ -145,35 +151,43 @@
 					count: 0
 				};
 			}
-			
-			educationByCommunity[normalizedCommunity].yearData[year].higherGrade += isNaN(higherGradeValue) ? 0 : higherGradeValue;
-			educationByCommunity[normalizedCommunity].yearData[year].middleGrade += isNaN(middleGradeValue) ? 0 : middleGradeValue;
+
+			educationByCommunity[normalizedCommunity].yearData[year].higherGrade += isNaN(
+				higherGradeValue
+			)
+				? 0
+				: higherGradeValue;
+			educationByCommunity[normalizedCommunity].yearData[year].middleGrade += isNaN(
+				middleGradeValue
+			)
+				? 0
+				: middleGradeValue;
 			educationByCommunity[normalizedCommunity].yearData[year].count += 1;
 		});
-		
+
 		// Log para depuración
 		console.log('Comunidades en parques:', Object.keys(parksByCommunity));
 		console.log('Comunidades en educación:', Object.keys(educationByCommunity));
 		console.log('Datos educativos procesados:', educationByCommunity);
-		
+
 		// Encontrar comunidades que aparecen en ambos conjuntos de datos
 		const commonCommunities = Object.keys(parksByCommunity).filter(
 			(community) => educationByCommunity[community]
 		);
-		
+
 		console.log('Comunidades comunes:', commonCommunities);
-		
+
 		// Preparar datos para el gráfico de treemap
 		const treeData = [];
-		
+
 		commonCommunities.forEach((community) => {
 			// Calcular promedios educativos
 			const educationInfo = educationByCommunity[community];
-			const avgHigherGrade = educationInfo.count > 0 ? 
-				educationInfo.totalHigherGrade / educationInfo.count : 0;
-			const avgMiddleGrade = educationInfo.count > 0 ? 
-				educationInfo.totalMiddleGrade / educationInfo.count : 0;
-			
+			const avgHigherGrade =
+				educationInfo.count > 0 ? educationInfo.totalHigherGrade / educationInfo.count : 0;
+			const avgMiddleGrade =
+				educationInfo.count > 0 ? educationInfo.totalMiddleGrade / educationInfo.count : 0;
+
 			// Usar higher_grade como indicador principal para el color
 			treeData.push({
 				x: parksByCommunity[community].displayName,
@@ -183,10 +197,10 @@
 				fillColor: getColorByRate(avgHigherGrade)
 			});
 		});
-		
+
 		// Ordenar por tamaño para mejor visualización
 		treeData.sort((a, b) => b.y - a.y);
-		
+
 		return {
 			treeData,
 			commonCommunities,
@@ -212,31 +226,35 @@
 			console.error('No data available for chart');
 			return;
 		}
-		
+
 		const { treeData, commonCommunities, educationByCommunity } = processCombinedData();
-		
+
 		// Si no hay suficientes datos, mostrar un mensaje
 		if (treeData.length === 0) {
-			chartContainer.innerHTML = '<div class="no-data">No hay suficientes datos comunes entre parques nacionales y datos educativos</div>';
+			chartContainer.innerHTML =
+				'<div class="no-data">No hay suficientes datos comunes entre parques nacionales y datos educativos</div>';
 			return;
 		}
-		
+
 		// Verificar si tenemos datos educativos válidos
 		let hasValidEducationData = false;
 		for (const community of Object.keys(educationByCommunity)) {
-			const avgHigherGrade = educationByCommunity[community].count > 0 
-				? educationByCommunity[community].totalHigherGrade / educationByCommunity[community].count 
-				: 0;
-				
+			const avgHigherGrade =
+				educationByCommunity[community].count > 0
+					? educationByCommunity[community].totalHigherGrade / educationByCommunity[community].count
+					: 0;
+
 			if (avgHigherGrade > 0) {
 				hasValidEducationData = true;
 				break;
 			}
 		}
-		
+
 		// Si no hay datos válidos de educación, usar una visualización diferente
 		if (!hasValidEducationData) {
-			console.log('No hay datos válidos de tasas educativas, cambiando a visualización alternativa');
+			console.log(
+				'No hay datos válidos de tasas educativas, cambiando a visualización alternativa'
+			);
 
 			// Usar un pie chart para mostrar distribución de parques por comunidad
 			const pieData = [];
@@ -368,7 +386,7 @@
 							},
 							{
 								from: 50.1,
-								to: 60, 
+								to: 60,
 								color: '#007300' // Verde oscuro
 							},
 							{
@@ -385,7 +403,7 @@
 								type: 'none' // Desactivar el filtro por defecto que hace que se vuelva blanco
 							},
 							borderColor: '#000000', // Borde negro cuando se pasa el cursor
-							borderWidth: 2, // Ancho del borde al pasar cursor
+							borderWidth: 2 // Ancho del borde al pasar cursor
 						},
 						active: {
 							filter: {
@@ -426,7 +444,7 @@
 					fontWeight: 'bold',
 					colors: ['#ffffff'] // Texto blanco para mayor contraste
 				},
-				formatter: function(text, op) {
+				formatter: function (text, op) {
 					return text;
 				},
 				dropShadow: {
@@ -437,7 +455,7 @@
 					color: '#000000',
 					opacity: 0.5
 				}
-			},
+			}
 		};
 
 		// Limpiar contenedor del gráfico si ya existe una instancia
@@ -523,30 +541,34 @@
 	.button-group {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 20px;
+		margin-bottom: 25px;
 	}
 
 	.button-group button {
-		margin: 0 10px;
-		padding: 8px 12px;
-		background-color: #a8c686;
-		color: #000;
+		padding: 10px 18px;
+		background-color: #3a9647;
+		color: white;
 		border: none;
-		border-radius: 4px;
+		border-radius: 5px;
 		cursor: pointer;
-		transition: background-color 0.3s;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	}
 
 	.button-group button:hover {
-		background-color: #8ab061;
+		background-color: #2e7639;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 	}
 
 	.explanation {
-		background-color: #f9f9f9;
-		padding: 15px;
-		border-radius: 8px;
-		margin-bottom: 20px;
-		text-align: center;
+		background-color: #f7fbf7;
+		padding: 20px;
+		border-radius: 10px;
+		border-left: 5px solid #3a9647;
+		margin-bottom: 30px;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 	}
 
 	.chart-container {

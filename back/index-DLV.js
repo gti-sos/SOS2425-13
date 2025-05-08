@@ -46,7 +46,7 @@ function loadBackend(app) {
     app.use(`${BASE_API}/proxy/social-pension-payrolls`, (req, res) => {
         const targetUrl = 'https://sos2425-11.onrender.com/api/v1/social-pension-payrolls' + req.url;
         console.log('Proxy request to:', targetUrl);
-        
+
         request(targetUrl).pipe(res);
     });
 
@@ -54,7 +54,7 @@ function loadBackend(app) {
     app.use(`${BASE_API}/proxy/annual-consumptions`, (req, res) => {
         const targetUrl = 'https://sos2425-12.onrender.com/api/v1/annual-consumptions' + req.url;
         console.log('Proxy request to:', targetUrl);
-        
+
         request(targetUrl).pipe(res);
     });
 
@@ -62,7 +62,7 @@ function loadBackend(app) {
     app.use(`${BASE_API}/proxy/education-data`, (req, res) => {
         const targetUrl = 'https://sos2425-14.onrender.com/api/v1/education-data' + req.url;
         console.log('Proxy request to:', targetUrl);
-        
+
         request(targetUrl).pipe(res);
     });
 
@@ -70,7 +70,7 @@ function loadBackend(app) {
     app.use(`${BASE_API}/proxy/dana-grants-subsidies-stats`, (req, res) => {
         const targetUrl = 'https://sos2425-18.onrender.com/api/v2/dana-grants-subsidies-stats' + req.url;
         console.log('Proxy request to:', targetUrl);
-        
+
         request(targetUrl).pipe(res);
     });
 
@@ -78,8 +78,31 @@ function loadBackend(app) {
     app.use(`${BASE_API}/proxy/ownerships-changes-stats`, (req, res) => {
         const targetUrl = 'https://sos2425-19.onrender.com/api/v2/ownerships-changes-stats' + req.url;
         console.log('Proxy request to:', targetUrl);
-        
+
         request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API del National Park Service (NPS)
+    app.use(`${BASE_API}/proxy/nps`, (req, res) => {
+        // URL base de la API NPS
+        const npsBaseUrl = 'https://developer.nps.gov/api/v1';
+
+        // Construir la URL completa - mantener la ruta solicitada después de /proxy/nps
+        const targetPath = req.url;
+        const targetUrl = `${npsBaseUrl}${targetPath}`;
+
+        console.log('Proxy request to NPS API:', targetUrl);
+
+        // Configurar la petición con la API key en las cabeceras
+        const requestOptions = {
+            url: targetUrl,
+            headers: {
+                'X-Api-Key': "${{ secrets.NPS_API_KEY }}"
+            }
+        };
+
+        // Reenviar la petición a la API NPS con las cabeceras adecuadas
+        request(requestOptions).pipe(res);
     });
 
 
