@@ -107,7 +107,7 @@
 	}
 
 	async function fetchTraffic() {
-		const res = await fetch('https://sos2425-10.onrender.com/api/v1/proxy/accidents-stats');
+		const res = await fetch('https://sos2425-10.onrender.com/api/v1/accidents-stats');
 		const json: any[] = await res.json();
 		trafficData = json.map((t) => ({
 			accident_id: t.accident_id,
@@ -172,10 +172,10 @@
 
 <main>
 	<div style="text-align:center; margin-bottom:30px; margin-top:30px;">
-		<a href="/integrations/water-supply-improvements/G12-annual-retributions"
+		<a href="/integrations/water-supply-improvements/G10-accidents-stats"
 			><button
 				style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
-				>G12-annual-retributions</button
+				>G12-accidents-stats</button
 			></a
 		>
 		<a href="/integrations/water-supply-improvements/G14-employment-data"

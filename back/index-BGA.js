@@ -1,6 +1,10 @@
 import dataStore from "@seald-io/nedb";
-const BASE_API = "/api/v1";
+import request from 'request';
+import 'dotenv/config';
+
 let db = new dataStore();
+const BASE_API = "/api/v1";
+
 
 const datosInicialesB = [
     { year: 2015, autonomous_community: "andalucia", amount: 12604168, benefited_population: 25208, project_count: 45 },
@@ -59,44 +63,38 @@ function loadBackend(app) {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
 
-    // Endpoint proxy para la API G10
-    app.use(`api/v2/proxy/accidents-stats`, (req, res) => {
-        const targetUrl = 'https://sos2425-10.onrender.com/api/v2/accidents-stats' + req.url;
-        console.log('Proxy request to:', targetUrl);
-        
-        request(targetUrl).pipe(res);
-    });
 
-    // Endpoint proxy para la API G12
-    app.use(`api/v2/proxy/annual-retributions`, (req, res) => {
-        const targetUrl = 'https://sos2425-12.onrender.com/api/v2/annual-retributions' + req.url;
-        console.log('Proxy request to:', targetUrl);
-        
-        request(targetUrl).pipe(res);
-    });
+    // externa
+    // Endpoint proxy para historial de precipitación (Visual Crossing)
+    app.use(`${BASE_API}/proxy/precipitation-history`, (req, res) => {
+        // Base URL de la API de Visual Crossing
+        const baseUrl = 'https://visual-crossing-weather.p.rapidapi.com/history';
 
-    // Endpoint proxy para la API G14
-    app.use(`api/v1/proxy/employment-data`, (req, res) => {
-        const targetUrl = 'https://sos2425-14.onrender.com/api/v1/employment-data' + req.url;
-        console.log('Proxy request to:', targetUrl);
-        
-        request(targetUrl).pipe(res);
-    });
+        // Conservamos toda la query (p. ej. "?location=Spain&start=2015-01-01&end=2015-12-31")
+        const targetPath = req.url;
+        const targetUrl = `${baseUrl}${targetPath}`;
 
-    // Endpoint proxy para la API G20
-    app.use(`api/v1/proxy/traffic-accidents`, (req, res) => {
-        const targetUrl = 'https://sos2425-20.onrender.com/api/v1/traffic-accidents' + req.url;
-        console.log('Proxy request to:', targetUrl);
-        
-        request(targetUrl).pipe(res);
-    });
+        console.log('Proxy request to Visual Crossing API:', targetUrl);
 
-    // Endpoint proxy para la API G21
-    app.use(`api/v1/proxy/cultural-event-stats`, (req, res) => {
-        const targetUrl = 'https://sos2425-21.onrender.com/api/v1/cultural-event-stats' + req.url;
-        console.log('Proxy request to:', targetUrl);
-        
-        request(targetUrl).pipe(res);
+        // Recuperamos la API Key de RapidAPI desde las variables de entorno
+        const apiKey = process.env.RAPIDAPI_KEY;
+        if (!apiKey) {
+            console.error('Error: RAPIDAPI_KEY no encontrada en las variables de entorno');
+            return res.status(500).send('Error de configuración: API key no disponible');
+        }
+
+        // Configuramos la petición incluyendo las cabeceras de RapidAPI
+        const requestOptions = {
+            url: targetUrl,
+            json: true,
+            headers: {
+                'BGA-API-Key': apiKey,
+                
+            }
+        };
+
+        // Reenviamos la petición a Visual Crossing y pipeamos la respuesta
+        request(requestOptions).pipe(res);
     });
 
 
@@ -164,18 +162,18 @@ function loadBackend(app) {
 
         dbQuery.exec((err, docs) => {
             if (err) {
-              return res.status(500).json({ error: "Error al consultar la base de datos" });
+                return res.status(500).json({ error: "Error al consultar la base de datos" });
             }
-          
+
             // transforma _id→rest y genera siempre un array
             const transformedDocs = docs.map(doc => {
-              const { _id, ...rest } = doc;
-              return rest;
+                const { _id, ...rest } = doc;
+                return rest;
             });
-          
+
             // y devuélvelo SÍEMPRE como array
             return res.status(200).json(transformedDocs);
-          });
+        });
     });
 
 

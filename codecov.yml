@@ -13,3 +13,4 @@ ignore:
   # Ignorar el proxy a APIs externas
   - "back/**/proxy/**"
   - "**/index-DLV.js"
+  - "**/index-BGA.js"

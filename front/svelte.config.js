@@ -6,20 +6,24 @@ const config = {
 		csp: {
 			mode: 'auto',
 			directives: {
-				'script-src': ['self'], // Eliminamos 'unsafe-inline' para mayor seguridad
+				'script-src': ['self'], // ya sin 'unsafe-inline'
 				'default-src': ['self'],
-				'style-src': ['self', 'unsafe-inline', 'https://cdn.jsdelivr.net'], // Evitamos 'unsafe-inline'
+				'style-src': [
+					'self',
+					'unsafe-inline',               // sigue permitiendo estilos inline
+					'https://cdn.jsdelivr.net',    // tu CDN habitual
+					'https://sos2425-13.onrender.com' // tu dominio de Render
+				],
 				'img-src': ['self', 'data:', 'https:'],
 				'connect-src': [
-					'self', // Permite las conexiones locales
-					'http://localhost:16078', // Si trabajas localmente
-					'https://sos2425-13.onrender.com', // La API de tráfico
-					'https://sos2425-20.onrender.com', // La API de proyectos de agua
-					'https://sos2425-10.onrender.com', // API del grupo 10
-					'https://sos2425-12.onrender.com', // API del grupo 12
-					'https://sos2425-14.onrender.com', // API del grupo 14
-					'https://sos2425-20.onrender.com', // API del grupo 20
-					'https://sos2425-21.onrender.com'  // API del grupo 21
+					'self',
+					'http://localhost:16078',
+					'https://sos2425-13.onrender.com',
+					'https://sos2425-10.onrender.com',
+					'https://sos2425-12.onrender.com',
+					'https://sos2425-14.onrender.com',
+					'https://sos2425-20.onrender.com',
+					'https://sos2425-21.onrender.com'
 				]
 			}
 		}
@@ -27,4 +31,3 @@ const config = {
 };
 
 export default config;
-

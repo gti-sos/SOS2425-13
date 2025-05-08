@@ -34,7 +34,7 @@
 	async function fetchAll() {
 		const [waterRes, trafficRes] = await Promise.all([
 			fetch('/api/v1/water-supply-improvements'),
-			fetch('https://sos2425-20.onrender.com/api/v1/proxy/traffic-accidents')
+			fetch('https://sos2425-20.onrender.com/api/v1/traffic-accidents')
 		]);
 		const waterJson: Water[] = await waterRes.json();
 		const trafficJson: Traffic[] = await trafficRes.json();
