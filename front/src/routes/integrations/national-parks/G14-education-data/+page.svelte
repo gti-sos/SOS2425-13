@@ -525,12 +525,15 @@
 </main>
 
 <style>
-	main {
-		max-width: 900px;
-		margin: 0 auto;
-		padding: 20px;
-		font-family: Arial, sans-serif;
-	}
+	 main {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box;
+        width: 100%;
+        overflow-x: hidden;
+    }
 
 	h2 {
 		color: #2c3e50;

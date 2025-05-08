@@ -273,7 +273,7 @@
 			dataLabels: {
 				enabled: true,
 				enabledOnSeries: undefined, // Activar en todas las series
-				formatter: function(val, opts) {
+				formatter: function (val, opts) {
 					const data = opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex];
 					return data.name;
 				},
@@ -285,7 +285,7 @@
 					fontSize: '11px',
 					fontWeight: 'normal',
 					colors: undefined, // Usar color automático para mejor contraste
-					fontFamily: 'Arial, sans-serif',
+					fontFamily: 'Arial, sans-serif'
 				},
 				background: {
 					enabled: true,
@@ -386,7 +386,7 @@
 					}
 				},
 				min: 0,
-				max: function(max) {
+				max: function (max) {
 					return max * 1.15; // Añadir 15% de margen superior
 				},
 				labels: {
@@ -494,29 +494,30 @@
 
 	<div class="button-group">
 		<a href="/integrations/national-parks/G11-social-pension-payrolls">
-		  <button>G11-social-pension-payrolls</button>
-		 
+			<button>G11-social-pension-payrolls</button>
 		</a>
 		<a href="/integrations/national-parks/G12-annual-consumptions">
-		  <button>G12-annual-consumptions</button>
+			<button>G12-annual-consumptions</button>
 		</a>
 		<a href="/integrations/national-parks/G14-education-data">
-		  <button>G14-education-data</button>
-		  
+			<button>G14-education-data</button>
 		</a>
 		<a href="/integrations/national-parks/G18-dana-grants-subsidies-stats">
-		  <button>G18-dana-grants-subsidies-stats</button>
+			<button>G18-dana-grants-subsidies-stats</button>
 		</a>
 		<a href="/integrations/national-parks/G19-ownerships-changes-stats">
-		  <button>G19-ownerships-changes-stats</button>
+			<button>G19-ownerships-changes-stats</button>
 		</a>
 		<a href="/integrations/national-parks/NPS">
 			<button>NPS</button>
-		  </a>
-		  <a href="/integrations/national-parks/native-land-digital">
+		</a>
+		<a href="/integrations/national-parks/native-land-digital">
 			<button>native-land-digital</button>
-		  </a>
-	  </div>
+		</a>
+		<a href="/integrations/national-parks/AEMET">
+			<button>AEMET</button>
+		</a>
+	</div>
 
 	<div class="chart-container">
 		<div bind:this={chartContainer} class="chart-box"></div>
@@ -545,22 +546,22 @@
 	}
 
 	.button-group {
-	  display: flex;
-	  justify-content: center;
-	  gap: 1rem;
-	  margin-bottom: 2rem;
+		display: flex;
+		justify-content: center;
+		gap: 1rem;
+		margin-bottom: 2rem;
 	}
 	.button-group button {
-	  padding: 0.5rem 1rem;
-	  font-size: 1rem;
-	  cursor: pointer;
-	  border: none;
-	  border-radius: 4px;
-	  background-color: #a8c686;
-	  color: #000;
+		padding: 0.5rem 1rem;
+		font-size: 1rem;
+		cursor: pointer;
+		border: none;
+		border-radius: 4px;
+		background-color: #a8c686;
+		color: #000;
 	}
 	.button-group button:hover {
-	  background-color: #9bb37c;
+		background-color: #9bb37c;
 	}
 
 	.chart-container,

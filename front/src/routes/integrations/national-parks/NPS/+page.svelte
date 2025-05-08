@@ -195,9 +195,9 @@
         margin: 0 auto;
         padding: 20px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        box-sizing: border-box; /* Añadir esta línea */
-        width: 100%; /* Asegurar que el ancho está definido */
-        overflow-x: hidden; /* Evitar scroll horizontal */
+        box-sizing: border-box;
+        width: 100%;
+        overflow-x: hidden;
     }
 
     h2 {
@@ -248,17 +248,18 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         padding: 20px;
         overflow: hidden;
-        max-width: 100%; /* Asegurar que no exceda el ancho del contenedor */
     }
 
-    /* Asegurar que Highcharts no rompa el contenedor */
+    /* Asegurar que Highcharts respete el ancho del contenedor */
     :global(.highcharts-container) {
         width: 100% !important;
+        max-width: 100% !important;
         height: 100% !important;
     }
 
     :global(.highcharts-root) {
         width: 100% !important;
+        max-width: 100% !important;
         height: 100% !important;
     }
 

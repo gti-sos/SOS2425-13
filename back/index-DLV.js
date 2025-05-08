@@ -140,6 +140,83 @@ function loadBackend(app) {
         request(finalUrl).pipe(res);
     });
 
+    // Endpoint proxy para la API de AEMET con manejo completo de datos
+    app.use(`${BASE_API}/proxy/aemet`, async (req, res) => {
+        try {
+            // URL base de la API AEMET
+            const aemetBaseUrl = 'https://opendata.aemet.es/opendata/api';
+
+            // Construir la URL completa
+            const targetPath = req.url;
+            const targetUrl = `${aemetBaseUrl}${targetPath}`;
+
+            console.log('Proxy request to AEMET API:', targetUrl);
+
+            // Obtener la API key de las variables de entorno
+            const apiKey = process.env.AEMET_API_KEY;
+
+            if (!apiKey) {
+                console.error('Error: AEMET_API_KEY no encontrada en las variables de entorno');
+                return res.status(500).send('Error de configuración: API key no disponible');
+            }
+
+            // Configurar la petición con la API key como parámetro query
+            const finalUrl = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}api_key=${apiKey}`;
+
+            // Realizar la primera petición para obtener URLs
+            const initialResponse = await new Promise((resolve, reject) => {
+                request({
+                    url: finalUrl,
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    json: true
+                }, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(body);
+                    }
+                });
+            });
+
+            // Verificar si la respuesta es correcta
+            if (initialResponse.estado !== 200) {
+                return res.status(initialResponse.estado || 500).json({
+                    error: initialResponse.descripcion || 'Error en la API de AEMET'
+                });
+            }
+
+            // Obtener datos reales haciendo una segunda petición al enlace 'datos'
+            if (initialResponse.datos) {
+                const dataResponse = await new Promise((resolve, reject) => {
+                    request({
+                        url: initialResponse.datos,
+                        json: true
+                    }, (error, response, body) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(body);
+                        }
+                    });
+                });
+
+                // Devolver los datos finales
+                return res.json(dataResponse);
+            } else {
+                return res.status(500).json({
+                    error: 'No se encontró el enlace a los datos en la respuesta de AEMET'
+                });
+            }
+        } catch (error) {
+            console.error('Error procesando petición a AEMET:', error);
+            return res.status(500).json({
+                error: error.message || 'Error interno del servidor'
+            });
+        }
+    });
+
 
     //DOCUMENTACIÓN DE POSTMAN
     app.get(BASE_API + "/national-parks/docs", (request, response) => {
