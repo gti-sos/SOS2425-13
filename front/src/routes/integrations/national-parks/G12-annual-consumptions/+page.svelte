@@ -385,7 +385,7 @@
 		{/if}
 	</div>
 
-	<div class="data-sources">
+	<div class="sources">
 		<h3>Fuentes de datos:</h3>
 		<ul>
 			<li>Parques Nacionales: API del Grupo 13 (SOS2425-13)</li>
@@ -459,10 +459,32 @@
 		color: #666;
 	}
 
-	.data-sources {
-		font-size: 14px;
-		color: #555;
-		padding: 10px;
-		border-top: 1px solid #eee;
-	}
+	.sources {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .sources ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .sources li {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .sources li:before {
+        content: "•";
+        color: #3a9647;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+
 </style>

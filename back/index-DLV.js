@@ -95,7 +95,7 @@ function loadBackend(app) {
 
         // Obtener la API key de las variables de entorno
         const apiKey = process.env.NPS_API_KEY;
-        
+
         if (!apiKey) {
             console.error('Error: NPS_API_KEY no encontrada en las variables de entorno');
             return res.status(500).send('Error de configuración: API key no disponible');
@@ -111,6 +111,33 @@ function loadBackend(app) {
 
         // Reenviar la petición a la API NPS con las cabeceras adecuadas
         request(requestOptions).pipe(res);
+    });
+
+    // Endpoint proxy para la API de Native Land Digital
+    app.use(`${BASE_API}/proxy/native-land`, (req, res) => {
+        // URL base de la API Native Land
+        const nativeBaseUrl = 'https://native-land.ca/api/index.php';
+
+        // Construir la URL completa
+        const targetPath = req.url;
+        const targetUrl = `${nativeBaseUrl}${targetPath}`;
+
+        console.log('Proxy request to Native Land API:', targetUrl);
+
+        // Obtener la API key de las variables de entorno
+        const apiKey = process.env.NATIVE_LAND_API_KEY;
+
+        if (!apiKey) {
+            console.error('Error: NATIVE_LAND_API_KEY no encontrada en las variables de entorno');
+            return res.status(500).send('Error de configuración: API key no disponible');
+        }
+
+        // Determinar si ya hay parámetros en la URL para añadir la API key correctamente
+        const separator = targetPath.includes('?') ? '&' : '?';
+        const finalUrl = `${targetUrl}${separator}key=${apiKey}`;
+
+        // Reenviar la petición a la API Native Land
+        request(finalUrl).pipe(res);
     });
 
 

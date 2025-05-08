@@ -54,21 +54,21 @@
 		function normalizeCommunity(name) {
 			const normalizeMap = {
 				// Mapeo para normalizar nombres
-				'baleares': 'islas baleares',
+				baleares: 'islas baleares',
 				'islas baleares': 'islas baleares',
 				'madrid, castilla y león': 'madrid y castilla y león',
 				'asturias, cantabria, castilla y león': 'asturias, cantabria y castilla y león'
 			};
-			
+
 			const lowercase = name.toLowerCase();
 			return normalizeMap[lowercase] || lowercase;
 		}
 
 		// Agrupar datos de parques por comunidad autónoma normalizada
 		const parksByCommunity = {};
-		parksData.forEach(park => {
+		parksData.forEach((park) => {
 			const community = normalizeCommunity(park.autonomous_community);
-			
+
 			if (!parksByCommunity[community]) {
 				parksByCommunity[community] = {
 					totalArea: 0,
@@ -82,10 +82,10 @@
 
 		// Agrupar datos de pensiones por comunidad autónoma normalizada
 		const pensionsByCommunity = {};
-		pensionsData.forEach(pension => {
+		pensionsData.forEach((pension) => {
 			// Usar "place" en lugar de "autonomous_community"
 			const community = normalizeCommunity(pension.place);
-			
+
 			if (!pensionsByCommunity[community]) {
 				pensionsByCommunity[community] = {
 					totalAmount: 0,
@@ -93,13 +93,14 @@
 					displayName: pension.place // Mantener nombre original para mostrar
 				};
 			}
-			
+
 			// Sumar retirement_amount + disability_amount en lugar de total_payroll_amount
 			const pensionAmount = (pension.retirement_amount || 0) + (pension.disability_amount || 0);
 			pensionsByCommunity[community].totalAmount += pensionAmount;
-			
+
 			// Sumar retirement_number + disability_number en lugar de beneficiaries
-			const beneficiariesCount = (pension.retirement_number || 0) + (pension.disability_number || 0);
+			const beneficiariesCount =
+				(pension.retirement_number || 0) + (pension.disability_number || 0);
 			pensionsByCommunity[community].beneficiaries += beneficiariesCount;
 		});
 
@@ -109,11 +110,11 @@
 
 		// Encontrar comunidades que aparecen en ambos conjuntos de datos
 		const commonCommunities = Object.keys(parksByCommunity).filter(
-			community => pensionsByCommunity[community]
+			(community) => pensionsByCommunity[community]
 		);
-		
+
 		console.log('Comunidades comunes:', commonCommunities);
-		
+
 		// Si no hay comunidades comunes, usar algunas para demostración
 		let categoriesToUse = commonCommunities;
 		if (commonCommunities.length === 0) {
@@ -123,29 +124,35 @@
 		}
 
 		// Encontrar valores máximos para normalización
-		const maxParksArea = Math.max(...categoriesToUse.map(community => 
-			parksByCommunity[community].totalArea));
-		const maxPensionAmount = Math.max(...categoriesToUse.map(community => 
-			(pensionsByCommunity[community]?.totalAmount || 0)));
+		const maxParksArea = Math.max(
+			...categoriesToUse.map((community) => parksByCommunity[community].totalArea)
+		);
+		const maxPensionAmount = Math.max(
+			...categoriesToUse.map((community) => pensionsByCommunity[community]?.totalAmount || 0)
+		);
 
 		// Preparar datos normalizados para el gráfico (escala 0-100)
-		const categories = categoriesToUse.map(community => 
-			parksByCommunity[community].displayName);
-			
-		const parksAreaSeries = categoriesToUse.map(community => 
-			(parksByCommunity[community].totalArea / maxParksArea) * 100);
-		
-		const pensionAmountSeries = categoriesToUse.map(community => 
-			((pensionsByCommunity[community]?.totalAmount || 0) / maxPensionAmount) * 100);
-		
+		const categories = categoriesToUse.map((community) => parksByCommunity[community].displayName);
+
+		const parksAreaSeries = categoriesToUse.map(
+			(community) => (parksByCommunity[community].totalArea / maxParksArea) * 100
+		);
+
+		const pensionAmountSeries = categoriesToUse.map(
+			(community) => ((pensionsByCommunity[community]?.totalAmount || 0) / maxPensionAmount) * 100
+		);
+
 		return {
 			categories,
 			parksAreaSeries,
 			pensionAmountSeries,
 			// Devolver también los valores originales para el tooltip
-			originalParksData: categoriesToUse.map(community => parksByCommunity[community].totalArea / 1000),
-			originalPensionsData: categoriesToUse.map(community => 
-				(pensionsByCommunity[community]?.totalAmount || 0) / 1000000)
+			originalParksData: categoriesToUse.map(
+				(community) => parksByCommunity[community].totalArea / 1000
+			),
+			originalPensionsData: categoriesToUse.map(
+				(community) => (pensionsByCommunity[community]?.totalAmount || 0) / 1000000
+			)
 		};
 	}
 
@@ -156,7 +163,13 @@
 			return;
 		}
 
-		const { categories, parksAreaSeries, pensionAmountSeries, originalParksData, originalPensionsData } = processCombinedData();
+		const {
+			categories,
+			parksAreaSeries,
+			pensionAmountSeries,
+			originalParksData,
+			originalPensionsData
+		} = processCombinedData();
 
 		// Configuración del gráfico
 		const options = {
@@ -214,7 +227,7 @@
 				min: 0,
 				max: 100,
 				labels: {
-					formatter: function(val) {
+					formatter: function (val) {
 						return val + '%'; // Mostrar como porcentaje
 					}
 				}
@@ -231,7 +244,7 @@
 			},
 			tooltip: {
 				y: {
-					formatter: function(val, { seriesIndex, dataPointIndex }) {
+					formatter: function (val, { seriesIndex, dataPointIndex }) {
 						// Mostrar el valor original en lugar del normalizado
 						if (seriesIndex === 0) {
 							return originalParksData[dataPointIndex].toFixed(2) + ' miles de ha';
@@ -252,12 +265,17 @@
 		chartInstance = new ApexCharts(chartContainer, options);
 		chartInstance.render();
 
-		console.log('Inicializando gráfico con datos procesados:', { categories, parksAreaSeries, pensionAmountSeries });
+		console.log('Inicializando gráfico con datos procesados:', {
+			categories,
+			parksAreaSeries,
+			pensionAmountSeries
+		});
 
 		// Si los datos son insuficientes, mostrar un mensaje
 		if (categories.length === 0 || !parksAreaSeries.length || !pensionAmountSeries.length) {
 			console.error('Datos insuficientes para crear el gráfico');
-			chartContainer.innerHTML = '<div class="error-message">No hay suficientes datos comunes para crear el gráfico</div>';
+			chartContainer.innerHTML =
+				'<div class="error-message">No hay suficientes datos comunes para crear el gráfico</div>';
 			return;
 		}
 	}
@@ -310,7 +328,7 @@
 		{/if}
 	</div>
 
-	<div class="data-sources">
+	<div class="sources">
 		<h3>Fuentes de datos:</h3>
 		<ul>
 			<li>Parques Nacionales: API del Grupo 13 (SOS2425-13)</li>
@@ -366,7 +384,6 @@
 		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 	}
 
-
 	.chart-container {
 		height: 500px;
 		margin: 30px 0;
@@ -385,10 +402,30 @@
 		color: #666;
 	}
 
-	.data-sources {
-		font-size: 14px;
-		color: #555;
-		padding: 10px;
-		border-top: 1px solid #eee;
+	.sources {
+		background-color: #f5f5f5;
+		padding: 20px;
+		border-radius: 8px;
+		margin: 30px 0;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	.sources ul {
+		list-style-type: none;
+		padding-left: 0;
+	}
+
+	.sources li {
+		margin-bottom: 10px;
+		padding-left: 20px;
+		position: relative;
+	}
+
+	.sources li:before {
+		content: '•';
+		color: #3a9647;
+		font-weight: bold;
+		position: absolute;
+		left: 0;
 	}
 </style>
