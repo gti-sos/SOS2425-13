@@ -5,6 +5,8 @@
 	let isApisDevVisible = false;
 	let isFrontendVisible = false;
 	let isMiembrosVisible = false;
+	let isVideoVisible = false;
+	let isHorasVisible = false;
 
 	function toggleVisibility(section: string) {
 		const isSame =
@@ -12,7 +14,9 @@
 			(section === 'repo' && isRepoVisible) ||
 			(section === 'apis' && isApisDevVisible) ||
 			(section === 'frontend' && isFrontendVisible) ||
-			(section === 'miembros' && isMiembrosVisible);
+			(section === 'miembros' && isMiembrosVisible) ||
+			(section == 'videos' && isVideoVisible) ||
+			(section == 'horas' && isHorasVisible);
 
 		// Reset de todas las secciones
 		isPostmanVisible = false;
@@ -20,6 +24,8 @@
 		isApisDevVisible = false;
 		isFrontendVisible = false;
 		isMiembrosVisible = false;
+		isVideoVisible = false;
+		isHorasVisible = false;
 
 		// Si no es la misma sección, la abrimos
 		if (!isSame) {
@@ -32,151 +38,190 @@
 	}
 </script>
 
+<main>
+	<div>
+		<h2>Descripción del proyecto</h2>
+		<p class="description">
+			Nuestro proyecto se basa en la integración de datos sobre incendios forestales, parques
+			naturales y ayudas para el abastecimiento de agua, con el objetivo de analizar la relación
+			entre la disponibilidad de este recurso y su impacto en la gestión ambiental y social. A
+			través de esta unión de información, buscamos identificar patrones que permitan mejorar la
+			prevención y respuesta ante incendios, optimizar la conservación de ecosistemas en áreas
+			protegidas y evaluar la efectividad de los subsidios destinados a mitigar la escasez hídrica
+			en municipios vulnerables.
+		</p>
+	</div>
 
-	<main>
-		<div>
-			<h2>Descripción del proyecto</h2>
-			<p class="description">
-				Nuestro proyecto se basa en la integración de datos sobre incendios forestales, parques
-				naturales y ayudas para el abastecimiento de agua, con el objetivo de analizar la relación
-				entre la disponibilidad de este recurso y su impacto en la gestión ambiental y social. A
-				través de esta unión de información, buscamos identificar patrones que permitan mejorar la
-				prevención y respuesta ante incendios, optimizar la conservación de ecosistemas en áreas
-				protegidas y evaluar la efectividad de los subsidios destinados a mitigar la escasez hídrica
-				en municipios vulnerables.
-			</p>
+	<div>
+		<h2>Enlace del repositorio</h2>
+		<p>
+			<a href="https://github.com/gti-sos/SOS2425-13" target="_blank" class="repo-link"
+				>GitHub Repository</a
+			>
+		</p>
+	</div>
+
+	<div>
+		<h2>Secciones del Proyecto</h2>
+		<p class="description">
+			Cada panel es interactivo, clica en alguno para que muestre los enlaces.
+		</p>
+	</div>
+
+	<div class="grid-container">
+		<div class="interactive-box {isMiembrosVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('miembros')}>Miembros del equipo</button>
+			{#if isMiembrosVisible}
+				<div class="content">
+					<ul>
+						<li>Blanca García Alonso – water-supply-improvements</li>
+						<li>Darío López Villegas – national-parks</li>
+						<li>Álvaro Morillo Navajas – forest-fires</li>
+					</ul>
+				</div>
+			{/if}
+		</div>
+		<!-- Documentación Postman -->
+
+		<div class="interactive-box {isPostmanVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('postman')}>Documentación Postman</button>
+			{#if isPostmanVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy"
+								>API Water Supply Improvements</a
+							>
+						</li>
+						<li>
+							<a href="https://documenter.getpostman.com/view/14944672/2sB2cUBNyt"
+								>API National Parks</a
+							>
+						</li>
+						<li>
+							<a href="https://documenter.getpostman.com/view/42116184/2sB2cUBNgF"
+								>API Forest Fires</a
+							>
+						</li>
+					</ul>
+				</div>
+			{/if}
 		</div>
 
-		<div>
-			<h2>Enlace del repositorio</h2>
-			<p>
-				<a href="https://github.com/gti-sos/SOS2425-13" target="_blank" class="repo-link"
-					>GitHub Repository</a
-				>
-			</p>
+		<!-- GitHub individual de cada miembro -->
+		<div class="interactive-box {isRepoVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('repo')}>GitHub individual de cada miembro</button>
+			{#if isRepoVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="https://github.com/blancagrclns" target="_blank">Blanca García Alonso</a>
+						</li>
+						<li>
+							<a href="https://github.com/darlopvil" target="_blank">Darío López Villegas</a>
+						</li>
+						<li>
+							<a href="https://github.com/alvmornav" target="_blank">Alvaro Morillo Navajas</a>
+						</li>
+					</ul>
+				</div>
+			{/if}
 		</div>
 
-		<div>
-			<h2>Secciones del Proyecto</h2>
-			<p class="description">
-				Cada panel es interactivo, clica en alguno para que muestre los enlaces.
-			</p>
+		<!-- APIs Desarrolladas -->
+		<div class="interactive-box {isApisDevVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('apis')}>APIs Desarrolladas</button>
+			{#if isApisDevVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="http://sos2425-13.onrender.com/api/v1/water-supply-improvements"
+								>Water Supply Improvements</a
+							>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/api/v2/national-parks">National Parks</a>
+						</li>
+						<li><a href="http://sos2425-13.onrender.com/api/v1/forest-fires">Forest Fires</a></li>
+					</ul>
+				</div>
+			{/if}
 		</div>
 
-		<div class="grid-container">
-			<div class="interactive-box {isMiembrosVisible ? 'expanded' : ''}">
-				<button on:click={() => toggleVisibility('miembros')}>Miembros del equipo</button>
-				{#if isMiembrosVisible}
-					<div class="content">
-						<ul>
-							<li>Blanca García Alonso – water-supply-improvements</li>
-							<li>Darío López Villegas – national-parks</li>
-							<li>Álvaro Morillo Navajas – forest-fires</li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-			<!-- Documentación Postman -->
-
-			<div class="interactive-box {isPostmanVisible ? 'expanded' : ''}">
-				<button on:click={() => toggleVisibility('postman')}>Documentación Postman</button>
-				{#if isPostmanVisible}
-					<div class="content">
-						<ul>
-							<li>
-								<a href="https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy"
-									>API Water Supply Improvements</a
-								>
-							</li>
-							<li>
-								<a href="https://documenter.getpostman.com/view/14944672/2sB2cUBNyt"
-									>API National Parks</a
-								>
-							</li>
-							<li>
-								<a href="https://documenter.getpostman.com/view/42116184/2sB2cUBNgF"
-									>API Forest Fires</a
-								>
-							</li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-
-			<!-- GitHub individual de cada miembro -->
-			<div class="interactive-box {isRepoVisible ? 'expanded' : ''}">
-				<button on:click={() => toggleVisibility('repo')}>GitHub individual de cada miembro</button>
-				{#if isRepoVisible}
-					<div class="content">
-						<ul>
-							<li>
-								<a href="https://github.com/blancagrclns" target="_blank">Blanca García Alonso</a>
-							</li>
-							<li>
-								<a href="https://github.com/darlopvil" target="_blank">Darío López Villegas</a>
-							</li>
-							<li>
-								<a href="https://github.com/alvmornav" target="_blank">Alvaro Morillo Navajas</a>
-							</li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-
-			<!-- APIs Desarrolladas -->
-			<div class="interactive-box {isApisDevVisible ? 'expanded' : ''}">
-				<button on:click={() => toggleVisibility('apis')}>APIs Desarrolladas</button>
-				{#if isApisDevVisible}
-					<div class="content">
-						<ul>
-							<li>
-								<a href="http://sos2425-13.onrender.com/api/v1/water-supply-improvements"
-									>Water Supply Improvements</a
-								>
-							</li>
-							<li>
-								<a href="http://sos2425-13.onrender.com/api/v2/national-parks">National Parks</a>
-							</li>
-							<li><a href="http://sos2425-13.onrender.com/api/v1/forest-fires">Forest Fires</a></li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-
-			<!-- FrontEnd -->
-			<div class="interactive-box {isFrontendVisible ? 'expanded' : ''}">
-				<button on:click={() => toggleVisibility('frontend')}>FrontEnd</button>
-				{#if isFrontendVisible}
-					<div class="content">
-						<ul>
-							<li>
-								<a href="http://sos2425-13.onrender.com/water-supply-improvements"
-									>Water Supply Improvements</a
-								>
-							</li>
-							<li>
-								<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
-							</li>
-							<li>
-								<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
-							</li>
-						</ul>
-					</div>
-				{/if}
-			</div>
-
-			<!-- Informe de Horas -->
-			<div class="interactive-box">
-				<a href="/analytics" style="display:block; width:100%;">
-					<button>Análisis</button>
-				</a>
-			</div>
+		<!-- FrontEnd -->
+		<div class="interactive-box {isFrontendVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('frontend')}>FrontEnd</button>
+			{#if isFrontendVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="http://sos2425-13.onrender.com/water-supply-improvements"
+								>Water Supply Improvements</a
+							>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
+						</li>
+					</ul>
+				</div>
+			{/if}
 		</div>
-	</main>
+		<!-- Videos de cada api -->
+		<div class="interactive-box {isVideoVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('videos')}>Videos</button>
+			{#if isVideoVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="http://sos2425-13.onrender.com/water-supply-improvements"
+								>Water Supply Improvements</a
+							>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
+						</li>
+					</ul>
+				</div>
+			{/if}
+		</div>
+		<!-- Informes de horas -->
+		<div class="interactive-box {isHorasVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('horas')}>Horas</button>
+			{#if isHorasVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="http://sos2425-13.onrender.com/water-supply-improvements"
+								>Water Supply Improvements</a
+							>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
+						</li>
+					</ul>
+				</div>
+			{/if}
+		</div>
 
+		<!-- Enlace a página de analystic -->
+		<div class="interactive-box">
+			<a href="/analytics" style="display:block; width:100%;">
+				<button>Gráficos</button>
+			</a>
+		</div>
+	</div>
+</main>
 
 <style>
-	
 	main {
 		margin: 20px;
 		color: #000;

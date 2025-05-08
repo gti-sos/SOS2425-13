@@ -59,6 +59,46 @@ function loadBackend(app) {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
 
+    // Endpoint proxy para la API G10
+    app.use(`api/v2/proxy/accidents-stats`, (req, res) => {
+        const targetUrl = 'https://sos2425-10.onrender.com/api/v2/accidents-stats' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API G12
+    app.use(`api/v2/proxy/annual-retributions`, (req, res) => {
+        const targetUrl = 'https://sos2425-12.onrender.com/api/v2/annual-retributions' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API G14
+    app.use(`api/v1/proxy/employment-data`, (req, res) => {
+        const targetUrl = 'https://sos2425-14.onrender.com/api/v1/employment-data' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API G20
+    app.use(`api/v1/proxy/traffic-accidents`, (req, res) => {
+        const targetUrl = 'https://sos2425-20.onrender.com/api/v1/traffic-accidents' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API G21
+    app.use(`api/v1/proxy/cultural-event-stats`, (req, res) => {
+        const targetUrl = 'https://sos2425-21.onrender.com/api/v1/cultural-event-stats' + req.url;
+        console.log('Proxy request to:', targetUrl);
+        
+        request(targetUrl).pipe(res);
+    });
+
 
 
 

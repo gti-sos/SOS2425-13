@@ -18,7 +18,7 @@
 	let combinedCanvasEl: HTMLCanvasElement;
 
 	async function fetchRetributions() {
-		const res = await fetch('https://sos2425-12.onrender.com/api/v2/annual-retributions');
+		const res = await fetch('https://sos2425-12.onrender.com/api/v2/proxy/annual-retributions');
 		const json: any[] = await res.json();
 		retributionData = json.map((r) => ({
 			technology: r.technology,
@@ -154,9 +154,12 @@
 		bind:this={combinedCanvasEl}
 		style="max-width:75%; margin:0 auto; display:block; height:400px;"
 	></canvas>
-	<button on:click={() => window.location.href = '/graficos/water-supply-improvements'} style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; font-size:14px; cursor:pointer;">
+	<button
+		on:click={() => (window.location.href = '/graficos/water-supply-improvements')}
+		style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; font-size:14px; cursor:pointer;"
+	>
 		Volver
-	  </button>
+	</button>
 </main>
 
 <style>
