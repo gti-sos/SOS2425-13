@@ -19,6 +19,8 @@ app.use(helmet());
 app.use(express.json());
 app.use(cors());
 
+require('dotenv').config(); //Manejar API keys externas
+
 
 
 // ---- PARTE BLANCA (modularizada correctamente) ----

@@ -93,11 +93,19 @@ function loadBackend(app) {
 
         console.log('Proxy request to NPS API:', targetUrl);
 
+        // Obtener la API key de las variables de entorno
+        const apiKey = process.env.NPS_API_KEY;
+        
+        if (!apiKey) {
+            console.error('Error: NPS_API_KEY no encontrada en las variables de entorno');
+            return res.status(500).send('Error de configuración: API key no disponible');
+        }
+
         // Configurar la petición con la API key en las cabeceras
         const requestOptions = {
             url: targetUrl,
             headers: {
-                'X-Api-Key': "${{ secrets.NPS_API_KEY }}"
+                'X-Api-Key': apiKey
             }
         };
 

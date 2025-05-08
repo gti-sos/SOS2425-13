@@ -190,95 +190,110 @@
 </main>
 
 <style>
-	main {
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 20px;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	}
+    main {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box; /* Añadir esta línea */
+        width: 100%; /* Asegurar que el ancho está definido */
+        overflow-x: hidden; /* Evitar scroll horizontal */
+    }
 
-	h2 {
-		color: #2c5e2e;
-		text-align: center;
-		margin-bottom: 1.2rem;
-		font-size: 1.8rem;
-	}
+    h2 {
+        color: #2c5e2e;
+        text-align: center;
+        margin-bottom: 1.2rem;
+        font-size: 1.8rem;
+    }
 
-	.button-group {
-		display: flex;
-		justify-content: center;
-		margin-bottom: 25px;
-	}
+    .button-group {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
 
-	.button-group button {
-		padding: 10px 18px;
-		background-color: #3a9647;
-		color: white;
-		border: none;
-		border-radius: 5px;
-		cursor: pointer;
-		font-weight: 500;
-		transition: all 0.2s ease;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	}
+    .button-group button {
+        padding: 10px 18px;
+        background-color: #3a9647;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-	.button-group button:hover {
-		background-color: #2e7639;
-		transform: translateY(-2px);
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-	}
+    .button-group button:hover {
+        background-color: #2e7639;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
 
-	.explanation {
-		background-color: #f7fbf7;
-		padding: 20px;
-		border-radius: 10px;
-		border-left: 5px solid #3a9647;
-		margin-bottom: 30px;
-		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-	}
+    .explanation {
+        background-color: #f7fbf7;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #3a9647;
+        margin-bottom: 30px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
 
-	.chart-container {
-		height: 450px;
-		margin: 30px 0;
-		background-color: white;
-		border-radius: 10px;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-		padding: 20px;
-		overflow: hidden;
-	}
+    .chart-container {
+        height: 450px;
+        margin: 30px 0;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        overflow: hidden;
+        max-width: 100%; /* Asegurar que no exceda el ancho del contenedor */
+    }
 
-	.loading-container,
-	.error-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 300px;
-	}
+    /* Asegurar que Highcharts no rompa el contenedor */
+    :global(.highcharts-container) {
+        width: 100% !important;
+        height: 100% !important;
+    }
 
-	.loading {
-		font-size: 18px;
-		color: #3a9647;
-	}
+    :global(.highcharts-root) {
+        width: 100% !important;
+        height: 100% !important;
+    }
 
-	.error {
-		font-size: 18px;
-		color: #e74c3c;
-		text-align: center;
-		padding: 20px;
-	}
+    .loading-container,
+    .error-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+    }
 
-	.sources {
-		font-size: 14px;
-		color: #555;
-		border-top: 1px solid #eee;
-		padding-top: 15px;
-	}
+    .loading {
+        font-size: 18px;
+        color: #3a9647;
+    }
 
-	.sources h4 {
-		margin-top: 0;
-	}
+    .error {
+        font-size: 18px;
+        color: #e74c3c;
+        text-align: center;
+        padding: 20px;
+    }
 
-	.sources ul {
-		padding-left: 20px;
-	}
+    .sources {
+        font-size: 14px;
+        color: #555;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+
+    .sources h4 {
+        margin-top: 0;
+    }
+
+    .sources ul {
+        padding-left: 20px;
+    }
 </style>
