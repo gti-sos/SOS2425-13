@@ -1,0 +1,15 @@
+coverage:
+  status:
+    project:
+      default:
+        # Ajustar threshold según necesites
+        threshold: 2%
+    patch:
+      default:
+        # Ignorar cobertura en parches nuevos
+        enabled: false
+
+ignore:
+  # Ignorar el proxy a APIs externas
+  - "back/**/proxy/**"
+  - "**/index-DLV.js"
