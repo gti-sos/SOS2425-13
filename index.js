@@ -2,6 +2,7 @@ import express from "express";
 import { handler } from './front/build/handler.js';
 import cors from "cors";
 import helmet from "helmet";
+import * as dotenv from 'dotenv';
 const app = express();
 //app.disable('x-powered-by'); -solución alternativa-
 const PORT = process.env.PORT || 16078;
@@ -19,7 +20,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(cors());
 
-require('dotenv').config(); //Manejar API keys externas
+dotenv.config(); //Manejar API keys externas
 
 
 
