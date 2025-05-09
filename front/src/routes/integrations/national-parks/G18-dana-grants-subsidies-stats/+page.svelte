@@ -515,6 +515,12 @@
 	});
 </script>
 
+
+<svelte:head>
+    <title>Biodiversidad en Parques Nacionales - Integración con G18-dana-grants-subsidies-stats</title>
+    <meta name="description" content="Visualización de la api del grupo 18" />
+</svelte:head>
+
 <main>
 	<h2>Integración: Parques Nacionales y Subvenciones DANA</h2>
 

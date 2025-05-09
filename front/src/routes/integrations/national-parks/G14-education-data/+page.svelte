@@ -487,6 +487,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Biodiversidad en Parques Nacionales - Integración con G14-education-data</title>
+	<meta name="description" content="Visualización de la api del grupo 14" />
+</svelte:head>
+
 <main>
 	<h2>Integración: Parques Nacionales y Datos Educativos</h2>
 
@@ -525,15 +530,15 @@
 </main>
 
 <style>
-	 main {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        box-sizing: border-box;
-        width: 100%;
-        overflow-x: hidden;
-    }
+	main {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 20px;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		box-sizing: border-box;
+		width: 100%;
+		overflow-x: hidden;
+	}
 
 	h2 {
 		color: #2c3e50;

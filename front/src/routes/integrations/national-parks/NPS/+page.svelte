@@ -150,6 +150,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Biodiversidad en Parques Nacionales - Integración con NPS</title>
+	<meta name="description" content="Visualización de la api del National Park Service" />
+</svelte:head>
+
 <main>
 	<h2>Integración con National Park Service (EE.UU.)</h2>
 
@@ -182,148 +187,158 @@
 		<div class="sources">
 			<h4>Fuentes de datos:</h4>
 			<ul>
-				<li>Parques Nacionales: <a href="https://sos2425-13.onrender.com/api/v2/national-parks" target="_blank">API del Grupo 13 (SOS2425-13)</a></li>
-				<li>Parques Nacionales de EE.UU.: <a href="https://www.nps.gov/subjects/developer/api-documentation.htm" target="_blank">National Park Service API</a></li>
+				<li>
+					Parques Nacionales: <a
+						href="https://sos2425-13.onrender.com/api/v2/national-parks"
+						target="_blank">API del Grupo 13 (SOS2425-13)</a
+					>
+				</li>
+				<li>
+					Parques Nacionales de EE.UU.: <a
+						href="https://www.nps.gov/subjects/developer/api-documentation.htm"
+						target="_blank">National Park Service API</a
+					>
+				</li>
 			</ul>
 		</div>
 	{/if}
 </main>
 
 <style>
-    main {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        box-sizing: border-box;
-        width: 100%;
-        overflow-x: hidden;
-    }
+	main {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 20px;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		box-sizing: border-box;
+		width: 100%;
+		overflow-x: hidden;
+	}
 
-    h2 {
-        color: #2c5e2e;
-        text-align: center;
-        margin-bottom: 1.2rem;
-        font-size: 1.8rem;
-    }
+	h2 {
+		color: #2c5e2e;
+		text-align: center;
+		margin-bottom: 1.2rem;
+		font-size: 1.8rem;
+	}
 
-    .button-group {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 25px;
-    }
+	.button-group {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 25px;
+	}
 
-    .button-group button {
-        padding: 10px 18px;
-        background-color: #3a9647;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+	.button-group button {
+		padding: 10px 18px;
+		background-color: #3a9647;
+		color: white;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	}
 
-    .button-group button:hover {
-        background-color: #2e7639;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
+	.button-group button:hover {
+		background-color: #2e7639;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	}
 
-    .explanation {
-        background-color: #f7fbf7;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #3a9647;
-        margin-bottom: 30px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    }
+	.explanation {
+		background-color: #f7fbf7;
+		padding: 20px;
+		border-radius: 10px;
+		border-left: 5px solid #3a9647;
+		margin-bottom: 30px;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+	}
 
-    .chart-container {
-        height: 450px;
-        margin: 30px 0;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        overflow: hidden;
-    }
+	.chart-container {
+		height: 450px;
+		margin: 30px 0;
+		background-color: white;
+		border-radius: 10px;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+		padding: 20px;
+		overflow: hidden;
+	}
 
-    /* Asegurar que Highcharts respete el ancho del contenedor */
-    :global(.highcharts-container) {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100% !important;
-    }
+	/* Asegurar que Highcharts respete el ancho del contenedor */
+	:global(.highcharts-container) {
+		width: 100% !important;
+		max-width: 100% !important;
+		height: 100% !important;
+	}
 
-    :global(.highcharts-root) {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100% !important;
-    }
+	:global(.highcharts-root) {
+		width: 100% !important;
+		max-width: 100% !important;
+		height: 100% !important;
+	}
 
-    .loading-container,
-    .error-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 300px;
-    }
+	.loading-container,
+	.error-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 300px;
+	}
 
-    .loading {
-        font-size: 18px;
-        color: #3a9647;
-    }
+	.loading {
+		font-size: 18px;
+		color: #3a9647;
+	}
 
-    .error {
-        font-size: 18px;
-        color: #e74c3c;
-        text-align: center;
-        padding: 20px;
-    }
+	.error {
+		font-size: 18px;
+		color: #e74c3c;
+		text-align: center;
+		padding: 20px;
+	}
 
-    .sources {
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 30px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+	.sources {
+		background-color: #f5f5f5;
+		padding: 20px;
+		border-radius: 8px;
+		margin: 30px 0;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	}
 
-    .sources h4 {
-        margin-top: 0;
-        color: #2c5e2e;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-    }
+	.sources h4 {
+		margin-top: 0;
+		color: #2c5e2e;
+		border-bottom: 2px solid #ddd;
+		padding-bottom: 10px;
+		margin-bottom: 15px;
+	}
 
-    .sources ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
+	.sources ul {
+		list-style-type: none;
+		padding-left: 0;
+	}
 
-    .sources li {
-        margin-bottom: 10px;
-        padding-left: 20px;
-        position: relative;
-    }
+	.sources li {
+		margin-bottom: 10px;
+		padding-left: 20px;
+		position: relative;
+	}
 
-    .sources li:before {
-        content: "•";
-        color: #3a9647;
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-    }
+	.sources li:before {
+		content: '•';
+		color: #3a9647;
+		font-weight: bold;
+		position: absolute;
+		left: 0;
+	}
 
-    .sources a {
-        color: #0066cc;
-        text-decoration: none;
-    }
+	.sources a {
+		color: #0066cc;
+		text-decoration: none;
+	}
 
-    .sources a:hover {
-        text-decoration: underline;
-    }
+	.sources a:hover {
+		text-decoration: underline;
+	}
 </style>

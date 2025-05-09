@@ -357,6 +357,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Biodiversidad en Parques Nacionales - Integración con G12-annual-consumptions</title>
+	<meta name="description" content="Visualización de la api del grupo 12" />
+</svelte:head>
+
 <main>
 	<h2>Integración: Parques Nacionales y Consumos de Agua</h2>
 
@@ -395,15 +400,15 @@
 </main>
 
 <style>
-	 main {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        box-sizing: border-box;
-        width: 100%;
-        overflow-x: hidden;
-    }
+	main {
+		max-width: 1000px;
+		margin: 0 auto;
+		padding: 20px;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		box-sizing: border-box;
+		width: 100%;
+		overflow-x: hidden;
+	}
 
 	h2 {
 		color: #2c3e50;
@@ -463,31 +468,29 @@
 	}
 
 	.sources {
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 30px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+		background-color: #f5f5f5;
+		padding: 20px;
+		border-radius: 8px;
+		margin: 30px 0;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	}
 
+	.sources ul {
+		list-style-type: none;
+		padding-left: 0;
+	}
 
-    .sources ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
+	.sources li {
+		margin-bottom: 10px;
+		padding-left: 20px;
+		position: relative;
+	}
 
-    .sources li {
-        margin-bottom: 10px;
-        padding-left: 20px;
-        position: relative;
-    }
-
-    .sources li:before {
-        content: "•";
-        color: #3a9647;
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-    }
-
+	.sources li:before {
+		content: '•';
+		color: #3a9647;
+		font-weight: bold;
+		position: absolute;
+		left: 0;
+	}
 </style>

@@ -569,6 +569,11 @@
 	});
 </script>
 
+<svelte:head>
+    <title>Biodiversidad en Parques Nacionales - Integración con Red Natura 2000</title>
+    <meta name="description" content="Visualización de la biodiversidad y estado de conservación de especies en parques nacionales españoles" />
+</svelte:head>
+
 <main>
 	<h2>Integración con Red Natura 2000</h2>
 

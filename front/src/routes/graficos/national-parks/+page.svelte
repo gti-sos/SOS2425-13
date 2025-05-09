@@ -489,6 +489,11 @@
 	});
 </script>
 
+<svelte:head>
+    <title>Gráficas de Parques Nacionales</title>
+    <meta name="description" content="Visualización de datos sobre los parques nacionales españoles" />
+</svelte:head>
+
 <main>
 	<h2>Visualización de los Parques Nacionales de España</h2>
 
