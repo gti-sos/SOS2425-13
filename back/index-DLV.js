@@ -4,21 +4,6 @@ import request from 'request';
 let db = new dataStore();
 const BASE_API = "/api/v2";
 
-//loadInitialData
-// Datos iniciales para cargar en la API
-let nuevosParques = [
-    { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
-    { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
-    { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
-    { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
-    { national_park: "Sierra de Guadarrama", declaration_date: 2013, autonomous_community: "Madrid, Segovia", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves2", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves3", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves4", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 },
-    { national_park: "Sierra de las Nieves5", declaration_date: 2021, autonomous_community: "Andalucía", initial_area: 33960, current_area: 33960 }
-];
-
 // Datos iniciales
 const datosIniciales = [
     { national_park: "Teide", declaration_date: 1954, autonomous_community: "Canarias", initial_area: 13571, current_area: 18990 },
@@ -29,9 +14,9 @@ const datosIniciales = [
     { national_park: "Tablas de Daimiel", declaration_date: 1973, autonomous_community: "Castilla-La Mancha", initial_area: 1928, current_area: 5410 },
     { national_park: "Caldera de Taburiente", declaration_date: 1954, autonomous_community: "Canarias", initial_area: 4690, current_area: 5956 },
     { national_park: "Ordesa y Monte Perdido", declaration_date: 1916, autonomous_community: "Aragón", initial_area: 2100, current_area: 15608 },
-    { national_park: "Aiguas Tortas y Lago de San Mauricio", declaration_date: 1955, autonomous_community: "Cataluña", initial_area: 10230, current_area: 14119 },
+    { national_park: "Aigüestortes", declaration_date: 1955, autonomous_community: "Cataluña", initial_area: 10230, current_area: 14119 },
     { national_park: "Archipiélago de Cabrera", declaration_date: 1991, autonomous_community: "Baleares", initial_area: 10021, current_area: 10021 },
-    { national_park: "Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
+    { national_park: "Parque Nacional de Timanfaya", declaration_date: 1974, autonomous_community: "Canarias", initial_area: 5107, current_area: 5107 },
     { national_park: "Sierra Nevada", declaration_date: 1995, autonomous_community: "Andalucía", initial_area: 70953, current_area: 70953 },
     { national_park: "Islas Atlánticas de Galicia", declaration_date: 2002, autonomous_community: "Galicia", initial_area: 8400, current_area: 1200 },
     { national_park: "Monfragüe", declaration_date: 2007, autonomous_community: "Extremadura", initial_area: 17852, current_area: 17852 },
@@ -140,83 +125,50 @@ function loadBackend(app) {
         request(finalUrl).pipe(res);
     });
 
-    // Endpoint proxy para la API de AEMET con manejo completo de datos
-    app.use(`${BASE_API}/proxy/aemet`, async (req, res) => {
-        try {
-            // URL base de la API AEMET
-            const aemetBaseUrl = 'https://opendata.aemet.es/opendata/api';
+    // Endpoint proxy para la API de Red Natura 2000
+    app.use(`${BASE_API}/proxy/red-natura-2000`, (req, res) => {
+        // URL base de la API Red Natura 2000
+        const baseUrl = 'https://iepnb.gob.es:443/api/rn2000/rpc';
 
-            // Construir la URL completa
-            const targetPath = req.url;
-            const targetUrl = `${aemetBaseUrl}${targetPath}`;
+        // Construir la URL completa
+        const targetPath = req.url;
+        const targetUrl = `${baseUrl}${targetPath}`;
 
-            console.log('Proxy request to AEMET API:', targetUrl);
+        console.log('Proxy request to Red Natura 2000 API:', targetUrl);
 
-            // Obtener la API key de las variables de entorno
-            const apiKey = process.env.AEMET_API_KEY;
-
-            if (!apiKey) {
-                console.error('Error: AEMET_API_KEY no encontrada en las variables de entorno');
-                return res.status(500).send('Error de configuración: API key no disponible');
-            }
-
-            // Configurar la petición con la API key como parámetro query
-            const finalUrl = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}api_key=${apiKey}`;
-
-            // Realizar la primera petición para obtener URLs
-            const initialResponse = await new Promise((resolve, reject) => {
-                request({
-                    url: finalUrl,
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    json: true
-                }, (error, response, body) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(body);
-                    }
-                });
-            });
-
-            // Verificar si la respuesta es correcta
-            if (initialResponse.estado !== 200) {
-                return res.status(initialResponse.estado || 500).json({
-                    error: initialResponse.descripcion || 'Error en la API de AEMET'
-                });
-            }
-
-            // Obtener datos reales haciendo una segunda petición al enlace 'datos'
-            if (initialResponse.datos) {
-                const dataResponse = await new Promise((resolve, reject) => {
-                    request({
-                        url: initialResponse.datos,
-                        json: true
-                    }, (error, response, body) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(body);
-                        }
-                    });
-                });
-
-                // Devolver los datos finales
-                return res.json(dataResponse);
-            } else {
-                return res.status(500).json({
-                    error: 'No se encontró el enlace a los datos en la respuesta de AEMET'
-                });
-            }
-        } catch (error) {
-            console.error('Error procesando petición a AEMET:', error);
-            return res.status(500).json({
-                error: error.message || 'Error interno del servidor'
-            });
-        }
+        // Reenviar la petición a la API Red Natura 2000
+        request(targetUrl).pipe(res);
     });
 
+    // Endpoint proxy para la API de GBIF
+    app.use(`${BASE_API}/proxy/gbif`, (req, res) => {
+        // URL base de la API GBIF
+        const gbifBaseUrl = 'https://api.gbif.org/v1';
+
+        // Construir la URL completa
+        const targetPath = req.url;
+        const targetUrl = `${gbifBaseUrl}${targetPath}`;
+
+        console.log('Proxy request to GBIF API:', targetUrl);
+
+        // Reenviar la petición a la API de GBIF
+        request(targetUrl).pipe(res);
+    });
+
+    // Endpoint proxy para la API de EIDOS
+    app.use(`${BASE_API}/proxy/eidos`, (req, res) => {
+        // URL base de la API EIDOS
+        const eidosBaseUrl = 'https://iepnb.gob.es:443/api/especie';
+
+        // Construir la URL completa
+        const targetPath = req.url;
+        const targetUrl = `${eidosBaseUrl}${targetPath}`;
+
+        console.log('Proxy request to EIDOS API:', targetUrl);
+
+        // Reenviar la petición a la API de EIDOS
+        request(targetUrl).pipe(res);
+    });
 
     //DOCUMENTACIÓN DE POSTMAN
     app.get(BASE_API + "/national-parks/docs", (request, response) => {

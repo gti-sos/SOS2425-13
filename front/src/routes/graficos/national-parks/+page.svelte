@@ -514,8 +514,8 @@
 		<a href="/integrations/national-parks/native-land-digital">
 			<button>native-land-digital</button>
 		</a>
-		<a href="/integrations/national-parks/AEMET">
-			<button>AEMET</button>
+		<a href="/integrations/national-parks/Red-Natura-2000">
+			<button>Red-Natura-2000</button>
 		</a>
 	</div>
 
