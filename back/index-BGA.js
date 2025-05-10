@@ -6,7 +6,7 @@ import 'dotenv/config';
 
 let db = new dataStore();
 const BASE_API = "/api/v1";
-require('dotenv').config();
+
 
 const datosInicialesB = [
     { year: 2015, autonomous_community: "andalucia", amount: 12604168, benefited_population: 25208, project_count: 45 },
@@ -87,9 +87,8 @@ function loadBackend(app) {
 
     // Tu proxy de precipitación
     app.get('/api/v1/proxy/precipitation-history', async (req, res) => {
-        const { location: locRaw, start, end } = req.query;
-        if (!locRaw || !start || !end) {
-            return res.status(400).json({ error: "Faltan parámetros 'location', 'start' o 'end'" });
+        if (!process.env.WTH_API_KEY || !process.env.WTH_API_HOST) {
+          return res.status(503).json({ error: 'Weather API credentials missing' });
         }
 
         // Mapeamos la CCAA al nombre de ciudad
@@ -132,17 +131,19 @@ function loadBackend(app) {
     //IDEALISTA
 
     const API_HOST = 'idealista7.p.rapidapi.com';
-    const API_KEY = process.env.WTH_API_KEY;  // Pon aquí tu RapidAPI Key
+    const IDEALISTA_KEY = process.env.WTH_API_KEY;
 
-    if (!API_KEY) {
-        console.error('ERROR: Debes exportar tu clave en WTH_API_KEY');
-        process.exit(1);
+    if (!IDEALISTA_KEY) {
+        console.warn('WARNING: No hay WTH_API_KEY, las rutas de Idealista devolverán 503');
     }
-
+    
+    // ¡fuera el process.exit!
     app.use(cors());
-
-    // Proxy específico para viviendas en venta en Madrid
+    
     app.get('/api/v1/proxy/idealista-madrid-homes', async (_req, res) => {
+        if (!IDEALISTA_KEY) {
+            return res.status(503).json({ error: 'Idealista API key missing' });
+        }
         const url = new URL('https://idealista7.p.rapidapi.com/getlocations');
         url.search = new URLSearchParams({
             locationId: '0-EU-ES-28',
@@ -175,28 +176,23 @@ function loadBackend(app) {
     });
 
     // Configuración de Plants API
-    const PLANTS_HOST = process.env.PLANTS_HOST || 'plants2.p.rapidapi.com';
-    const RAPIDAPI_KEY = process.env.WTH_API_KEY;
-    const AUTH_TOKEN = process.env.PLANTS_AUTH_TOKEN;
-
-    // Validación de variables de entorno
-    if (!RAPIDAPI_KEY) {
-        console.error('ERROR: define RAPIDAPI_KEY con tu RapidAPI Key');
-        process.exit(1);
+    const PLANTS_HOST = 'plants2.p.rapidapi.com';
+    const PLANTS_KEY  = process.env.WTH_API_KEY;
+    const AUTH_TOKEN  = process.env.PLANTS_AUTH_TOKEN;
+    
+    if (!PLANTS_KEY || !AUTH_TOKEN) {
+        console.warn('WARNING: faltan PLANTS_KEY o PLANTS_AUTH_TOKEN, las rutas de Plants devolverán 503');
     }
-    if (!AUTH_TOKEN) {
-        console.error('ERROR: define PLANTS_AUTH_TOKEN con tu token de autorización');
-        process.exit(1);
-    }
-
+    
     app.use(cors());
-
-    /**
-     * Proxy para contar el número de plantas según ID
-     * GET /api/v1/proxy/plants-count?id=<plantId>
-     * Responde { plantCount: number }
-     */
+    
     app.get('/api/v1/proxy/plants-count', async (req, res) => {
+        if (!PLANTS_KEY || !AUTH_TOKEN) {
+            return res.status(503).json({ error: 'Plants API credentials missing' });
+        }
+
+ 
+F    
         const plantId = req.query.id;
         if (!plantId || typeof plantId !== 'string') {
             return res.status(400).json({ error: "Falta parámetro 'id'" });
