@@ -1,6 +1,7 @@
 import dataStore from '@seald-io/nedb';
-import request from 'request';
-import axios from 'axios';
+import fetch from 'node-fetch';
+import cors from 'cors';
+
 import 'dotenv/config';
 
 let db = new dataStore();
@@ -63,54 +64,182 @@ function loadBackend(app) {
     app.get(BASE_API + "/water-supply-improvements/docs", (req, res) => {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
-    
-    app.get(`${BASE_API}/proxy/precipitation-history`, async (req, res) => {
-        const { location, start, end } = req.query;
-        if (!location || !start || !end) {
-          return res
-            .status(400)
-            .json({ error: "Los parámetros 'location', 'start' y 'end' son obligatorios" });
-        }
-      
-        try {
-          const { data } = await axios.get(
-            `https://${process.env.WTH_API_HOST}/history`,
-            {
-              params: {
-                location,                               // p.ej. "Spain"
-                startDateTime: `${start}T00:00:00`,     // "2015-01-01T00:00:00"
-                endDateTime:   `${end}T23:59:59`,       // "2015-12-31T23:59:59"
-                aggregateHours: 24,                     // datos diarios
-                unitGroup: 'metric',                    // precipitación en mm
-                contentType: 'json'
-              },
-              headers: {
-                'X-RapidAPI-Key': process.env.WTH_API_KEY,
-                'X-RapidAPI-Host': process.env.WTH_API_HOST
-              }
-            }
-          );
-      
-          // Extraemos la lista de días con fecha y precipitación
-          const days = data.locations?.[location]?.values.map(({ datetimeStr, precip }) => ({
-            date:          datetimeStr,
-            precipitation: precip
-          })) ?? [];
-      
-          return res.json({ days });
-      
-        } catch (error) {
-          console.error(
-            'Error al obtener historial de precipitación:',
-            error.response?.status,
-            error.response?.data || error.message
-          );
-          const status  = error.response?.status || 500;
-          const payload = error.response?.data   || { error: error.message };
-          return res.status(status).json(payload);
-        }
-      });
 
+    //API EXTERNA PARA TIEMPO:
+    // Mapa de CCAA → ubicación válida para la API de clima
+    const REGION_TO_LOC = {
+        'andalucia': 'Seville,ES',
+        'aragon': 'Zaragoza,ES',
+        'asturias': 'Oviedo,ES',
+        'baleares': 'Palma,ES',
+        'canarias': 'Las Palmas,ES',
+        'cantabria': 'Santander,ES',
+        'castilla y leon': 'Valladolid,ES',
+        'castilla-la mancha': 'Toledo,ES',
+        'cataluña': 'Barcelona,ES',
+        'valencia': 'Valencia,ES',
+        'extremadura': 'Merida,ES',
+        'galicia': 'Santiago de Compostela,ES',
+        'madrid': 'Madrid,ES',
+        'murcia': 'Murcia,ES',
+        'pais vasco': 'Bilbao,ES'
+    };
+
+    // Tu proxy de precipitación
+    app.get('/api/v1/proxy/precipitation-history', async (req, res) => {
+        const { location: locRaw, start, end } = req.query;
+        if (!locRaw || !start || !end) {
+            return res.status(400).json({ error: "Faltan parámetros 'location', 'start' o 'end'" });
+        }
+
+        // Mapeamos la CCAA al nombre de ciudad
+        const key = String(locRaw).toLowerCase();
+        const location = REGION_TO_LOC[key] || String(locRaw);
+
+        try {
+            const resp = await fetch(
+                `https://${process.env.WTH_API_HOST}/history?` +
+                new URLSearchParams({
+                    location,
+                    startDateTime: `${start}T00:00:00`,
+                    endDateTime: `${end}T23:59:59`,
+                    aggregateHours: '24',
+                    unitGroup: 'metric',
+                    contentType: 'json'
+                }),
+                {
+                    headers: {
+                        'X-RapidAPI-Key': process.env.WTH_API_KEY,
+                        'X-RapidAPI-Host': process.env.WTH_API_HOST
+                    }
+                }
+            );
+            if (!resp.ok) {
+                return res.status(resp.status).json({ error: resp.statusText });
+            }
+            const data = await resp.json();
+            const days = data.locations?.[location]?.values.map(v => ({
+                date: v.datetimeStr,
+                precipitation: v.precip
+            })) || [];
+            res.json({ days });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+
+    //IDEALISTA
+
+    const API_HOST = 'idealista7.p.rapidapi.com';
+    const API_KEY = process.env.WTH_API_KEY;  // Pon aquí tu RapidAPI Key
+
+    if (!API_KEY) {
+        console.error('ERROR: Debes exportar tu clave en WTH_API_KEY');
+        process.exit(1);
+    }
+
+    app.use(cors());
+
+    // Proxy específico para viviendas en venta en Madrid
+    app.get('/api/v1/proxy/idealista-madrid-homes', async (_req, res) => {
+        const url = new URL('https://idealista7.p.rapidapi.com/getlocations');
+        url.search = new URLSearchParams({
+            locationId: '0-EU-ES-28',
+            location: 'es',
+            propertyType: 'homes',
+            operation: 'sale'
+        }).toString();
+
+        try {
+            console.log('Fetch Idealista Madrid →', url.toString());
+            const resp = await fetch(url.toString(), {
+                headers: {
+                    'X-RapidAPI-Host': API_HOST,
+                    'X-RapidAPI-Key': API_KEY
+                }
+            });
+            if (!resp.ok) {
+                const text = await resp.text();
+                console.error(`Idealista error ${resp.status}: ${text}`);
+                return res.status(resp.status).json({ error: text });
+            }
+            const data = await resp.json();
+            // Devuelve tal cual la respuesta de getlocations, o extrae totalResults:
+            // return res.json({ totalResults: data.totalResults ?? data.total });
+            return res.json(data);
+        } catch (err) {
+            console.error('Error al consultar Idealista:', err);
+            return res.status(500).json({ error: err.message || 'Error interno' });
+        }
+    });
+
+    // Configuración de Plants API
+    const PLANTS_HOST = process.env.PLANTS_HOST || 'plants2.p.rapidapi.com';
+    const RAPIDAPI_KEY = process.env.WTH_API_KEY;
+    const AUTH_TOKEN = process.env.PLANTS_AUTH_TOKEN;
+
+    // Validación de variables de entorno
+    if (!RAPIDAPI_KEY) {
+        console.error('ERROR: define RAPIDAPI_KEY con tu RapidAPI Key');
+        process.exit(1);
+    }
+    if (!AUTH_TOKEN) {
+        console.error('ERROR: define PLANTS_AUTH_TOKEN con tu token de autorización');
+        process.exit(1);
+    }
+
+    app.use(cors());
+
+    /**
+     * Proxy para contar el número de plantas según ID
+     * GET /api/v1/proxy/plants-count?id=<plantId>
+     * Responde { plantCount: number }
+     */
+    app.get('/api/v1/proxy/plants-count', async (req, res) => {
+        const plantId = req.query.id;
+        if (!plantId || typeof plantId !== 'string') {
+            return res.status(400).json({ error: "Falta parámetro 'id'" });
+        }
+
+        try {
+            const url = new URL(`https://${PLANTS_HOST}/api/plants`);
+            url.search = new URLSearchParams({ id: plantId }).toString();
+            console.log('Fetch Plants API →', url.toString());
+
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'Authorization': AUTH_TOKEN,
+                    'X-RapidAPI-Host': PLANTS_HOST,
+                    'X-RapidAPI-Key': RAPIDAPI_KEY
+                }
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error(`Plants API error ${response.status}:`, text);
+                return res.status(response.status).json({ error: text });
+            }
+
+            const data = await response.json();
+            // Calcular plantCount según tipo de respuesta
+            let plantCount;
+            if (Array.isArray(data)) {
+                plantCount = data.length;
+            } else if (data && typeof data === 'object') {
+                // Contar número de claves en el objeto
+                plantCount = Object.keys(data).length;
+            } else {
+                plantCount = 0;
+            }
+            return res.json({ plantCount });
+        } catch (error) {
+            console.error('Error al consultar Plants API:', error);
+            return res.status(500).json({ error: error.message || 'Error interno' });
+        }
+    });
+
+ 
 
 
     // Load Initial Data
@@ -125,7 +254,6 @@ function loadBackend(app) {
             });
         });
     });
-
 
     // GET con filtros (from, to y otros campos)
     app.get(BASE_API + "/water-supply-improvements", (req, res) => {
