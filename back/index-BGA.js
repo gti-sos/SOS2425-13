@@ -6,7 +6,7 @@ import 'dotenv/config';
 
 let db = new dataStore();
 const BASE_API = "/api/v1";
-
+require('dotenv').config();
 
 const datosInicialesB = [
     { year: 2015, autonomous_community: "andalucia", amount: 12604168, benefited_population: 25208, project_count: 45 },
