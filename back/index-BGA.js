@@ -65,6 +65,19 @@ function loadBackend(app) {
         res.redirect("https://documenter.getpostman.com/view/42334859/2sB2cVe2Fy");
     });
 
+    // Load Initial Data
+    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
+        db.count({}, (err, count) => {
+            if (err) return res.status(500).send({ error: "Error al acceder a la base de datos" });
+            if (count > 0) return res.status(405).send({ message: "Ya existen datos. No se sobreescriben." });
+            db.insert(datosInicialesB, (err, newDocs) => {
+                if (err) return res.status(500).send({ error: "Error al insertar los datos" });
+                const transformed = newDocs.map(({ _id, ...rest }) => rest);
+                return res.status(200).send({ message: "Datos iniciales cargados correctamente", data: transformed });
+            });
+        });
+    });
+
     //API EXTERNA PARA TIEMPO:
     // Mapa de CCAA → ubicación válida para la API de clima
     const REGION_TO_LOC = {
@@ -85,36 +98,49 @@ function loadBackend(app) {
         'pais vasco': 'Bilbao,ES'
     };
 
-    // Tu proxy de precipitación
     app.get('/api/v1/proxy/precipitation-history', async (req, res) => {
-        if (!process.env.WTH_API_KEY || !process.env.WTH_API_HOST) {
-          return res.status(503).json({ error: 'Weather API credentials missing' });
+        // 1) Extrae correctamente los query params
+        const { location: locRaw, start, end } = req.query;
+
+        // 2) Valídelos antes de seguir
+        if (!locRaw || !start || !end) {
+            return res
+                .status(400)
+                .json({ error: "Faltan parámetros 'location', 'start' o 'end'" });
         }
 
-        // Mapeamos la CCAA al nombre de ciudad
-        const key = String(locRaw).toLowerCase();
-        const location = REGION_TO_LOC[key] || String(locRaw);
+        // 3) Mapea la comunidad a ciudad
+        const key = locRaw.toString().toLowerCase();
+        const location = REGION_TO_LOC[key] || locRaw;
+
+        // 4) Construye y registra la URL real
+        const params = new URLSearchParams({
+            location,
+            startDateTime: `${start}T00:00:00`,
+            endDateTime: `${end}T23:59:59`,
+            aggregateHours: '24',
+            unitGroup: 'metric',
+            contentType: 'json'
+        });
+        const urlString = `https://${process.env.WTH_API_HOST}/history?${params}`;
+        console.log("📡 Fetching weather:", urlString);
+
+        // 5) Comprueba credenciales
+        if (!process.env.WTH_API_KEY || !process.env.WTH_API_HOST) {
+            return res.status(503).json({ error: 'Weather API credentials missing' });
+        }
 
         try {
-            const resp = await fetch(
-                `https://${process.env.WTH_API_HOST}/history?` +
-                new URLSearchParams({
-                    location,
-                    startDateTime: `${start}T00:00:00`,
-                    endDateTime: `${end}T23:59:59`,
-                    aggregateHours: '24',
-                    unitGroup: 'metric',
-                    contentType: 'json'
-                }),
-                {
-                    headers: {
-                        'X-RapidAPI-Key': process.env.WTH_API_KEY,
-                        'X-RapidAPI-Host': process.env.WTH_API_HOST
-                    }
+            const resp = await fetch(urlString, {
+                headers: {
+                    'X-RapidAPI-Key': process.env.WTH_API_KEY,
+                    'X-RapidAPI-Host': process.env.WTH_API_HOST
                 }
-            );
+            });
             if (!resp.ok) {
-                return res.status(resp.status).json({ error: resp.statusText });
+                const text = await resp.text();
+                console.error(`Weather API error ${resp.status}:`, text);
+                return res.status(resp.status).json({ error: text });
             }
             const data = await resp.json();
             const days = data.locations?.[location]?.values.map(v => ({
@@ -123,9 +149,11 @@ function loadBackend(app) {
             })) || [];
             res.json({ days });
         } catch (err) {
+            console.error('Error al consultar Weather API:', err);
             res.status(500).json({ error: err.message });
         }
     });
+
 
 
     //IDEALISTA
@@ -136,10 +164,10 @@ function loadBackend(app) {
     if (!IDEALISTA_KEY) {
         console.warn('WARNING: No hay WTH_API_KEY, las rutas de Idealista devolverán 503');
     }
-    
+
     // ¡fuera el process.exit!
     app.use(cors());
-    
+
     app.get('/api/v1/proxy/idealista-madrid-homes', async (_req, res) => {
         if (!IDEALISTA_KEY) {
             return res.status(503).json({ error: 'Idealista API key missing' });
@@ -177,22 +205,22 @@ function loadBackend(app) {
 
     // Configuración de Plants API
     const PLANTS_HOST = 'plants2.p.rapidapi.com';
-    const PLANTS_KEY  = process.env.WTH_API_KEY;
-    const AUTH_TOKEN  = process.env.PLANTS_AUTH_TOKEN;
-    
+    const PLANTS_KEY = process.env.WTH_API_KEY;
+    const AUTH_TOKEN = process.env.PLANTS_AUTH_TOKEN;
+
     if (!PLANTS_KEY || !AUTH_TOKEN) {
         console.warn('WARNING: faltan PLANTS_KEY o PLANTS_AUTH_TOKEN, las rutas de Plants devolverán 503');
     }
-    
+
     app.use(cors());
-    
+
     app.get('/api/v1/proxy/plants-count', async (req, res) => {
         if (!PLANTS_KEY || !AUTH_TOKEN) {
             return res.status(503).json({ error: 'Plants API credentials missing' });
         }
 
- 
-F    
+
+        F
         const plantId = req.query.id;
         if (!plantId || typeof plantId !== 'string') {
             return res.status(400).json({ error: "Falta parámetro 'id'" });
@@ -235,21 +263,9 @@ F
         }
     });
 
- 
 
 
-    // Load Initial Data
-    app.get(BASE_API + "/water-supply-improvements/loadInitialData", (req, res) => {
-        db.count({}, (err, count) => {
-            if (err) return res.status(500).send({ error: "Error al acceder a la base de datos" });
-            if (count > 0) return res.status(405).send({ message: "Ya existen datos. No se sobreescriben." });
-            db.insert(datosInicialesB, (err, newDocs) => {
-                if (err) return res.status(500).send({ error: "Error al insertar los datos" });
-                const transformed = newDocs.map(({ _id, ...rest }) => rest);
-                return res.status(200).send({ message: "Datos iniciales cargados correctamente", data: transformed });
-            });
-        });
-    });
+
 
     // GET con filtros (from, to y otros campos)
     app.get(BASE_API + "/water-supply-improvements", (req, res) => {
@@ -354,7 +370,7 @@ F
         const requiredFields = ["year", "autonomous_community", "amount", "benefited_population", "project_count"];
         const missing = requiredFields.filter(f => !newEntry[f]);
         if (missing.length > 0) return res.status(400).send({ error: "Faltan campos", missing });
-
+    
         db.findOne({ year: newEntry.year, autonomous_community: newEntry.autonomous_community.toLowerCase() }, (err, doc) => {
             if (err) return res.status(500).send({ error: "Error en la búsqueda" });
             if (doc) return res.status(409).send({ error: "Ya existe un recurso para esa comunidad y año" });
@@ -364,7 +380,7 @@ F
             });
         });
     });
-
+    
     app.post(BASE_API + "/water-supply-improvements/:year", (req, res) => {
         return res.status(405).send({ error: "No se permite POST a un recurso específico" });
     });
@@ -374,14 +390,14 @@ F
      y era vulnerable a ataques de este tipo porque asume que newEntry.autonomous_community es siempre una cadena de texto. 
      Si un atacante envía un valor que no es una cadena, la llamada a toLowerCase() fallará y 
      podría causar un error o comportamiento inesperado en la aplicación. 
-
+    
      Beneficios de esta solución:
         -Seguridad mejorada: Valida los tipos de datos antes de procesarlos
         -Prevención de errores: Evita excepciones causadas por tipos de datos inesperados
         -Mensajes claros: Proporciona mensajes específicos sobre qué campo tiene un tipo incorrecto
         -Datos consistentes: Asegura que los datos almacenados siempre tengan el formato esperado
         -Mantiene la funcionalidad: El comportamiento para usuarios legítimos sigue siendo el mismo
-
+    
     */
     // POST
     app.post(BASE_API + "/water-supply-improvements", (req, res) => {
@@ -488,13 +504,13 @@ F
            El código este:
            if ((update.year && update.year !== year) || 
        (update.autonomous_community && update.autonomous_community.toLowerCase() !== community)) {
-   
+     
           llama al método toLowerCase() en update.autonomous_community sin verificar si realmente es una cadena de texto, 
            lo que puede provocar errores si un atacante envía otros tipos de datos.
-   
+     
             Se ha agregado un campo de validación más arriba para verificar que el tipo de dato es correcto antes de llamar a toLowerCase().
-   
-   */
+     
+    */
 
             // Si se intenta modificar 'year' o 'autonomous_community' se debe verificar que no cree duplicados
             if ((update.year && update.year !== year) ||
