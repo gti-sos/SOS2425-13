@@ -11,3 +11,4 @@
 	const EVOLUTIONS_API = dev
 		? 'http://localhost:16078/api/v1/proxy/annual-evolutions'
 		: 'https://sos2425-13.onrender.com/api/v1/proxy/annual-evolutions';
+</script>		

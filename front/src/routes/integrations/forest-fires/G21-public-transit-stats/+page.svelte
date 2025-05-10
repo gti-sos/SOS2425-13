@@ -11,3 +11,4 @@
 	const TRANSIT_API = dev
 		? 'http://localhost:16078/api/v1/proxy/public-transit-stats'
 		: 'https://sos2425-13.onrender.com/api/v1/proxy/public-transit-stats';
+</script>		

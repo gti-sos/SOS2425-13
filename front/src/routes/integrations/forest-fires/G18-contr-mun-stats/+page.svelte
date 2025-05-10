@@ -11,3 +11,4 @@
 	const PENSIONS_API = dev
 		? 'http://localhost:16078/api/v1/proxy/contr-mun-stats'
 		: 'https://sos2425-13.onrender.com/api/v1/proxy/contr-mun-stats';
+</script>		
