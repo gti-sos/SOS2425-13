@@ -94,13 +94,6 @@
   {:else}
     <svg bind:this={svg}></svg>
   {/if}
-
-  <button
-  on:click={() => (window.location.href = '/integrations/water-supply-improvements/externas')}
-  style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; cursor:pointer;"
->
-  Volver
-</button>
 </main>
 
 <style>
