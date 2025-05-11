@@ -4,19 +4,22 @@
 	let isApisDevVisible = false;
 	let isFrontendVisible = false;
 	let isMiembrosVisible = false;
+	let isVideoVisible = false;
 
 	function toggleVisibility(section: string) {
 		const isSame =
 			(section === 'postman' && isPostmanVisible) ||
 			(section === 'apis' && isApisDevVisible) ||
 			(section === 'frontend' && isFrontendVisible) ||
-			(section === 'miembros' && isMiembrosVisible);
+			(section === 'miembros' && isMiembrosVisible) ||
+			(section === 'videos' && isVideoVisible);
 
 		// Reset de todas las secciones
 		isPostmanVisible = false;
 		isApisDevVisible = false;
 		isFrontendVisible = false;
 		isMiembrosVisible = false;
+		isVideoVisible = false;
 
 		// Si no es la misma sección, la abrimos
 		if (!isSame) {
@@ -24,6 +27,7 @@
 			else if (section === 'apis') isApisDevVisible = true;
 			else if (section === 'frontend') isFrontendVisible = true;
 			else if (section === 'miembros') isMiembrosVisible = true;
+			else if (section === 'videos') isVideoVisible = true;
 		}
 	}
 </script>
@@ -136,6 +140,26 @@
 			<a href="/analytics" style="display:block; width:100%;">
 				<button>Gráficos</button>
 			</a>
+		</div>
+
+		<!-- Videos de cada api -->
+		<div class="interactive-box {isVideoVisible ? 'expanded' : ''}">
+			<button on:click={() => toggleVisibility('videos')}>Videos</button>
+			{#if isVideoVisible}
+				<div class="content">
+					<ul>
+						<li>
+							<a href="https://youtu.be/qAS4tBELpBM">Water Supply Improvements</a>
+						</li>
+						<li>
+							<a href="https://dalek.zone/w/xhShuPj2w4UhexwCrCHKhv">National Parks</a>
+						</li>
+						<li>
+							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
+						</li>
+					</ul>
+				</div>
+			{/if}
 		</div>
 	</div>
 </main>
