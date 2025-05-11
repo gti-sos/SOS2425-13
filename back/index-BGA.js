@@ -78,184 +78,171 @@ function loadBackend(app) {
         });
     });
 
-    //API EXTERNA PARA TIEMPO:
-    // Mapa de CCAA → ubicación válida para la API de clima
-    const REGION_TO_LOC = {
-        'andalucia': 'Seville,ES',
-        'aragon': 'Zaragoza,ES',
-        'asturias': 'Oviedo,ES',
-        'baleares': 'Palma,ES',
-        'canarias': 'Las Palmas,ES',
-        'cantabria': 'Santander,ES',
-        'castilla y leon': 'Valladolid,ES',
-        'castilla-la mancha': 'Toledo,ES',
-        'cataluña': 'Barcelona,ES',
-        'valencia': 'Valencia,ES',
-        'extremadura': 'Merida,ES',
-        'galicia': 'Santiago de Compostela,ES',
-        'madrid': 'Madrid,ES',
-        'murcia': 'Murcia,ES',
-        'pais vasco': 'Bilbao,ES'
-    };
 
-    app.get('/api/v1/proxy/precipitation-history', async (req, res) => {
-        // 1) Extrae correctamente los query params
-        const { location: locRaw, start, end } = req.query;
-
-        // 2) Valídelos antes de seguir
-        if (!locRaw || !start || !end) {
-            return res
-                .status(400)
-                .json({ error: "Faltan parámetros 'location', 'start' o 'end'" });
-        }
-
-        // 3) Mapea la comunidad a ciudad
-        const key = locRaw.toString().toLowerCase();
-        const location = REGION_TO_LOC[key] || locRaw;
-
-        // 4) Construye y registra la URL real
-        const params = new URLSearchParams({
-            location,
-            startDateTime: `${start}T00:00:00`,
-            endDateTime: `${end}T23:59:59`,
-            aggregateHours: '24',
-            unitGroup: 'metric',
-            contentType: 'json'
-        });
-        const urlString = `https://${process.env.WTH_API_HOST}/history?${params}`;
-        console.log("📡 Fetching weather:", urlString);
-
-        // 5) Comprueba credenciales
-        if (!process.env.WTH_API_KEY || !process.env.WTH_API_HOST) {
-            return res.status(503).json({ error: 'Weather API credentials missing' });
-        }
-
-        try {
-            const resp = await fetch(urlString, {
-                headers: {
-                    'X-RapidAPI-Key': process.env.WTH_API_KEY,
-                    'X-RapidAPI-Host': process.env.WTH_API_HOST
-                }
-            });
-            if (!resp.ok) {
-                const text = await resp.text();
-                console.error(`Weather API error ${resp.status}:`, text);
-                return res.status(resp.status).json({ error: text });
-            }
-            const data = await resp.json();
-            const days = data.locations?.[location]?.values.map(v => ({
-                date: v.datetimeStr,
-                precipitation: v.precip
-            })) || [];
-            res.json({ days });
-        } catch (err) {
-            console.error('Error al consultar Weather API:', err);
-            res.status(500).json({ error: err.message });
-        }
-    });
-
-
-
-    // IDEALISTA
-    const IDEALISTA_HOST = process.env.IDEALISTA_HOST;
-    const IDEALISTA_API_KEY = process.env.WTH_API_KEY;
-
-    if (!IDEALISTA_API_KEY) {
-        console.warn('WARNING: No hay IDEALISTA_API_KEY, las rutas de Idealista devolverán 503');
+/** -------------------- API de Weather / Precipitation -------------------- */
+const REGION_TO_LOC = {
+    andalucia: 'Seville,ES',
+    aragon: 'Zaragoza,ES',
+    asturias: 'Oviedo,ES',
+    baleares: 'Palma,ES',
+    canarias: 'Las Palmas,ES',
+    cantabria: 'Santander,ES',
+    'castilla y leon': 'Valladolid,ES',
+    'castilla-la mancha': 'Toledo,ES',
+    cataluña: 'Barcelona,ES',
+    valencia: 'Valencia,ES',
+    extremadura: 'Merida,ES',
+    galicia: 'Santiago de Compostela,ES',
+    madrid: 'Madrid,ES',
+    murcia: 'Murcia,ES',
+    'pais vasco': 'Bilbao,ES'
+  };
+  
+  app.get('/api/v1/proxy/precipitation-history', async (req, res) => {
+    const { location: locRaw, start, end } = req.query;
+    if (!locRaw || !start || !end) {
+      return res.status(400).json({ error: "Faltan parámetros 'location', 'start' o 'end'" });
     }
-
-    app.get('/api/v1/proxy/idealista-madrid-homes', async (req, res) => {
-        if (!IDEALISTA_API_KEY) {
-            return res.status(503).json({ error: 'Idealista API key missing' });
-        }
-
-        const url = new URL(`https://${IDEALISTA_HOST}/getlocations`);
-        url.search = new URLSearchParams({
-            locationId: '0-EU-ES-28',       // Comunidad de Madrid
-            location: 'es',
-            propertyType: 'homes',
-            operation: 'sale'
-        }).toString();
-
-        console.log('📡 Fetch Idealista Madrid →', url.toString());
-
-        try {
-            const resp = await fetch(url.toString(), {
-                headers: {
-                    'X-RapidAPI-Host': IDEALISTA_HOST,
-                    'X-RapidAPI-Key': IDEALISTA_API_KEY
-                }
-            });
-
-            if (!resp.ok) {
-                const text = await resp.text();
-                console.error(`Idealista error ${resp.status}:`, text);
-                return res.status(resp.status).json({ error: text });
-            }
-
-            // Parseamos la respuesta y extraemos sólo el total para el municipio Madrid
-            const { locations } = await resp.json();
-            // Buscamos el entry con subTypeText==="Municipio" y cuyo name incluya "Madrid"
-            const madrid = locations.find(
-                loc => loc.subTypeText === 'Municipio' && loc.name.startsWith('Madrid')
-            );
-            const totalResults = madrid
-                ? madrid.total
-                : locations.reduce((sum, loc) => sum + (loc.total ?? 0), 0);
-
-            return res.json({ totalResults });
-
-        } catch (err) {
-            console.error('Error al consultar Idealista:', err);
-            return res.status(500).json({ error: err.message || 'Error interno' });
-        }
+  
+    const key = locRaw.toString().toLowerCase();
+    const location = REGION_TO_LOC[key] || locRaw.toString();
+  
+    const params = new URLSearchParams({
+      location,
+      startDateTime: `${start}T00:00:00`,
+      endDateTime: `${end}T23:59:59`,
+      aggregateHours: '24',
+      unitGroup: 'metric',
+      contentType: 'json'
     });
-
-
-
-    //PLANTAS
-    const PLANTS_HOST = process.env.PLANTS_HOST;
-    const WTH_API_KEY = process.env.WTH_API_KEY;
-    const AUTH_TOKEN = process.env.PLANTS_AUTH_TOKEN;
-
-    if (!PLANTS_HOST) {
-        throw new Error('Falta definir PLANTS_HOST en .env');
+    const host = process.env.WTH_API_HOST;
+    const apiKey = process.env.WTH_API_KEY;
+    if (!host || !apiKey) {
+      return res.status(503).json({ error: 'Weather API credentials missing' });
     }
-    if (!WTH_API_KEY) {
-        throw new Error('Falta definir WTH_API_KEY en .env');
-    }
-
-    app.get('/api/v1/proxy/plants-count', async (req, res) => {
-        const plantId = req.query.id;
-        if (!plantId) return res.status(400).json({ error: "Falta parámetro 'id'" });
-
-        // …credenciales y URL ya validadas…
-
-        const resp = await fetch(`https://${PLANTS_HOST}/api/plants?id=${plantId}`, {
-            headers: {
-                'X-RapidAPI-Host': PLANTS_HOST,
-                'X-RapidAPI-Key': WTH_API_KEY,
-                'Authorization': AUTH_TOKEN
-            }
-        });
-
-        if (!resp.ok) {
-            const text = await resp.text();
-            return res.status(resp.status).json({ error: text });
+  
+    const urlString = `https://${host}/history?${params}`;
+    console.log("📡 Fetching weather:", urlString);
+  
+    try {
+      const resp = await fetch(urlString, {
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': host
         }
-
-        const data = await resp.json();
-        // Si quieres el conteo:
-        const plantCount = Array.isArray(data)
-            ? data.length
-            : (data && typeof data === 'object')
-                ? Object.keys(data).length
-                : 0;
-
-        return res.json({ plantCount });
-    });
-
-
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        console.error(`Weather API error ${resp.status}:`, text);
+        return res.status(resp.status).json({ error: text });
+      }
+  
+      const data = await resp.json();
+      const days = data.locations?.[location]?.values.map(v => ({
+        date: v.datetimeStr,
+        precipitation: v.precip
+      })) || [];
+      return res.json({ days });
+  
+    } catch (err) {
+      console.error('Error al consultar Weather API:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+  
+  /** -------------------- API de Idealista -------------------- */
+  const IDEALISTA_HOST = process.env.IDEALISTA_HOST;
+  
+  app.get('/api/v1/proxy/idealista-madrid-homes', async (req, res) => {
+    const apiKey = process.env.WTH_API_KEY;
+    if (!IDEALISTA_HOST || !apiKey) {
+      return res.status(503).json({ error: 'Idealista API credentials missing' });
+    }
+  
+    const url = new URL(`https://${IDEALISTA_HOST}/getlocations`);
+    url.search = new URLSearchParams({
+      locationId:   '0-EU-ES-28',
+      location:     'es',
+      propertyType: 'homes',
+      operation:    'sale'
+    }).toString();
+  
+    console.log('📡 Fetch Idealista Madrid →', url.toString());
+  
+    try {
+      const resp = await fetch(url.toString(), {
+        headers: {
+          'X-RapidAPI-Host': IDEALISTA_HOST,
+          'X-RapidAPI-Key':  apiKey
+        }
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        console.error(`Idealista error ${resp.status}:`, text);
+        return res.status(resp.status).json({ error: text });
+      }
+  
+      const { locations } = await resp.json();
+      const madrid = locations.find(
+        (loc) => loc.subTypeText === 'Municipio' && loc.name.startsWith('Madrid')
+      );
+      const totalResults = madrid
+        ? madrid.total
+        : locations.reduce((sum, loc) => sum + (loc.total ?? 0), 0);
+  
+      return res.json({ totalResults });
+  
+    } catch (err) {
+      console.error('Error al consultar Idealista:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+  
+  /** -------------------- API de Plantas -------------------- */
+  app.get('/api/v1/proxy/plants-count', async (req, res) => {
+    const host = process.env.PLANTS_HOST;
+    const apiKey = process.env.WTH_API_KEY;
+    const auth  = process.env.PLANTS_AUTH_TOKEN;
+  
+    if (!host) {
+      return res.status(503).json({ error: 'Plants API host missing' });
+    }
+    if (!apiKey) {
+      return res.status(503).json({ error: 'Plants API key missing' });
+    }
+  
+    const plantId = req.query.id;
+    if (!plantId) {
+      return res.status(400).json({ error: "Falta parámetro 'id'" });
+    }
+  
+    try {
+      const resp = await fetch(`https://${host}/api/plants?id=${encodeURIComponent(plantId.toString())}`, {
+        headers: {
+          'X-RapidAPI-Host': host,
+          'X-RapidAPI-Key':  apiKey,
+          'Authorization':   auth || ''
+        }
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        return res.status(resp.status).json({ error: text });
+      }
+  
+      const data = await resp.json();
+      const plantCount = Array.isArray(data)
+        ? data.length
+        : (data && typeof data === 'object')
+          ? Object.keys(data).length
+          : 0;
+  
+      return res.json({ plantCount });
+  
+    } catch (err) {
+      console.error('Error al consultar Plants API:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
 
 
 
