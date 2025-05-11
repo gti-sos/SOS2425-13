@@ -5,6 +5,7 @@
 	let isApisDevVisible = false;
 	let isFrontendVisible = false;
 	let isMiembrosVisible = false;
+	let isVideoVisible = false;
 
 	function toggleVisibility(section: string) {
 		const isSame =
@@ -12,6 +13,7 @@
 			(section === 'repo' && isRepoVisible) ||
 			(section === 'apis' && isApisDevVisible) ||
 			(section === 'frontend' && isFrontendVisible) ||
+			(section == 'videos' && isVideoVisible) ||
 			(section === 'miembros' && isMiembrosVisible);
 
 		// Reset de todas las secciones
@@ -20,6 +22,7 @@
 		isApisDevVisible = false;
 		isFrontendVisible = false;
 		isMiembrosVisible = false;
+		isVideoVisible = false;
 
 		// Si no es la misma sección, la abrimos
 		if (!isSame) {
@@ -28,6 +31,7 @@
 			else if (section === 'apis') isApisDevVisible = true;
 			else if (section === 'frontend') isFrontendVisible = true;
 			else if (section === 'miembros') isMiembrosVisible = true;
+			else if (section === 'videos') isVideoVisible = true;
 		}
 	}
 </script>
@@ -165,27 +169,41 @@
 				{/if}
 			</div>
 
-			<!-- Informe de Horas -->
 			<div class="interactive-box">
 				<a href="/analytics" style="display:block; width:100%;">
-					<button>Informe de Horas</button>
+					<button>Gráficos</button>
 				</a>
+			</div>
+
+			<!-- Videos de cada api -->
+			<div class="interactive-box {isVideoVisible ? 'expanded' : ''}">
+				<button on:click={() => toggleVisibility('videos')}>Videos</button>
+				{#if isVideoVisible}
+					<div class="content">
+						<ul>
+							<li>
+								<a href="https://youtu.be/qAS4tBELpBM">Water Supply Improvements</a>
+							</li>
+							<li>
+								<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
+							</li>
+							<li>
+								<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
+							</li>
+						</ul>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</main>
 </div>
 
 <style>
+	main {
+		margin: 20px;
+		color: #000;
+	}
 
-
-  
-
-  main {
-    margin: 20px;
-    color: #000;
-  }
-
- 
 	h2 {
 		margin: 75px 0;
 		font-size: 24px;

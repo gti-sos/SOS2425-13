@@ -1,36 +1,26 @@
 <script lang="ts">
 	// Estados para cada sección de visibilidad
 	let isPostmanVisible = false;
-	let isRepoVisible = false;
 	let isApisDevVisible = false;
 	let isFrontendVisible = false;
 	let isMiembrosVisible = false;
-	let isVideoVisible = false;
-	let isHorasVisible = false;
 
 	function toggleVisibility(section: string) {
 		const isSame =
 			(section === 'postman' && isPostmanVisible) ||
-			(section === 'repo' && isRepoVisible) ||
 			(section === 'apis' && isApisDevVisible) ||
 			(section === 'frontend' && isFrontendVisible) ||
-			(section === 'miembros' && isMiembrosVisible) ||
-			(section == 'videos' && isVideoVisible) ||
-			(section == 'horas' && isHorasVisible);
+			(section === 'miembros' && isMiembrosVisible);
 
 		// Reset de todas las secciones
 		isPostmanVisible = false;
-		isRepoVisible = false;
 		isApisDevVisible = false;
 		isFrontendVisible = false;
 		isMiembrosVisible = false;
-		isVideoVisible = false;
-		isHorasVisible = false;
 
 		// Si no es la misma sección, la abrimos
 		if (!isSame) {
 			if (section === 'postman') isPostmanVisible = true;
-			else if (section === 'repo') isRepoVisible = true;
 			else if (section === 'apis') isApisDevVisible = true;
 			else if (section === 'frontend') isFrontendVisible = true;
 			else if (section === 'miembros') isMiembrosVisible = true;
@@ -49,15 +39,6 @@
 			prevención y respuesta ante incendios, optimizar la conservación de ecosistemas en áreas
 			protegidas y evaluar la efectividad de los subsidios destinados a mitigar la escasez hídrica
 			en municipios vulnerables.
-		</p>
-	</div>
-
-	<div>
-		<h2>Enlace del repositorio</h2>
-		<p>
-			<a href="https://github.com/gti-sos/SOS2425-13" target="_blank" class="repo-link"
-				>GitHub Repository</a
-			>
 		</p>
 	</div>
 
@@ -108,26 +89,6 @@
 			{/if}
 		</div>
 
-		<!-- GitHub individual de cada miembro -->
-		<div class="interactive-box {isRepoVisible ? 'expanded' : ''}">
-			<button on:click={() => toggleVisibility('repo')}>GitHub individual de cada miembro</button>
-			{#if isRepoVisible}
-				<div class="content">
-					<ul>
-						<li>
-							<a href="https://github.com/blancagrclns" target="_blank">Blanca García Alonso</a>
-						</li>
-						<li>
-							<a href="https://github.com/darlopvil" target="_blank">Darío López Villegas</a>
-						</li>
-						<li>
-							<a href="https://github.com/alvmornav" target="_blank">Alvaro Morillo Navajas</a>
-						</li>
-					</ul>
-				</div>
-			{/if}
-		</div>
-
 		<!-- APIs Desarrolladas -->
 		<div class="interactive-box {isApisDevVisible ? 'expanded' : ''}">
 			<button on:click={() => toggleVisibility('apis')}>APIs Desarrolladas</button>
@@ -152,48 +113,6 @@
 		<div class="interactive-box {isFrontendVisible ? 'expanded' : ''}">
 			<button on:click={() => toggleVisibility('frontend')}>FrontEnd</button>
 			{#if isFrontendVisible}
-				<div class="content">
-					<ul>
-						<li>
-							<a href="http://sos2425-13.onrender.com/water-supply-improvements"
-								>Water Supply Improvements</a
-							>
-						</li>
-						<li>
-							<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
-						</li>
-						<li>
-							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
-						</li>
-					</ul>
-				</div>
-			{/if}
-		</div>
-		<!-- Videos de cada api -->
-		<div class="interactive-box {isVideoVisible ? 'expanded' : ''}">
-			<button on:click={() => toggleVisibility('videos')}>Videos</button>
-			{#if isVideoVisible}
-				<div class="content">
-					<ul>
-						<li>
-							<a href="http://sos2425-13.onrender.com/water-supply-improvements"
-								>Water Supply Improvements</a
-							>
-						</li>
-						<li>
-							<a href="http://sos2425-13.onrender.com/national-parks">National Parks</a>
-						</li>
-						<li>
-							<a href="http://sos2425-13.onrender.com/forest-fires">Forest Fires</a>
-						</li>
-					</ul>
-				</div>
-			{/if}
-		</div>
-		<!-- Informes de horas -->
-		<div class="interactive-box {isHorasVisible ? 'expanded' : ''}">
-			<button on:click={() => toggleVisibility('horas')}>Horas</button>
-			{#if isHorasVisible}
 				<div class="content">
 					<ul>
 						<li>
