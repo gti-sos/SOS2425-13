@@ -71,12 +71,15 @@
 	} as const;
 
 	function normalize(s: string | undefined) {
-		return (s ?? '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ñ/g, 'n');
+		return (s ?? '')
+			.trim()
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/ñ/g, 'n');
 	}
 
-	const allCommunities = Object.values(
-		provinceMap
-	) as (typeof provinceMap)[keyof typeof provinceMap][];
+	const allCommunities = Object.values(provinceMap) as string[];
 	const uniqueCommunities = Array.from(new Set(allCommunities));
 	const communityDisplayMap: Record<string, string> = {};
 	uniqueCommunities.forEach((raw) => {
@@ -125,7 +128,6 @@
 			])
 		).sort();
 
-		// Suma de población beneficiada por comunidad
 		const populationTotals = comms.map((c) =>
 			waterData.reduce(
 				(sum, w) => (w.autonomous_community === c ? sum + w.benefited_population : sum),
@@ -133,7 +135,6 @@
 			)
 		);
 
-		// Serie proyectos de agua = población beneficiada
 		const waterSeries: echarts.ScatterSeriesOption = {
 			name: 'Población Beneficiada',
 			type: 'scatter',
@@ -142,7 +143,6 @@
 			itemStyle: { color: '#42a5f5' }
 		};
 
-		// Serie accidentes = puntos por accident_id
 		const accidentSeries: echarts.ScatterSeriesOption = {
 			name: 'Accident IDs',
 			type: 'scatter',
@@ -152,7 +152,7 @@
 		};
 
 		const option: echarts.EChartsOption = {
-			title: { text: 'Población Beneficiada vs Accident IDs por Comunidad', left: 'center' },
+			title: { text: 'Población Beneficiada vs Accident IDs', left: 'center' },
 			tooltip: { trigger: 'item' },
 			legend: { top: 30, data: ['Población Beneficiada', 'Accident IDs'] },
 			xAxis: { type: 'category', data: comms, name: 'Comunidad Autónoma' },
@@ -170,12 +170,12 @@
 	});
 </script>
 
-<main>
+<main class="p-4 mx-auto" style="max-width:900px;">
 	<div style="text-align:center; margin-bottom:30px; margin-top:30px;">
-		<a href="/integrations/water-supply-improvements/G10-accidents-stats"
+		<a href="/integrations/water-supply-improvements/G12-annual-retributions"
 			><button
 				style="margin:4px; padding:8px 12px; background-color:#a8c686; color:#000; border:none; border-radius:4px; cursor:pointer;"
-				>G12-accidents-stats</button
+				>G12-annual-retributions</button
 			></a
 		>
 		<a href="/integrations/water-supply-improvements/G14-employment-data"
@@ -197,8 +197,10 @@
 			></a
 		>
 	</div>
-	<h2 style="text-align:center;">Población Beneficiada vs Accident IDs por Comunidad</h2>
-	<div bind:this={chartDiv} style="width:80%; height:400px; margin:20px auto;"></div>
+	<div class="chart-container">
+		<div bind:this={chartDiv} class="chart" style="width:80%; height:400px; margin:0 auto;"></div>
+		<div class="chart-type">echarts:scatter</div>
+	</div>
 	<button
 		on:click={() => (window.location.href = '/graficos/water-supply-improvements')}
 		style="display:block; margin:20px auto; padding:8px 12px; background-color:#8fc177; color:#000; border:none; border-radius:4px; cursor:pointer;"
@@ -211,6 +213,25 @@
 	main {
 		font-family: sans-serif;
 		margin: 20px auto;
-		max-width: 900px;
+	}
+	.chart-container {
+		position: relative;
+		background: #fff;
+		padding: 1rem;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+	.chart {
+		width: 100%;
+	}
+	.chart-type {
+		position: absolute;
+		bottom: 8px;
+		right: 12px;
+		background: rgba(255, 255, 255, 0.8);
+		padding: 2px 6px;
+		font-size: 12px;
+		border-radius: 4px;
+		color: #555;
 	}
 </style>
