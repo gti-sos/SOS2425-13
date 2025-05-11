@@ -15,7 +15,7 @@
 			id: 'idealista',
 			title: 'Página de Viviendas en Venta vs Proyectos en Madrid',
 			description: `Este gráfico facilita comparar de un vistazo las dos magnitudes obtenidas de tus APIs — la altura de las barras hace evidente la diferencia entre el tamaño del mercado inmobiliario madrileño y el volumen de proyectos de mejora de agua.`,
-			link: '/integrations/water-supply-improvements/externas/plantas'
+			link: '/integrations/water-supply-improvements/externas/idealista'
 		},
 		{
 			id: 'tiempo',

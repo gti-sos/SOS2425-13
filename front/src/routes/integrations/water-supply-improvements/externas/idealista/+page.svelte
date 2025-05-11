@@ -4,7 +4,7 @@
 
   let svg: SVGSVGElement;
   let totalHomes = 0;
-  let projectCount = 0;
+  let totalBeneficiaries = 0;
   let errorMsg: string | null = null;
 
   const margin = { top: 20, right: 20, bottom: 50, left: 60 };
@@ -14,10 +14,10 @@
   function renderChart() {
     const data = [
       { label: 'Viviendas en venta', value: totalHomes },
-      { label: 'Proyectos mejora de agua', value: projectCount }
+      { label: 'Población beneficiada', value: totalBeneficiaries }
     ];
 
-    // Clear any existing content
+    // Limpiar SVG antes de renderizar de nuevo
     d3.select(svg).selectAll('*').remove();
 
     const g = d3.select(svg)
@@ -35,7 +35,7 @@
       .nice()
       .range([height, 0]);
 
-    // X Axis
+    // Eje X con etiquetas rotadas
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(x))
@@ -43,11 +43,11 @@
       .attr('transform', 'rotate(-40)')
       .style('text-anchor', 'end');
 
-    // Y Axis
+    // Eje Y
     g.append('g')
       .call(d3.axisLeft(y));
 
-    // Bars
+    // Barras
     g.selectAll('.bar')
       .data(data)
       .enter()
@@ -67,17 +67,15 @@
       const homesJson = await homesRes.json();
       totalHomes = homesJson.totalResults ?? homesJson.total ?? 0;
 
-      // Fetch proyectos de mejora de agua en Madrid
-      const projectsRes = await fetch(
-        `/api/v1/water-supply-improvements?autonomous_community=madrid`
-      );
-      if (!projectsRes.ok) throw new Error(`Projects API: ${projectsRes.status} ${projectsRes.statusText}`);
-      const projectsJson = await projectsRes.json();
-      projectCount = Array.isArray(projectsJson)
-        ? projectsJson.reduce((sum, item) => sum + (item.project_count ?? 0), 0)
-        : 0;
+      // Datos iniciales local para 2015
+      const datosInicialesB = [
+        { year: 2015, autonomous_community: "madrid", benefited_population: 4164 },
+        // ...otros datos omitidos
+      ];
+      // Obtener población beneficiada para Madrid en 2015
+      const madrid2015 = datosInicialesB.find(d => d.year === 2015 && d.autonomous_community === 'madrid');
+      totalBeneficiaries = madrid2015 ? madrid2015.benefited_population : 0;
 
-      // Render D3 chart
       renderChart();
     } catch (err: any) {
       errorMsg = err.message;
@@ -92,6 +90,10 @@
   {#if errorMsg}
     <p class="text-red-600">Error: {errorMsg}</p>
   {:else}
+    <div class="mb-4">
+      <p><strong>Total de viviendas:</strong> {totalHomes}</p>
+      <p><strong>Población beneficiada:</strong> {totalBeneficiaries}</p>
+    </div>
     <svg bind:this={svg}></svg>
   {/if}
 </main>

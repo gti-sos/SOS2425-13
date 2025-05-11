@@ -156,111 +156,103 @@ function loadBackend(app) {
 
 
 
-    //IDEALISTA
+    // IDEALISTA
+    const IDEALISTA_HOST = process.env.IDEALISTA_HOST;
+    const IDEALISTA_API_KEY = process.env.WTH_API_KEY;
 
-    const API_HOST = 'idealista7.p.rapidapi.com';
-    const IDEALISTA_KEY = process.env.WTH_API_KEY;
-
-    if (!IDEALISTA_KEY) {
-        console.warn('WARNING: No hay WTH_API_KEY, las rutas de Idealista devolverán 503');
+    if (!IDEALISTA_API_KEY) {
+        console.warn('WARNING: No hay IDEALISTA_API_KEY, las rutas de Idealista devolverán 503');
     }
 
-    // ¡fuera el process.exit!
-    app.use(cors());
-
-    app.get('/api/v1/proxy/idealista-madrid-homes', async (_req, res) => {
-        if (!IDEALISTA_KEY) {
+    app.get('/api/v1/proxy/idealista-madrid-homes', async (req, res) => {
+        if (!IDEALISTA_API_KEY) {
             return res.status(503).json({ error: 'Idealista API key missing' });
         }
-        const url = new URL('https://idealista7.p.rapidapi.com/getlocations');
+
+        const url = new URL(`https://${IDEALISTA_HOST}/getlocations`);
         url.search = new URLSearchParams({
-            locationId: '0-EU-ES-28',
+            locationId: '0-EU-ES-28',       // Comunidad de Madrid
             location: 'es',
             propertyType: 'homes',
             operation: 'sale'
         }).toString();
 
+        console.log('📡 Fetch Idealista Madrid →', url.toString());
+
         try {
-            console.log('Fetch Idealista Madrid →', url.toString());
             const resp = await fetch(url.toString(), {
                 headers: {
-                    'X-RapidAPI-Host': API_HOST,
-                    'X-RapidAPI-Key': API_KEY
+                    'X-RapidAPI-Host': IDEALISTA_HOST,
+                    'X-RapidAPI-Key': IDEALISTA_API_KEY
                 }
             });
+
             if (!resp.ok) {
                 const text = await resp.text();
-                console.error(`Idealista error ${resp.status}: ${text}`);
+                console.error(`Idealista error ${resp.status}:`, text);
                 return res.status(resp.status).json({ error: text });
             }
-            const data = await resp.json();
-            // Devuelve tal cual la respuesta de getlocations, o extrae totalResults:
-            // return res.json({ totalResults: data.totalResults ?? data.total });
-            return res.json(data);
+
+            // Parseamos la respuesta y extraemos sólo el total para el municipio Madrid
+            const { locations } = await resp.json();
+            // Buscamos el entry con subTypeText==="Municipio" y cuyo name incluya "Madrid"
+            const madrid = locations.find(
+                loc => loc.subTypeText === 'Municipio' && loc.name.startsWith('Madrid')
+            );
+            const totalResults = madrid
+                ? madrid.total
+                : locations.reduce((sum, loc) => sum + (loc.total ?? 0), 0);
+
+            return res.json({ totalResults });
+
         } catch (err) {
             console.error('Error al consultar Idealista:', err);
             return res.status(500).json({ error: err.message || 'Error interno' });
         }
     });
 
-    // Configuración de Plants API
-    const PLANTS_HOST = 'plants2.p.rapidapi.com';
-    const PLANTS_KEY = process.env.WTH_API_KEY;
+
+
+    //PLANTAS
+    const PLANTS_HOST = process.env.PLANTS_HOST;
+    const WTH_API_KEY = process.env.WTH_API_KEY;
     const AUTH_TOKEN = process.env.PLANTS_AUTH_TOKEN;
 
-    if (!PLANTS_KEY || !AUTH_TOKEN) {
-        console.warn('WARNING: faltan PLANTS_KEY o PLANTS_AUTH_TOKEN, las rutas de Plants devolverán 503');
+    if (!PLANTS_HOST) {
+        throw new Error('Falta definir PLANTS_HOST en .env');
+    }
+    if (!WTH_API_KEY) {
+        throw new Error('Falta definir WTH_API_KEY en .env');
     }
 
-    app.use(cors());
-
     app.get('/api/v1/proxy/plants-count', async (req, res) => {
-        if (!PLANTS_KEY || !AUTH_TOKEN) {
-            return res.status(503).json({ error: 'Plants API credentials missing' });
-        }
-
-
-        F
         const plantId = req.query.id;
-        if (!plantId || typeof plantId !== 'string') {
-            return res.status(400).json({ error: "Falta parámetro 'id'" });
+        if (!plantId) return res.status(400).json({ error: "Falta parámetro 'id'" });
+
+        // …credenciales y URL ya validadas…
+
+        const resp = await fetch(`https://${PLANTS_HOST}/api/plants?id=${plantId}`, {
+            headers: {
+                'X-RapidAPI-Host': PLANTS_HOST,
+                'X-RapidAPI-Key': WTH_API_KEY,
+                'Authorization': AUTH_TOKEN
+            }
+        });
+
+        if (!resp.ok) {
+            const text = await resp.text();
+            return res.status(resp.status).json({ error: text });
         }
 
-        try {
-            const url = new URL(`https://${PLANTS_HOST}/api/plants`);
-            url.search = new URLSearchParams({ id: plantId }).toString();
-            console.log('Fetch Plants API →', url.toString());
+        const data = await resp.json();
+        // Si quieres el conteo:
+        const plantCount = Array.isArray(data)
+            ? data.length
+            : (data && typeof data === 'object')
+                ? Object.keys(data).length
+                : 0;
 
-            const response = await fetch(url.toString(), {
-                headers: {
-                    'Authorization': AUTH_TOKEN,
-                    'X-RapidAPI-Host': PLANTS_HOST,
-                    'X-RapidAPI-Key': RAPIDAPI_KEY
-                }
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                console.error(`Plants API error ${response.status}:`, text);
-                return res.status(response.status).json({ error: text });
-            }
-
-            const data = await response.json();
-            // Calcular plantCount según tipo de respuesta
-            let plantCount;
-            if (Array.isArray(data)) {
-                plantCount = data.length;
-            } else if (data && typeof data === 'object') {
-                // Contar número de claves en el objeto
-                plantCount = Object.keys(data).length;
-            } else {
-                plantCount = 0;
-            }
-            return res.json({ plantCount });
-        } catch (error) {
-            console.error('Error al consultar Plants API:', error);
-            return res.status(500).json({ error: error.message || 'Error interno' });
-        }
+        return res.json({ plantCount });
     });
 
 
