@@ -61,6 +61,7 @@
     "node": "^24.0.1",
     "node-fetch": "^3.3.2",
     "request": "^2.88.2",
+    "svelte-apexcharts": "^1.0.2",
     "svelte-routing": "^2.13.0",
     "sveltestrap": "^5.11.3"
   },
