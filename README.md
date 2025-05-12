@@ -3,8 +3,6 @@
 [![codecov](https://codecov.io/gh/gti-sos/SOS2425-13/graph/badge.svg?token=ayG1fcohfW)](https://codecov.io/gh/gti-sos/SOS2425-13)
 [![CI/CD](https://github.com/gti-sos/SOS2425-13/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/gti-sos/SOS2425-13/actions/workflows/ci-cd.yaml)
 
-
-
  ### Team
  - [Blanca García Alonso](https://github.com/blancagrclns)
  - [Alvaro Morillo Navajas](https://github.com/alvmornav)
